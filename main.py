@@ -1,4 +1,3 @@
-
 from src.preprocess import PreProcess
 from src.analysis import Analysis
 import config
@@ -19,14 +18,17 @@ if __name__ == '__main__':
     output_folder = r"C:\Users\ArneEichholtz\PycharmProjects\NLP-Pipeline-BERT\output"
     project = "Politie"
 
-    preprocess = PreProcess(in_folder=input_folder, out_folder=output_folder, project=project)
+    data_from_file = True  # Parameter to read data (split texts, embeddings) from file or initialize at runtime
 
-    # something for emb_from_file, because if True, it is not necessary to read input texts
+    preprocess = PreProcess(in_folder=input_folder,
+                            out_folder=output_folder,
+                            project=project,
+                            data_from_file=data_from_file)
 
     # Initializing text data
     text_clean = "ft"  # ft (filter-texts), vect (vectorization) or def (default)
     split_size = "chunk"
-    data = preprocess.initialize_texts(text_clean_method=text_clean, text_split_size=split_size)
+    data = preprocess.initialize_data(text_clean_method=text_clean, text_split_size=split_size)
 
     # Initialize embeddings
     emb_from_file = False

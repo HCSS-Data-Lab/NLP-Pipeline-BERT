@@ -3,8 +3,8 @@
 texts_pp_params = {
     # Text preprocessing parameters
 
-    # Parameters below in config or define in main?
-    'split_text_size': 'chunk',  # Text section size to use for embeddings. Options: chunk, sentence, sentence-pairs
+    'def_clean_meth': 'def',  # Default text clean method
+    'def_split_size': 'chunk',  # Default text split size
     'chunk_size': 1000  # Number of characters in chunk
 }
 

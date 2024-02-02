@@ -25,29 +25,28 @@ class EmbeddingsPreProcess:
         """
 
         self.path = emb_path
-        self.emb_from_file = emb_from_file
         self.clean_method = clean_method
         self.split_size = split_size
         self.embedding_name = f"embeddings_{split_size}_{clean_method}.pkl"
 
-    def get_embeddings(self, data):
-        """
-        Retrieves or generates embeddings for the provided data. Method either loads embeddings
-        or generates embeddings at runtime using a BERT-model specified in config. It also saves
-        the generated embeddings.
+    # def get_embeddings(self, data):
+    #     """
+    #     Retrieves or generates embeddings for the provided data. Method either loads embeddings
+    #     or generates embeddings at runtime using a BERT-model specified in config. It also saves
+    #     the generated embeddings.
+    #
+    #     Args:
+    #         data (list[str]): The input data for which embeddings are to be generated
+    #
+    #     Returns:
+    #         tuple: A tuple containing the data and their corresponding embeddings.
+    #     """
+    #     if self.emb_from_file:
+    #         return self._load_embeddings_from_file()
+    #     else:
+    #         return self._generate_embeddings_at_runtime(data)
 
-        Args:
-            data (list[str]): The input data for which embeddings are to be generated
-
-        Returns:
-            tuple: A tuple containing the data and their corresponding embeddings.
-        """
-        if self.emb_from_file:
-            return self._load_embeddings_from_file()
-        else:
-            return self._generate_embeddings_at_runtime(data)
-
-    def _load_embeddings_from_file(self):
+    def load_embeddings_from_file(self):
         """
         Loads embeddings from file.
         """
@@ -56,7 +55,7 @@ class EmbeddingsPreProcess:
             data_dict = pickle.load(file)
         return data_dict['data'], data_dict['embeddings']
 
-    def _generate_embeddings_at_runtime(self, data):
+    def generate_embeddings_at_runtime(self, data):
         """
         Generates embeddings at runtime using a pre-defined model.
         """
