@@ -11,6 +11,7 @@ if __name__ == '__main__':
     - fix passing of split_size and clean_method for texts_pp. Default only in one function? Ask chatgpt
     - data is given as param to get_embeddings(), and also returned. This can be made neater
     - split embeddings and texts from file 
+    - error handling for when _from_file is True but file does not exist
     
     """
 
@@ -18,21 +19,29 @@ if __name__ == '__main__':
     output_folder = r"C:\Users\ArneEichholtz\PycharmProjects\NLP-Pipeline-BERT\output"
     project = "Politie"
 
-    data_from_file = True  # Parameter to read data (split texts, embeddings) from file or initialize at runtime
+    text_from_file = True
+    emb_from_file = True
 
     preprocess = PreProcess(in_folder=input_folder,
                             out_folder=output_folder,
                             project=project,
-                            data_from_file=data_from_file)
+                            text_from_file=text_from_file,
+                            emb_from_file=emb_from_file)
+
+    # Parameters
+    text_clean = "def"  # ft (filter-texts), vect (vectorization) or def (default)
+    split_size = "chunk"
 
     # Initializing text data
-    text_clean = "ft"  # ft (filter-texts), vect (vectorization) or def (default)
-    split_size = "chunk"
-    data = preprocess.initialize_data(text_clean_method=text_clean, text_split_size=split_size)
+    texts = preprocess.initialize_texts(text_clean_method=text_clean, text_split_size=split_size)
+
+    print(len(texts))
 
     # Initialize embeddings
-    emb_from_file = False
-    embeddings = preprocess.initialize_embeddings(data=data, emb_from_file=emb_from_file)
+    # embeddings = preprocess.initialize_embeddings(data=texts, text_clean_method=text_clean, text_split_size=split_size)
+
+
+
 
 
     # # Initializing topic-model

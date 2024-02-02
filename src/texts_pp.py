@@ -1,6 +1,7 @@
 import os
 from tqdm import tqdm
 import spacy
+import pickle
 
 import config
 
@@ -90,8 +91,7 @@ def sentencize_text(texts):
 
 class TextPreProcess:
 
-    def __init__(self, text_bodies_path,
-                 clean_meth=config.texts_pp_params["def_clean_meth"]):
+    def __init__(self, text_bodies_path, split_texts_path, clean_meth=config.texts_pp_params["def_clean_meth"], split_size=config.texts_pp_params["def_split_size"]):
         """
         Class TextPreProcess stores the path where input texts are stored, how they should
         be cleaned and in what size they are split up.
@@ -107,15 +107,27 @@ class TextPreProcess:
         """
 
         self.path = text_bodies_path
+        self.split_texts_path = split_texts_path
         self.clean_meth = clean_meth  # Text clean method
+        self.split_size = split_size
         self.text_bodies = []  # Initialize text_bodies as []
+
+    def load_texts_from_file(self):
+        print(f"Reading split text elements from file...")
+        with open(os.path.join(self.split_texts_path, f"texts_{self.split_size}_{self.clean_meth}.pkl"),
+                  "rb") as file:
+            data_dict = pickle.load(file)
+        return data_dict['texts']
+
+    def read_split_texts_runtime(self):
+        pass
 
     def read_input_texts(self):
         """
         Read text bodies saved as .txt files in text_bodies_path,
         saving result to attribute self.text_bodies.
         """
-        text_names = sorted([text_file for text_file in self.path if text_file.endswith('.txt')])
+        text_names = sorted([text_file for text_file in os.listdir(self.path) if text_file.endswith('.txt')])
         print(f'{"Number of texts in folder:":<65}{len(text_names):>10}')
 
         texts = []
@@ -123,6 +135,21 @@ class TextPreProcess:
             with open(os.path.join(self.path, text), "r", encoding="utf-8") as file:
                 text_body = file.read()
             texts.append(text_body)
+        return texts
+
+    def split_filter_texts(self, texts):
+        """
+        Split texts and filter result if clean_meth is "ft"
+
+        Returns:
+            texts (list[str]): split and filtered texts
+
+        """
+        texts = self.split_texts(texts)
+
+        if self.clean_meth == "ft":
+            texts = filter_texts(texts)
+
         return texts
 
     def split_texts(self, texts, split_size=config.texts_pp_params["def_split_size"]):

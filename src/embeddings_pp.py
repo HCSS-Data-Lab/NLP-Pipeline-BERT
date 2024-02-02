@@ -6,19 +6,17 @@ import config
 
 class EmbeddingsPreProcess:
 
-    def __init__(self, emb_path, emb_from_file, clean_method, split_size):
+    def __init__(self, emb_path, clean_method, split_size):
         """
         Initializes the EmbeddingsPreProcess object with necessary configurations.
 
         Parameters:
             emb_path (str): Path where embeddings are stored or will be saved.
-            emb_from_file (bool): Flag to indicate whether to load embeddings from a file.
             clean_method (str): Method used for text cleaning.
             split_size (str): Size of text chunks for splitting before embedding.
 
         Attributes:
             emb_path (str):
-            emb_from_file (bool):
             clean_method (str):
             split_size (str):
             embedding_name (str): embeddings filename based on split_size and clean_method
@@ -28,23 +26,6 @@ class EmbeddingsPreProcess:
         self.clean_method = clean_method
         self.split_size = split_size
         self.embedding_name = f"embeddings_{split_size}_{clean_method}.pkl"
-
-    # def get_embeddings(self, data):
-    #     """
-    #     Retrieves or generates embeddings for the provided data. Method either loads embeddings
-    #     or generates embeddings at runtime using a BERT-model specified in config. It also saves
-    #     the generated embeddings.
-    #
-    #     Args:
-    #         data (list[str]): The input data for which embeddings are to be generated
-    #
-    #     Returns:
-    #         tuple: A tuple containing the data and their corresponding embeddings.
-    #     """
-    #     if self.emb_from_file:
-    #         return self._load_embeddings_from_file()
-    #     else:
-    #         return self._generate_embeddings_at_runtime(data)
 
     def load_embeddings_from_file(self):
         """

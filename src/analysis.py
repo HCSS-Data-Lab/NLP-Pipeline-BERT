@@ -1,4 +1,4 @@
-from bertopic import BERTopic
+# from bertopic import BERTopic
 from sklearn.feature_extraction.text import CountVectorizer
 import time
 import os
