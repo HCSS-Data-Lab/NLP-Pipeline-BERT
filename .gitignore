@@ -1,0 +1,11 @@
+*.pkl
+*.npy
+*.txt
+*.png
+*.html
+*.pickle
+*.exe
+*_def
+*_ft
+*_vect
+bertopic_model
