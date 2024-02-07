@@ -85,31 +85,32 @@ def filter_texts(texts):
         lemmas.append(" ".join(filtered_lemmas))
     return lemmas
 
-
 class TextPreProcess:
 
     def __init__(self, splits_from_file, text_bodies_path, split_texts_path, clean_meth, split_size):
         """
-        Class TextPreProcess stores the path where input texts are stored, how they should
-        be cleaned and in what size they are split up.
+        Class TextPreProcess stores the variables needed in text preprocessing: splits from file,
+        text-bodies path, split-texts path, text clean method and text split size. It also handles
+        all functionality of text preprocessing: loading split texts from file or reading text bodies
+        and splitting texts at runtime.
 
         Parameters:
-            text_from_file (bool): read split texts from file or read and split and runtime
-            text_bodies_path (str): path where text bodies are stored
-            clean_meth (str, optional): text cleaning method
+            splits_from_file (bool): Load split texts from file or read and split text bodies at runtime
+            text_bodies_path (str): Directory path where text bodies are stored.
+            split_texts_path (str): Directory path where split texts are stored.
+            clean_meth (str): Text clean method.
+            split_size (str): Text split size.
 
         Attributes:
-            path (str):
-            clean_meth (str):
-            text_bodies (list[str]): list with text bodies
+            texts_split_name (str): text split .pkl dictionary filename
         """
 
-        self.splits_from_file = splits_from_file  # Read split texts from file or not
+        self.splits_from_file = splits_from_file
         self.bodies_path = text_bodies_path
         self.split_texts_path = split_texts_path
 
-        self.clean_meth = clean_meth  # Text clean method
-        self.split_size = split_size  # Text split size
+        self.clean_meth = clean_meth
+        self.split_size = split_size
         self.texts_split_name = f"texts_{self.split_size}_{self.clean_meth}.pkl"
 
     def get_texts(self):
@@ -117,6 +118,7 @@ class TextPreProcess:
             texts = self.load_split_texts()
         else:
             texts = self.generate_split_texts()
+        print(f"Split size: {self.split_size}")
         print(f'{"Number of split texts:":<65}{len(texts):>10}\n')
         return texts
 
@@ -174,8 +176,6 @@ class TextPreProcess:
             raise ValueError(
                 f"split_size: {self.split_size} is undefined. Valid options are 'chunk', 'sentence', or 'sentence-pairs'.")
 
-        print(f"Split size: {self.split_size}")
-        print(f"{'Number of split texts:':<65}{len(splits):>10}")
         if self.clean_meth == "ft":
             return filter_texts(splits)
         else:

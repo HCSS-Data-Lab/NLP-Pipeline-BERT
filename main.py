@@ -1,26 +1,20 @@
 from src.preprocess import PreProcess
-from src.analysis import Analysis
-import config
-
 
 if __name__ == '__main__':
 
     """
     TODO:
-    - inheritance of classes for pre-processing, texts_pp and embeddings_pp; maybe a neat OO solution is possible here
-    - fix passing of split_size and clean_method for texts_pp. Default only in one function? Ask chatgpt
-    - data is given as param to get_embeddings(), and also returned. This can be made neater
-    - split embeddings and texts from file 
-    - error handling for when _from_file is True but file does not exist
-    - add/improve documentation
+    - Inheritance of classes for pre-processing, texts_pp and embeddings_pp; maybe a neat OO solution is possible here
+    - Add default pp param from config to function definitions.
+    - Add/improve documentation
     """
 
     input_folder = r"C:\Users\ArneEichholtz\PycharmProjects\NLP-Pipeline-BERT\input"
     output_folder = r"C:\Users\ArneEichholtz\PycharmProjects\NLP-Pipeline-BERT\output"
     project = "Politie"
 
-    splits_from_file = True
-    emb_from_file = True
+    splits_from_file = False
+    emb_from_file = False
 
     preprocess = PreProcess(in_folder=input_folder,
                             out_folder=output_folder,

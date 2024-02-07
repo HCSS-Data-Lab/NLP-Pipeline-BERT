@@ -27,6 +27,7 @@ class EmbeddingsPreProcess:
         self.clean_meth = clean_meth
         self.split_size = split_size
         self.embedding_name = f"embeddings_{split_size}_{clean_meth}.pkl"
+        self.bert_model = config.emb_pp_params["bert_model"]
 
     def get_embeddings(self, data):
         if self.emb_from_file:
@@ -56,11 +57,11 @@ class EmbeddingsPreProcess:
         Generates embeddings at runtime using a pre-defined model.
         """
         print("Initializing embeddings at runtime...")
-        model = SentenceTransformer(config.emb_pp_params["bert_model"])
+        model = SentenceTransformer(self.bert_model)
         embeddings = model.encode(data, show_progress_bar=True)
 
         with open(os.path.join(self.path, self.embedding_name), "wb") as file:
-            pickle.dump({'embeddings': embeddings, 'embedding-text-size': self.split_size}, file,
+            pickle.dump({'embeddings': embeddings, 'embedding-text-size': self.split_size, 'bert_model': self.bert_model}, file,
                         protocol=pickle.HIGHEST_PROTOCOL)
         return embeddings
 
