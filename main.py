@@ -19,7 +19,7 @@ if __name__ == '__main__':
     output_folder = r"C:\Users\ArneEichholtz\PycharmProjects\NLP-Pipeline-BERT\output"
     project = "Politie"
 
-    split_texts_from_file = False
+    splits_from_file = True
     emb_from_file = True
 
     preprocess = PreProcess(in_folder=input_folder,
@@ -31,38 +31,10 @@ if __name__ == '__main__':
     split_size = "chunk"
 
     # Initializing text data
-    texts = preprocess.initialize_texts(split_texts_from_file=split_texts_from_file, text_clean_method=text_clean, text_split_size=split_size)
+    texts = preprocess.initialize_texts(splits_from_file=splits_from_file, text_clean_method=text_clean, text_split_size=split_size)
 
     # Initialize embeddings
-    # embeddings = preprocess.initialize_embeddings(data=texts, text_clean_method=text_clean, text_split_size=split_size)
-
-
-
-
-
-    # # Initializing topic-model
-    # model_from_file = False
-    # model_name = f"bertopic_model_{text_clean}"
-    # analysis = Analysis(model_from_file=model_from_file, text_clean=text_clean)
-    #
-    # analysis.initialize_topic_model()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    embeddings = preprocess.initialize_embeddings(emb_from_file=emb_from_file, data=texts, text_clean_method=text_clean, text_split_size=split_size)
 
 
 

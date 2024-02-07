@@ -52,7 +52,6 @@ def chunk_texts(texts, chunk_size=1000):
         chunks_out.extend(chunks)
     return chunks_out
 
-
 def sentencize_text(texts):
     """
     TODO:
@@ -89,7 +88,7 @@ def filter_texts(texts):
 
 class TextPreProcess:
 
-    def __init__(self, split_texts_from_file, text_bodies_path, split_texts_path, clean_meth, split_size):
+    def __init__(self, splits_from_file, text_bodies_path, split_texts_path, clean_meth, split_size):
         """
         Class TextPreProcess stores the path where input texts are stored, how they should
         be cleaned and in what size they are split up.
@@ -105,29 +104,32 @@ class TextPreProcess:
             text_bodies (list[str]): list with text bodies
         """
 
-        self.split_texts_from_file = split_texts_from_file
+        self.splits_from_file = splits_from_file  # Read split texts from file or not
         self.bodies_path = text_bodies_path
         self.split_texts_path = split_texts_path
+
         self.clean_meth = clean_meth  # Text clean method
         self.split_size = split_size  # Text split size
-        self.text_bodies = []  # Initialize text_bodies as []
+        self.texts_split_name = f"texts_{self.split_size}_{self.clean_meth}.pkl"
 
     def get_texts(self):
-        if self.split_texts_from_file:
-            return self.load_split_texts()
+        if self.splits_from_file:
+            texts = self.load_split_texts()
         else:
-            return self.generate_split_texts()
+            texts = self.generate_split_texts()
+        print(f'{"Number of split texts:":<65}{len(texts):>10}\n')
+        return texts
 
     def load_split_texts(self):
-        print(f"Reading split text elements from file...")
-        path = os.path.join(self.split_texts_path, f"texts_{self.split_size}_{self.clean_meth}.pkl")
+        path = os.path.join(self.split_texts_path, self.texts_split_name)
         if os.path.exists(path):
+            print(f"Split texts file name: {self.texts_split_name}. Reading split text elements from file...")
             with open(path, "rb") as file:
                 data_dict = pickle.load(file)
             return data_dict['texts']
         else:
             raise ValueError(
-                f"Folder output/project/texts does not contain text .pkl dictionary file with split text size: {self.split_size} and text clean method: {self.clean_meth}. "
+                f"Folder output/project/texts does not contain text .pkl dict file with split text size: {self.split_size} and text clean method: {self.clean_meth}. "
                 f"Generate it at runtime.")
 
     def generate_split_texts(self):
@@ -136,7 +138,7 @@ class TextPreProcess:
             text_bodies = self.read_input_texts()
             split_texts = self.split_texts(text_bodies)
 
-            with open(os.path.join(self.split_texts_path, f"texts_{self.split_size}_{self.clean_meth}.pkl"), "wb") as file:
+            with open(os.path.join(self.split_texts_path, self.texts_split_name), "wb") as file:
                 pickle.dump({'texts': split_texts}, file, protocol=pickle.HIGHEST_PROTOCOL)
 
             return split_texts
@@ -179,9 +181,5 @@ class TextPreProcess:
         else:
             return splits
 
-    def get_text_bodies(self):
-        return self.text_bodies
-
     def get_text_bodies_path(self):
         return self.bodies_path
-

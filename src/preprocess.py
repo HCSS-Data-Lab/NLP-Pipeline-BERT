@@ -42,38 +42,15 @@ class PreProcess:
         self.def_clean_meth = config.texts_pp_params["def_clean_meth"]  # Default text clean method from config
         self.def_split_size = config.texts_pp_params["def_split_size"]  # Default text split size from config
 
-    def initialize_texts(self, split_texts_from_file, text_clean_method, text_split_size):
-        texts_pp = TextPreProcess(split_texts_from_file, self.text_bodies_path, self.split_texts_path, text_clean_method, text_split_size)
+    def initialize_texts(self, splits_from_file, text_clean_method, text_split_size):
+        texts_pp = TextPreProcess(splits_from_file, self.text_bodies_path, self.split_texts_path, text_clean_method, text_split_size)
         texts = texts_pp.get_texts()
         return texts
 
-    def initialize_embeddings(self, data, text_clean_method, text_split_size):
-        # if self.emb_from_file:
-        #     return self.initialize_emb_from_file(data, text_clean_method, text_split_size)
-        # else:
-        #     return self.initialize_emb_runtime(data, text_clean_method, text_split_size)
-        pass
-
-    # def initialize_emb_runtime(self, data, clean_method, split_size):
-    #     """
-    #     Initialize embeddings at runtime from the input data and using a
-    #     BERT-model specified in config.
-    #
-    #     Args:
-    #         data (list[str]): text data
-    #         clean_method (str): text clean method
-    #         split_size (str): text split size
-    #
-    #     Returns:
-    #         data (list[str]): text data
-    #         embeddings (): 768-dim text embeddings
-    #     """
-    #     embeddings_pp = EmbeddingsPreProcess(self.emb_path, clean_method, split_size)
-    #     embeddings = embeddings_pp.generate_embeddings_at_runtime(data)
-    #     return embeddings
-    #
-    # def get_project(self):
-    #     return self.project
+    def initialize_embeddings(self, emb_from_file, data, text_clean_method, text_split_size):
+        embeddings_pp = EmbeddingsPreProcess(emb_from_file, self.emb_path, text_clean_method, text_split_size)
+        embeddings = embeddings_pp.get_embeddings(data)
+        return embeddings
 
     def get_text_bodies_path(self):
         return self.text_bodies_path
