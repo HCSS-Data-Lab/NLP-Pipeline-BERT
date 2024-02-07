@@ -60,7 +60,7 @@ class PreProcess:
             text_split_size: Text split size.
 
         Returns:
-            embeddings (torch.Tensor): text embeddings, each doc as a 768-dim vector.
+            embeddings (torch.Tensor): text embeddings, each doc as a 768-dim vector. Shape: (num docs, 768)
         """
         embeddings_pp = EmbeddingsPreProcess(emb_from_file, self.emb_path, text_clean_method, text_split_size)
         embeddings = embeddings_pp.get_embeddings(data)
