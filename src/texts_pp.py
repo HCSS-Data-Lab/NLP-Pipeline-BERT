@@ -3,22 +3,7 @@ from tqdm import tqdm
 import spacy
 import pickle
 
-def chunk_texts(texts, chunk_size=1000):
-    """
-    Chunks texts into segments of specified chunk size.
-
-    Args:
-        texts (list[str]): input texts
-        chunk_size (int): The length of each chunked text segment.
-
-    Returns:
-        list[str]: A list with the chunked text segments.
-    """
-    chunks_out = []
-    for text in texts:
-        chunks = make_chunks(text, chunk_size)
-        chunks_out.extend(chunks)
-    return chunks_out
+import config
 
 def make_chunks(text, max_length):
     """
@@ -101,7 +86,7 @@ class TextPreProcess:
             split_size (str): Text split size. (chunk, sentence, or sentence-pairs)
 
         Attributes:
-            texts_split_name (str): text split .pkl dictionary filename
+            texts_split_name (str): Text split .pkl dictionary filename
         """
 
         self.splits_from_file = splits_from_file
@@ -110,7 +95,12 @@ class TextPreProcess:
 
         self.clean_meth = clean_meth
         self.split_size = split_size
-        self.texts_split_name = f"texts_{self.split_size}_{self.clean_meth}.pkl"
+        self.chunk_size = config.parameters["chunk_size"]
+
+        if self.split_size == "chunk":
+            self.texts_split_name = f"texts_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
+        else:
+            self.texts_split_name = f"texts_{self.split_size}_{self.clean_meth}.pkl"
 
     def get_texts(self):
         """
@@ -201,7 +191,7 @@ class TextPreProcess:
 
         """
         if self.split_size == "chunk":
-            splits = chunk_texts(texts)
+            splits = self.chunk_texts(texts)
         elif self.split_size == "sentence":
             splits = sentencize_text(texts)
         elif self.split_size == "sentence-pairs":
@@ -215,6 +205,22 @@ class TextPreProcess:
             return filter_texts(splits)
         else:
             return splits
+
+    def chunk_texts(self, texts):
+        """
+        Chunks texts into segments of specified chunk size.
+
+        Args:
+            texts (list[str]): input texts
+
+        Returns:
+            list[str]: A list with the chunked text segments.
+        """
+        chunks_out = []
+        for text in texts:
+            chunks = make_chunks(text, self.chunk_size)
+            chunks_out.extend(chunks)
+        return chunks_out
 
     def get_text_bodies_path(self):
         return self.bodies_path

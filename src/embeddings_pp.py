@@ -22,16 +22,22 @@ class EmbeddingsPreProcess:
             split_size (str): Text split size. (chunk, sentence, or sentence-pairs)
 
         Attributes:
-            embedding_name (str): embedding filename based on split_size and clean_method.
-            bert_model (str): pre-trained sentence BERT model name, defined in config.
+            embedding_name (str): Embedding filename based on split_size and clean_method.
+            bert_model (str): Pre-trained sentence BERT model name, defined in config.
         """
 
         self.emb_from_file = emb_from_file
         self.path = emb_path
         self.clean_meth = clean_meth
         self.split_size = split_size
-        self.embedding_name = f"embeddings_{split_size}_{clean_meth}.pkl"
-        self.bert_model = config.emb_pp_params["bert_model"]
+        self.chunk_size = config.parameters["chunk_size"]
+        self.bert_model = config.parameters["bert_model"]
+
+        if self.split_size == "chunk":
+            self.embedding_name = f"embeddings_{self.bert_model}_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
+        else:
+            self.embedding_name = f"embeddings_{self.bert_model}_{self.split_size}_{self.clean_meth}.pkl"
+
 
     def get_embeddings(self, data):
         """

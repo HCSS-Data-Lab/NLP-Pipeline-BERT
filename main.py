@@ -1,4 +1,7 @@
+import os
+
 from src.preprocess import PreProcess
+from src.analysis import Analysis
 
 if __name__ == '__main__':
 
@@ -28,7 +31,21 @@ if __name__ == '__main__':
     texts = preprocess.initialize_texts(splits_from_file=splits_from_file, text_clean_method=text_clean, text_split_size=split_size)
 
     # Initialize embeddings
-    embeddings = preprocess.initialize_embeddings(emb_from_file=emb_from_file, data=texts, text_clean_method=text_clean, text_split_size=split_size)
+    # embeddings = preprocess.initialize_embeddings(emb_from_file=emb_from_file, data=texts, text_clean_method=text_clean, text_split_size=split_size)
+
+    # Initialize topic-model
+    mod_from_file = False
+    models_path = os.path.join(output_folder, project, "models")
+    analysis = Analysis(models_path, mod_from_file, text_clean, split_size)
+
+    topics, probs, topic_model = analysis.initialize_topic_model(texts)
+
+
+
+    # topics, _ = analysis.initialize_topic_model(texts)
+    # topic_model = ...
+
+    # plot(topic_model)
 
 
 
