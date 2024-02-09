@@ -70,7 +70,7 @@ def filter_texts(texts):
 
 class TextPreProcess:
 
-    def __init__(self, splits_from_file, text_bodies_path, splits_path, clean_meth, split_size):
+    def __init__(self, splits_from_file, text_bodies_path, splits_path):
         """
         Class TextPreProcess stores the variables needed in text preprocessing: splits from file,
         text-bodies path, split-texts path, text clean method and text split size. It also handles
@@ -93,8 +93,8 @@ class TextPreProcess:
         self.bodies_path = text_bodies_path
         self.splits_path = splits_path
 
-        self.clean_meth = clean_meth
-        self.split_size = split_size
+        self.clean_meth = config.parameters["clean_meth"]
+        self.split_size = config.parameters["split_size"]
         self.chunk_size = config.parameters["chunk_size"]
 
         if self.split_size == "chunk":
@@ -128,7 +128,7 @@ class TextPreProcess:
         """
         path = os.path.join(self.splits_path, self.texts_split_name)
         if os.path.exists(path):
-            print(f"Split texts file name: {self.texts_split_name}. Reading split text elements from file...")
+            print(f"Split texts file name: {self.texts_split_name}. \nReading split text elements from file...")
             with open(path, "rb") as file:
                 data_dict = pickle.load(file)
             return data_dict['texts']

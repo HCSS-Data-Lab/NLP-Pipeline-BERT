@@ -3,6 +3,7 @@ import os
 import config
 from src.texts_pp import TextPreProcess
 from src.embeddings_pp import EmbeddingsPreProcess
+from src.red_embeddings_pp import RedEmbeddingsPreProcess
 
 class PreProcess:
 
@@ -33,7 +34,7 @@ class PreProcess:
         self.emb_path = os.path.join(out_folder, project, "embeddings")
         self.model_path = os.path.join(out_folder, project, "models")
 
-    def initialize_texts(self, splits_from_file, text_clean_method, text_split_size):
+    def initialize_texts(self, splits_from_file):
         """
         Initialize texts
 
@@ -45,11 +46,11 @@ class PreProcess:
         Returns:
             texts (list[str]): split texts
         """
-        texts_pp = TextPreProcess(splits_from_file, self.text_bodies_path, self.split_texts_path, text_clean_method, text_split_size)
+        texts_pp = TextPreProcess(splits_from_file, self.text_bodies_path, self.split_texts_path)
         texts = texts_pp.get_texts()
         return texts
 
-    def initialize_embeddings(self, emb_from_file, data, text_clean_method, text_split_size):
+    def initialize_embeddings(self, emb_from_file, data):
         """
         Initialize embeddings
 
@@ -62,6 +63,15 @@ class PreProcess:
         Returns:
             embeddings (torch.Tensor): text embeddings, each doc as a 768-dim vector. Shape: (num docs, 768)
         """
-        embeddings_pp = EmbeddingsPreProcess(emb_from_file, self.emb_path, text_clean_method, text_split_size)
+        embeddings_pp = EmbeddingsPreProcess(emb_from_file, self.emb_path)
         embeddings = embeddings_pp.get_embeddings(data)
         return embeddings
+
+    def initialize_red_embeddings(self, red_from_file, embeddings):
+        red_emb_pp = RedEmbeddingsPreProcess(red_from_file, self.emb_path)
+        reduced_embeddings = red_emb_pp.get_red_embeddings(embeddings)
+        return reduced_embeddings
+
+
+
+

@@ -6,7 +6,7 @@ import config
 
 class EmbeddingsPreProcess:
 
-    def __init__(self, emb_from_file, emb_path, clean_meth, split_size):
+    def __init__(self, emb_from_file, emb_path):
         """
         Class EmbeddingsPreProcess stores the variables needed to initialize the embeddings: emb_from_file,
         embeddings path, text clean-method, and text split-size. It also handles the functionality to
@@ -28,8 +28,8 @@ class EmbeddingsPreProcess:
 
         self.emb_from_file = emb_from_file
         self.path = emb_path
-        self.clean_meth = clean_meth
-        self.split_size = split_size
+        self.clean_meth = config.parameters["clean_meth"]
+        self.split_size = config.parameters["split_size"]
         self.chunk_size = config.parameters["chunk_size"]
         self.bert_model = config.parameters["bert_model"]
 
@@ -54,7 +54,7 @@ class EmbeddingsPreProcess:
             embeddings = self.load_embeddings()
         else:
             embeddings = self.generate_embeddings(data)
-        print(f'{"Embeddings shape:":<65}{str(embeddings.shape):>10}')
+        print(f'{"Embeddings shape:":<65}{str(embeddings.shape):>10}\n')
         return embeddings
 
     def load_embeddings(self):
@@ -66,14 +66,13 @@ class EmbeddingsPreProcess:
         """
         path = os.path.join(self.path, self.embedding_name)
         if os.path.exists(path):
-            print(f"Embedding file name: {self.embedding_name}. Reading embeddings from file...")
+            print(f"Embedding file name: {self.embedding_name}. \nReading embeddings from file...")
             with open(os.path.join(self.path, self.embedding_name), "rb") as file:
                 data_dict = pickle.load(file)
             return data_dict['embeddings']
         else:
             raise ValueError(
-                f"Folder output/project/embeddings does not contain emb .pkl dict file with split text size: {self.split_size} and text clean method: {self.clean_meth}. "
-                f"Generate it at runtime.")
+                f"Folder output/project/embeddings does not contain specified emb .pkl dict file. Generate it at runtime.")
 
     def generate_embeddings(self, data):
         """
