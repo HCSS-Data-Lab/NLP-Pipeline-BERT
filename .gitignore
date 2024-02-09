@@ -9,3 +9,5 @@
 *_ft
 *_vect
 bertopic_model
+!.gitignore
+!.requirements.txt

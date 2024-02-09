@@ -5,7 +5,7 @@ This repository does the following
 
 ## Requirements
 
-The `requirements.txt` is NOT up to date.
+The `requirements.txt` is up to date.
 
 ## Running code
 
