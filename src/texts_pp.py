@@ -81,11 +81,11 @@ class TextPreProcess:
             splits_from_file (bool): Load split texts from file or read and split text bodies at runtime
             text_bodies_path (str): Directory path where text bodies are stored.
             splits_path (str): Directory path where split texts are stored.
+
+        Attributes:
             clean_meth (str): Text clean method. (def for default, ft for filter-text function,
                               vect for vectorization param in BERTopic)
             split_size (str): Text split size. (chunk, sentence, or sentence-pairs)
-
-        Attributes:
             texts_split_name (str): Text split .pkl dictionary filename
         """
 

@@ -17,13 +17,13 @@ class EmbeddingsPreProcess:
             emb_from_file (bool): Boolean indicator whether to load existing embeddings from file or generate them
                                   at runtime from text data.
             emb_path (str): Directory path where embeddings are stored.
+
+        Attributes:
             clean_meth (str): Text clean method. (def for default, ft for filter-text function,
                               vect for vectorization param in BERTopic)
             split_size (str): Text split size. (chunk, sentence, or sentence-pairs)
-
-        Attributes:
-            embedding_name (str): Embedding filename based on split_size and clean_method.
             bert_model (str): Pre-trained sentence BERT model name, defined in config.
+            embedding_name (str): Embedding filename based on split_size and clean_method.
         """
 
         self.emb_from_file = emb_from_file
@@ -37,7 +37,6 @@ class EmbeddingsPreProcess:
             self.embedding_name = f"embeddings_{self.bert_model}_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
         else:
             self.embedding_name = f"embeddings_{self.bert_model}_{self.split_size}_{self.clean_meth}.pkl"
-
 
     def get_embeddings(self, data):
         """

@@ -7,6 +7,24 @@ import config
 class RedEmbeddingsPreProcess:
 
     def __init__(self, red_from_file, emb_path):
+        """
+        Class RedEmbeddingsPreProcess stores the variables used for reduced embeddings
+        preprocessing and handles all the functionality of loading or generating
+        reduced embeddings.
+
+        Parameters:
+            red_from_file (bool): Boolean indicator whether to read reduced embeddings from file or not
+            emb_path (str): Directory path where to load/save embeddings.
+
+        Attributes:
+            clean_meth (str): Text clean method. (def for default, ft for filter-text function,
+                              vect for vectorization param in BERTopic)
+            split_size (str): Text split size. (chunk, sentence, or sentence-pairs)
+            bert_model (str): Pre-trained sentence BERT model name, defined in config.
+            random_state (int): Random state value used in UMAP function, for reproducibility over runs
+            red_emb_name (str): reduced embeddings file name, used when saving to file
+        """
+
         self.red_from_file = red_from_file
         self.path = emb_path
         self.clean_meth = config.parameters["clean_meth"]
