@@ -11,3 +11,4 @@
 bertopic_model
 !.gitignore
 !requirements.txt
+__pycache__/*
