@@ -11,3 +11,5 @@
 bertopic_model
 !.gitignore
 !requirements.txt
+input/
+output/

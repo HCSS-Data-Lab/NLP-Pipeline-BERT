@@ -9,7 +9,8 @@ class Evaluation:
     def __init__(self):
         print("\nEval object created")
 
-    def calculate_coherence(self, topic_model, texts):
+
+    def calculate_coherence(self, topic_model, texts, metrics):
         print("Calculating coherence...")
         topics = np.array(topic_model.topics_)  # Topic id for each document, [-1, -1, 58, 17, 23, -1, ...]
         documents = pd.DataFrame({"Document": texts,
@@ -35,10 +36,9 @@ class Evaluation:
         # based on the BERTopic paper.
         # For c_v, values range between [0, 1] where 1 indicates perfect association. Reasonably good performance is coherence > 0.5 (from
         # Computational Social Science Book)
-        coherence_metrics = ['c_v', 'c_npmi']
-        dict = {}
 
-        for metric in coherence_metrics:
+        dict = {}
+        for metric in metrics:
             coherence_model = CoherenceModel(topics=topic_words,
                                              texts=tokens,
                                              corpus=corpus,
