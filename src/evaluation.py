@@ -37,7 +37,7 @@ class Evaluation:
         # For c_v, values range between [0, 1] where 1 indicates perfect association. Reasonably good performance is coherence > 0.5 (from
         # Computational Social Science Book)
 
-        dict = {}
+        out_dict = {}
         for metric in metrics:
             coherence_model = CoherenceModel(topics=topic_words,
                                              texts=tokens,
@@ -46,9 +46,9 @@ class Evaluation:
                                              coherence=metric)
             coherence = coherence_model.get_coherence()
             print(f"Coherence score {metric}: {coherence:.4f}")
-            dict[metric] = coherence
+            out_dict[metric] = coherence
 
-        return dict
+        return out_dict
 
     def calculate_diversity(self, topic_model):
         # words_output = []  # 2-D list with topic words

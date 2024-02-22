@@ -40,8 +40,6 @@ class PreProcess:
 
         Args:
             splits_from_file: Load split texts saved in file or read and split text bodies at runtime.
-            text_clean_method: Text cleaning method.
-            text_split_size: Text split size.
 
         Returns:
             texts (list[str]): split texts
@@ -57,8 +55,6 @@ class PreProcess:
         Args:
             emb_from_file: Load embeddings saved in file or initialize embeddings at runtime based on text data.
             data: Text data used for generating embeddings.
-            text_clean_method: Text cleaning method.
-            text_split_size: Text split size.
 
         Returns:
             embeddings (torch.Tensor): text embeddings, each doc as a 768-dim vector. Shape: (num docs, 768)

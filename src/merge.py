@@ -2,17 +2,17 @@ from typing import List
 
 from scipy.cluster import hierarchy as sch
 
-def find_unique_ids(lst: List[List[int]]):
+def find_unique_ids(lst):
     """
     Finds collections of ids that are longest and unique
 
     Args:
-        lst:
+        lst (list[list[int]]): topic ids
 
     Returns:
+        out_list (list[list[int]]): topic ids that are longest and unique.
 
     """
-    """="""
     lst.sort(key=len, reverse=True)
     ids = set()
     out_list = []
