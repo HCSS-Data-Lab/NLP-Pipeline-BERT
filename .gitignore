@@ -13,3 +13,4 @@ bertopic_model
 !requirements.txt
 input/
 output/
+__pycache__/*
