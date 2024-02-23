@@ -1,15 +1,21 @@
 # NLP Pipeline BERT
 
-This repository does the following
-- 
+This repository does the following:
+- Read cleaned text bodies from specified input folder
+- Pre-process the text bodies in the following way: split them in specified sizes (chunks with chunk_size number of character; sentences; or sentence pairs)
+- Make embeddings from the split text parts
+- Reduce the dimensionality of the embeddings by mapping them to a 2-dim space
+- Running topic modeling analysis with BERTopic module
+- Plotting the results
+- (Optional): Merging topic output to improve results
+- (Optional): Evaluate topic output by calculating coherence 
 
 ## Requirements
 
 The `requirements.txt` is up to date.
 
 ## Running code
-
-### Parameters
+Run script `main.py`
  
 ## Example usage
 
@@ -22,32 +28,36 @@ python main.py
 The project folder is structured as follows:
 
 ```text
-├── embeddings
-│                                      
-├── input
-│                                      
-├── models
-│                                      
-├── output
+├── .devcontainer
+│
+├── .github
+│
+├── .idea                                                   
 │                                      
 ├── src
-    ├── analysis
-    ├── embeddings_pp
-    ├── evaluation
-    ├── preprocess                             
-    └── texts_pp
+    ├── analysis.py
+    ├── embeddings_pp.py
+    ├── evaluation.py
+    ├── merge.py
+    ├── plotting.py
+    ├── preprocess.py   
+    ├── red_embeddings_pp.py                         
+    └── texts_pp.py
 │                                      
-├── webapp
+├── utils                            
+    └── visualize_documents_func.py                                      
 │                                      
 ├── .gitignore
+│
+├── Dockerfile
 │                                      
-├── config
+├── config.py
 │                                      
-├── main
+├── get-pip.py
+│
+├── main.py
 │                                      
-├── README
+├── requirements.txt
 │                                      
-├── requirements
-│                                      
-└── test
+└── test.py
 ```
