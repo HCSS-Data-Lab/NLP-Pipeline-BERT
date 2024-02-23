@@ -33,7 +33,7 @@ parameters = {
 
     # Plotting parameters
     'n_total': 50,   # Total number of topics to show in the fig
-    'sample': 1,    # Sample (fraction) of docs to show in plot
+    'sample': 0.1,    # Sample (fraction) of docs to show in plot
     'n_words_legend': 3,    # Number of words to use in the description in the legend
     'n_words_hover': 6    # Number of words to display when hovering over figure
 

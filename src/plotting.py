@@ -1,5 +1,6 @@
 import numpy as np
 import os
+from src.visualize_documents_func import visualize_documents_
 
 import config
 
@@ -57,25 +58,51 @@ class Plotting:
         fig is saved to html if so specified.
         """
         print("Plotting documents...")
+
         legend_labels = self.make_legend_labels()
         hover_labels = self.make_hover_labels()
         num_docs_topic = get_num_docs_topic(hover_labels)
         self.print_num_docs(num_docs_topic)
         plot_embeddings = self.make_plot_embeddings()
 
-        fig = self.topic_model.visualize_documents(hover_labels,
-                                                   reduced_embeddings=plot_embeddings,  # Add pre-defined reduced embeddings is faster than automatic in BERTopic module
-                                                   hide_document_hover=False,
-                                                   custom_labels=True,
-                                                   topics=range(self.n_total),
-                                                   sample=self.sample,
-                                                   title=self.fig_title)
+        indices, fig = visualize_documents_(topic_model=self.topic_model,
+                                            docs=hover_labels,
+                                            reduced_embeddings=plot_embeddings,
+                                            hide_document_hover=False,
+                                            custom_labels=True,
+                                            topics=range(self.n_total),
+                                            sample=self.sample,
+                                            title=self.fig_title)
 
+        print("Number of docs sampled: ", len(indices))
         fig.show()
 
         if self.save_html:
             file_name = self.get_param_str()
             fig.write_html(os.path.join(self.folder, file_name))
+
+    def sample_docs_by_topic(self, sample_fraction=0.1):
+        """
+        Sample a given sample-size per topic, so if sample_size=0.1 10% of docs
+        from each topic will be randomly sampled. Number of samples is floor-rounded
+        to the nearest integer, ie 10% * 19 documents = 1 sample.
+
+        Args:
+            sample_fraction (float): sample size as fraction
+
+        Returns:
+            sampled_indices (lst[int]): sampled topic indices
+        """
+        np.random.seed(0)
+        sampled_indices = []
+        unique_topics = np.unique(self.topics)
+        for t in unique_topics:
+            indices = np.where(self.topics == t)[0]
+            num_docs_for_topic = indices.shape[0]
+            sampled_inds_topic = np.random.choice(indices, size=int(sample_fraction * num_docs_for_topic), replace=False)
+            sampled_indices.extend(sampled_inds_topic)
+
+        return sampled_indices
 
     def make_legend_labels(self):
         """
@@ -190,3 +217,9 @@ class Plotting:
 
     def get_param_str(self):
         return f"plot_mn{self.model_name}_n{self.n_total}_s{self.sample}.html"
+
+    def get_sample_docs(self):
+        pass
+
+
+

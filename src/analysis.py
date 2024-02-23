@@ -7,7 +7,6 @@ from keyphrase_vectorizers import KeyphraseCountVectorizer
 import time
 import os
 import pickle
-import datetime
 
 import config
 

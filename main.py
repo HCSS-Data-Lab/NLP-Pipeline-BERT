@@ -28,7 +28,7 @@ if __name__ == '__main__':
     reduced_embeddings = preprocess.initialize_red_embeddings(red_from_file=red_from_file, embeddings=embeddings)
 
     # Initialize topic-model
-    mod_from_file = False
+    mod_from_file = True
     mod_emb_from_file = True
     path = os.path.join(output_folder, project)
 
@@ -41,6 +41,7 @@ if __name__ == '__main__':
     folder = os.path.join(output_folder, "figures")
     plotting = Plotting(topic_model, reduced_embeddings, model_name, num_texts, folder)
     plotting.plot()
+
 
 
     #################################################################
