@@ -15,7 +15,9 @@ This repository does the following:
 The `requirements.txt` is up to date.
 
 ## Running code
-Run script `main.py`
+Run script `main.py`.
+Specify parameters in `config.py`.
+Specify in `main.py` whether to load split texts, embeddings, reduced embeddings, topic-model object from file or generate at runtime.
  
 ## Example usage
 
