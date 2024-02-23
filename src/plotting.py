@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from src.visualize_documents_func import visualize_documents_
+from utils.visualize_documents_func import visualize_documents_
 
 import config
 
