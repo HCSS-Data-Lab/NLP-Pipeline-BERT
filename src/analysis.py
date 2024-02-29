@@ -172,7 +172,12 @@ class Analysis:
 
     def get_repr_str(self):
         """
-        Get str of representation model values, used for bertopic model file name
+        Get str of representation model values, used for bertopic model file name;
+        T means preceding value is True, F means it is False.
+        mmr: use MMR or not;
+        p: use PoS (Parts-of-Speech) for topic fine-tuning or not;
+        kp: use KeyPhrase as CountVectorizer to filter stop words and noun phrases.
+
         Returns:
             str: representation model values in str
         """

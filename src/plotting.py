@@ -45,8 +45,7 @@ class Plotting:
         self.n_words_legend = config.parameters["n_words_legend"]
         self.n_words_hover = config.parameters["n_words_hover"]
         self.plot_non_docs = plot_non_docs
-        # self.fig_title = f"Text Data | Documents & Topics (merged)\n{self.model_name}" if self.merged else f"Text Data | Documents & Topics (unmerged)\n{self.model_name}"
-        self.fig_title = f"(merged)\n{self.model_name}" if self.merged else f"(unmerged)\n{self.model_name}"
+        self.fig_title = self.get_fig_title()
 
 
     def plot(self):
@@ -65,12 +64,16 @@ class Plotting:
         self.print_num_docs(num_docs_topic)
         plot_embeddings = self.make_plot_embeddings()
 
+        # indices = get_sample_indices()
+        # hover_labels = get_summary_of_sampled_docs(indices)
+        # visualize_documents_(indices, hover_labels)
+
         indices, fig = visualize_documents_(topic_model=self.topic_model,
                                             docs=hover_labels,
                                             reduced_embeddings=plot_embeddings,
                                             hide_document_hover=False,
                                             custom_labels=True,
-                                            topics=range(self.n_total),
+                                            topics=list(range(self.n_total)),
                                             sample=self.sample,
                                             title=self.fig_title)
 
@@ -218,8 +221,13 @@ class Plotting:
     def get_param_str(self):
         return f"plot_mn{self.model_name}_n{self.n_total}_s{self.sample}.html"
 
+    def get_fig_title(self):
+        # self.fig_title = f"Text Data | Documents & Topics (merged)\n{self.model_name}" if self.merged else f"Text Data | Documents & Topics (unmerged)\n{self.model_name}"
+        if self.merged:
+            return f"(merged)\n{self.model_name}_sam{config.parameters['sample']}"
+        else:
+            return f"(unmerged)\n{self.model_name}_sam{config.parameters['sample']}"
+
     def get_sample_docs(self):
         pass
-
-
 

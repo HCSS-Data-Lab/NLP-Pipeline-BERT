@@ -2,7 +2,14 @@
 
 parameters = {
 
-    'clean_meth': 'vect',  # Text cleaning method: def (default), vect (vectorization), or ft (filter-texts)
+    # Text filter parameters, used when reading text bodies
+    'filter_Politie': False,
+
+    'filter_ParlaMint': True,
+    'filter_pattern_ParlaMint': "\[\[|\]\]|ParlaMint.+?\s",  # Clean regex for ParlaMint data: remove brackets and datestamp starting with ParlaMint
+
+    # Running parameters
+    'clean_meth': 'vect',  # Text clean method: def (default, no cleaning), vect (vectorization), or ft (filter-texts function)
     'split_size': 'chunk',  # Text split size: chunk, sentence or sentence-pairs
     'chunk_size': 500,  # Number of characters in chunk
 
@@ -33,7 +40,7 @@ parameters = {
 
     # Plotting parameters
     'n_total': 50,   # Total number of topics to show in the fig
-    'sample': 0.1,    # Sample (fraction) of docs to show in plot
+    'sample': 1.0,    # Sample (fraction) of docs to show in plot
     'n_words_legend': 3,    # Number of words to use in the description in the legend
     'n_words_hover': 6    # Number of words to display when hovering over figure
 

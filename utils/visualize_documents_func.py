@@ -1,9 +1,26 @@
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+from scipy.spatial import ConvexHull
 
 from umap import UMAP
 from typing import List, Union
+
+def add_convex_hulls(fig, topic_per_doc, embeddings_2d, topic_range):
+    for id in topic_range:
+        if id != -1:
+            inds = np.where(topic_per_doc == id)[0]
+            hull_points = embeddings_2d[inds]
+            hull = ConvexHull(hull_points)
+
+            for simplex in hull.simplices:
+                fig.add_trace(go.Scatter(x=hull_points[simplex, 0], y=hull_points[simplex, 1], mode='lines', line_color='darkblue'))
+
+            hull_vertices = hull_points[hull.vertices]
+            fig.add_trace(go.Scatter(x=hull_vertices[:, 0], y=hull_vertices[:, 1], fill='toself', fillcolor='darkblue',
+                                    opacity=0.1, line=dict(color='darkblue')))
+    return fig
+
 
 def visualize_documents_(topic_model,
                          docs: List[str],
@@ -236,5 +253,11 @@ def visualize_documents_(topic_model,
 
     fig.update_xaxes(visible=False)
     fig.update_yaxes(visible=False)
+
+    # # Convex hulls
+    # topic_per_doc_samples = [topic_per_doc[index] for index in indices]  # Topic id for each of the sampled documents
+    # tpds_arr = np.array(topic_per_doc_samples)
+    # fig = add_convex_hulls(fig, tpds_arr, embeddings_2d, topics)  # Add convex hulls to figure
+
     # return fig  # OLD LINE
     return indices, fig  # NEW LINE

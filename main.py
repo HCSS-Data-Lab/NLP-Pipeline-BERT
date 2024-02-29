@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
     input_folder = r"C:\Users\ArneEichholtz\PycharmProjects\NLP-Pipeline-BERT\input"
     output_folder = r"C:\Users\ArneEichholtz\PycharmProjects\NLP-Pipeline-BERT\output"
-    project = "Politie"
+    project = "ParlaMint"
 
     preprocess = PreProcess(in_folder=input_folder,
                             out_folder=output_folder,
