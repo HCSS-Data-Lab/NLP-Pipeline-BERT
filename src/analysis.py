@@ -1,4 +1,5 @@
 from bertopic import BERTopic
+import umap
 from bertopic.representation import MaximalMarginalRelevance
 from bertopic.representation import PartOfSpeech
 from sklearn.feature_extraction.text import CountVectorizer
@@ -130,10 +131,18 @@ class Analysis:
             # representation_model = PartOfSpeech(config.parameters['spacy_mod_pos'])
             representation_model = PartOfSpeech(config.parameters['spacy_mod_pos'], pos_patterns=config.parameters["pos_patterns"])
 
-        # Create the topic model with conditionally added components
+        umap_model = umap.UMAP(n_neighbors=15,
+                               n_components=5,
+                               min_dist=0.0,
+                               metric='cosine',
+                               low_memory=False,
+                               random_state=config.parameters["random_state"])
+
+        # Create the topic model
         topic_model = BERTopic(vectorizer_model=vectorizer_model,
                                embedding_model=self.bert_model,
-                               representation_model=representation_model)
+                               representation_model=representation_model,
+                               umap_model=umap_model)
         return topic_model
 
     def train_topic_model(self, topic_model, data):
