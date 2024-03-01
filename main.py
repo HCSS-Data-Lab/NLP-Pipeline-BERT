@@ -8,9 +8,18 @@ from src.merge import Merge
 
 if __name__ == '__main__':
 
+    """
+    TODO:
+    - Add making automatic folders for project
+    - Clean up plotting class
+    
+    
+    """
+
+
     input_folder = r"C:\Users\ArneEichholtz\PycharmProjects\NLP-Pipeline-BERT\input"
     output_folder = r"C:\Users\ArneEichholtz\PycharmProjects\NLP-Pipeline-BERT\output"
-    project = "Politie"
+    project = "ParlaMint"
 
     preprocess = PreProcess(in_folder=input_folder,
                             out_folder=output_folder,
@@ -28,7 +37,7 @@ if __name__ == '__main__':
     reduced_embeddings = preprocess.initialize_red_embeddings(red_from_file=red_from_file, embeddings=embeddings)
 
     # Initialize topic-model
-    mod_from_file = False
+    mod_from_file = True
     mod_emb_from_file = True
     path = os.path.join(output_folder, project)
 
@@ -39,9 +48,12 @@ if __name__ == '__main__':
     model_name = analysis.get_model_file_name()
     num_texts = len(texts)
     folder = os.path.join(output_folder, "figures")
-    plotting = Plotting(topic_model, reduced_embeddings, model_name, num_texts, folder)
+    plotting = Plotting(topic_model=topic_model,
+                        reduced_embeddings=reduced_embeddings,
+                        model_name=model_name,
+                        docs=texts,
+                        folder=folder)
     plotting.plot()
-
 
 
     #################################################################

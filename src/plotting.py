@@ -1,9 +1,11 @@
 import numpy as np
 import os
-from utils.visualize_documents_func import visualize_documents_
+
+from utils.visualize_func import get_sample_indices
+from utils.visualize_func import visualize_documents_
+from utils.text_process_llm import get_summary_sampled_docs
 
 import config
-
 
 def first_at_end(lst):
     """Append the first element of list at the end"""
@@ -25,15 +27,17 @@ def get_num_docs_topic(hover_labels):
 
 class Plotting:
 
-    def __init__(self, topic_model, reduced_embeddings, model_name, num_docs, folder="", save_html=False, merged=False, plot_non_docs=False):
+    def __init__(self, topic_model, reduced_embeddings, model_name, docs, folder="", save_html=False, merged=False, plot_non_docs=False, summarize_docs=False):
         # Parameters
         self.topic_model = topic_model
         self.red_emb = reduced_embeddings
         self.model_name = model_name
-        self.num_docs = num_docs
+        self.docs = docs
+        self.num_docs = len(docs)
         self.folder = folder
         self.save_html = save_html
         self.merged = merged
+        self.summarize_docs = summarize_docs
 
         # Variables from topic-model object
         self.topics = self.get_topics()
@@ -57,27 +61,29 @@ class Plotting:
         fig is saved to html if so specified.
         """
         print("Plotting documents...")
-
         legend_labels = self.make_legend_labels()
-        hover_labels = self.make_hover_labels()
+
+        indices = get_sample_indices(self.topic_model, sample=self.sample)
+        print("Number of docs sampled: ", len(indices))
+
+        if self.summarize_docs:
+            hover_labels = get_summary_sampled_docs(self.docs, indices)
+        else:
+            hover_labels = self.make_hover_labels()
+
         num_docs_topic = get_num_docs_topic(hover_labels)
         self.print_num_docs(num_docs_topic)
         plot_embeddings = self.make_plot_embeddings()
 
-        # indices = get_sample_indices()
-        # hover_labels = get_summary_of_sampled_docs(indices)
-        # visualize_documents_(indices, hover_labels)
-
-        indices, fig = visualize_documents_(topic_model=self.topic_model,
-                                            docs=hover_labels,
-                                            reduced_embeddings=plot_embeddings,
-                                            hide_document_hover=False,
-                                            custom_labels=True,
-                                            topics=list(range(self.n_total)),
-                                            sample=self.sample,
-                                            title=self.fig_title)
-
-        print("Number of docs sampled: ", len(indices))
+        fig = visualize_documents_(topic_model=self.topic_model,
+                                   docs=hover_labels,
+                                   indices=indices,
+                                   reduced_embeddings=plot_embeddings,
+                                   sample=self.sample,
+                                   hide_document_hover=False,
+                                   custom_labels=True,
+                                   topics=list(range(self.n_total)),
+                                   title=self.fig_title)
         fig.show()
 
         if self.save_html:

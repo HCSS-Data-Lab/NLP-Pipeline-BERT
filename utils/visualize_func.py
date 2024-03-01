@@ -21,9 +21,20 @@ def add_convex_hulls(fig, topic_per_doc, embeddings_2d, topic_range):
                                     opacity=0.1, line=dict(color='darkblue')))
     return fig
 
+def get_sample_indices(topic_model, sample=1.0):
+    np.random.seed(0)
+    topic_per_doc = topic_model.topics_
+    indices = []
+    for topic in set(topic_per_doc):
+        s = np.where(np.array(topic_per_doc) == topic)[0]
+        size = int(len(s) * sample)
+        indices.extend(np.random.choice(s, size=size, replace=False))
+    indices = np.array(indices)
+    return indices
 
 def visualize_documents_(topic_model,
                          docs: List[str],
+                         indices: List[int] = None,  # Added parameter indices
                          topics: List[int] = None,
                          embeddings: np.ndarray = None,
                          reduced_embeddings: np.ndarray = None,
@@ -121,14 +132,6 @@ def visualize_documents_(topic_model,
     #     size = len(s) if len(s) < 100 else int(len(s) * sample)
     #     indices.extend(np.random.choice(s, size=size, replace=False))
     # indices = np.array(indices)
-
-    # NEW CODE, removed part for not sample if len(s)<100
-    indices = []
-    for topic in set(topic_per_doc):
-        s = np.where(np.array(topic_per_doc) == topic)[0]
-        size = int(len(s) * sample)
-        indices.extend(np.random.choice(s, size=size, replace=False))
-    indices = np.array(indices)
 
     df = pd.DataFrame({"topic": np.array(topic_per_doc)[indices]})
     df["doc"] = [docs[index] for index in indices]
@@ -259,5 +262,4 @@ def visualize_documents_(topic_model,
     # tpds_arr = np.array(topic_per_doc_samples)
     # fig = add_convex_hulls(fig, tpds_arr, embeddings_2d, topics)  # Add convex hulls to figure
 
-    # return fig  # OLD LINE
-    return indices, fig  # NEW LINE
+    return fig
