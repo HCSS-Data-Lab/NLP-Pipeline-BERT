@@ -11,7 +11,6 @@ if __name__ == '__main__':
     """
     TODO:
     - Add making automatic folders for project
-    - Clean up plotting class
     
     """
 

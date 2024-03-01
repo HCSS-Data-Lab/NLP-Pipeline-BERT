@@ -4,6 +4,7 @@ import os
 from utils.visualize_func import get_sample_indices
 from utils.visualize_func import visualize_documents_
 from utils.text_process_llm import get_summary_sampled_docs
+from utils.text_process_llm import get_summary_labels
 
 import config
 
@@ -27,7 +28,7 @@ def get_num_docs_topic(hover_labels):
 
 class Plotting:
 
-    def __init__(self, topic_model, reduced_embeddings, model_name, docs, folder="", save_html=False, merged=False, plot_non_docs=False, summarize_docs=False):
+    def __init__(self, topic_model, reduced_embeddings, model_name, docs, folder="", save_html=False, merged=False, plot_non_docs=False, summarize_labels=False, summarize_docs=False):
         # Parameters
         self.topic_model = topic_model
         self.red_emb = reduced_embeddings
@@ -37,6 +38,7 @@ class Plotting:
         self.folder = folder
         self.save_html = save_html
         self.merged = merged
+        self.summarize_labels = summarize_labels
         self.summarize_docs = summarize_docs
 
         # Variables from topic-model object
@@ -61,7 +63,13 @@ class Plotting:
         fig is saved to html if so specified.
         """
         print("Plotting documents...")
-        legend_labels = self.make_legend_labels()
+        words_legend = self.top_n_words(n_topics=self.num_topics, n_words=self.n_words_legend)
+
+        if self.summarize_labels:
+            legend_labels = get_summary_labels(words_legend)
+            self.topic_model.set_topic_labels(legend_labels)
+        else:
+            legend_labels = self.make_legend_labels(words_legend)
 
         indices = get_sample_indices(self.topic_model, sample=self.sample)
         print("Number of docs sampled: ", len(indices))
@@ -113,7 +121,7 @@ class Plotting:
 
         return sampled_indices
 
-    def make_legend_labels(self):
+    def make_legend_labels(self, words_legend):
         """
         Function to make legend labels, which is the first n_words_legend words of each
         topic separated by ','. Set as labels via set_topic_labels() function within BERTopic.
@@ -122,7 +130,6 @@ class Plotting:
             legend_labels (lst[str]): legend labels
         """
         print("Making legend labels...")
-        words_legend = self.top_n_words(n_topics=self.num_topics, n_words=self.n_words_legend)
         legend_labels = [f"{i}: " + ", ".join(w) for i, w in enumerate(words_legend)]
         self.topic_model.set_topic_labels(legend_labels)  # legend_labels contains outlier topic label '0: the, and, of' but this is skipped automatically
         return legend_labels
