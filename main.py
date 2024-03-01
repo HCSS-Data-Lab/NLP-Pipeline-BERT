@@ -46,10 +46,17 @@ if __name__ == '__main__':
     model_name = analysis.get_model_file_name()
     num_texts = len(texts)
     folder = os.path.join(output_folder, "figures")
+    
+    # Change to True after adding labels and summary in .py file
+    summarize_labels=False
+    summarize_docs=False
+
     plotting = Plotting(topic_model=topic_model,
                         reduced_embeddings=reduced_embeddings,
                         model_name=model_name,
                         docs=texts,
+                        # summarize_docs=summarize_docs,
+                        # summarize_labels=summarize_labels,
                         folder=folder)
     plotting.plot()
 
