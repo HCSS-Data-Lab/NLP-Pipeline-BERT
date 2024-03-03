@@ -27,12 +27,17 @@ class PreProcess:
 
         self.in_folder = in_folder
         self.project = project
-        self.text_bodies_path = os.path.join(in_folder, project, "text_bodies")
+        if self.project == "ParlaMint":
+            self.text_bodies_path = os.path.join(in_folder, project, "2014")
+        else:
+            self.text_bodies_path = os.path.join(in_folder, project, "text_bodies")
 
         self.out_folder = out_folder
         self.split_texts_path = os.path.join(out_folder, project, "texts")
         self.emb_path = os.path.join(out_folder, project, "embeddings")
         self.model_path = os.path.join(out_folder, project, "models")
+
+        self.create_output_folders()
 
     def initialize_texts(self, splits_from_file):
         """
@@ -40,8 +45,6 @@ class PreProcess:
 
         Args:
             splits_from_file: Load split texts saved in file or read and split text bodies at runtime.
-            text_clean_method: Text cleaning method.
-            text_split_size: Text split size.
 
         Returns:
             texts (list[str]): split texts
@@ -57,8 +60,6 @@ class PreProcess:
         Args:
             emb_from_file: Load embeddings saved in file or initialize embeddings at runtime based on text data.
             data: Text data used for generating embeddings.
-            text_clean_method: Text cleaning method.
-            text_split_size: Text split size.
 
         Returns:
             embeddings (torch.Tensor): text embeddings, each doc as a 768-dim vector. Shape: (num docs, 768)
@@ -68,10 +69,25 @@ class PreProcess:
         return embeddings
 
     def initialize_red_embeddings(self, red_from_file, embeddings):
+        """
+        Initialize reduced embeddings, ie embeddings mapped to 2 dimensions
+
+        Args:
+            red_from_file (bool): Boolean indicator whether to load reduced embeddings saved in file or initialize at runtime
+            embeddings (torch.Tensor): text embeddings
+
+        Returns:
+            reduced_embeddings (np.ndarray): reduced embeddings as 2-dim np array
+        """
         red_emb_pp = RedEmbeddingsPreProcess(red_from_file, self.emb_path)
         reduced_embeddings = red_emb_pp.get_red_embeddings(embeddings)
         return reduced_embeddings
 
-
-
-
+    def create_output_folders(self):
+        """
+        Create output folders if they do not exist
+        """
+        folders = [self.out_folder, self.split_texts_path, self.emb_path, self.model_path]
+        for folder in folders:
+            if not os.path.exists(folder):
+                os.makedirs(folder)

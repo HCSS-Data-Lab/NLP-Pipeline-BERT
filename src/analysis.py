@@ -1,10 +1,18 @@
 from bertopic import BERTopic
+import umap
+from bertopic.representation import MaximalMarginalRelevance
+from bertopic.representation import PartOfSpeech
 from sklearn.feature_extraction.text import CountVectorizer
+from keyphrase_vectorizers import KeyphraseCountVectorizer
+
 import time
 import os
 import pickle
 
 import config
+
+def bool_ind(bool_val):
+    return "T" if bool_val else "F"
 
 class Analysis:
 
@@ -13,14 +21,19 @@ class Analysis:
         Class Analysis handles running the topic modeling analysis with the BERTopic module.
 
         Parameters:
-            models_path (str): Path where models are stored or retrieved
+            out_path (str): path to output folder with folders "models" and "embeddings"
             model_from_file (bool): Use model saved in file or not
-            clean_meth (str): Text cleaning method
+            mod_emb_from_file (bool): Use embeddings from file for model or not
 
         Attributes:
-            model_file_name (str): file name for BERTopic object stored in file.
+            clean_meth (str): Text clean method. (def for default, ft for filter-text function,
+                              vect for vectorization param in BERTopic)
+            split_size (str): Text split size. (chunk, sentence, or sentence-pairs)
+            chunk_size (str): size or number of characters in text chunks
             bert_model (str): Pre-trained sentence BERT model name, defined in config.
-            merged (bool): Indicator to show whether topic output has been merged or not.
+            use_mmr (bool): Boolean indicator whether to use MMR for topic fine-tuning or not.
+            model_file_name (str): name for topic-model when saving/loading from file.
+            emb_name (str): name for embeddings used for saving/loading from file.
         """
 
         self.models_path = os.path.join(out_path, "models")
@@ -33,15 +46,17 @@ class Analysis:
         self.split_size = config.parameters["split_size"]
         self.chunk_size = config.parameters["chunk_size"]
         self.bert_model = config.parameters["bert_model"]
+        self.use_mmr = config.parameters["use_mmr"]
+        self.use_pos = config.parameters["use_pos"]
+        self.update_topics = config.parameters["update_topics"]
+        self.use_keyphrase = config.parameters["use_keyphrase"]
 
         if self.split_size == "chunk":
-            self.model_file_name = f"bertopic_model_{self.bert_model}_{self.split_size}{self.chunk_size}_{self.clean_meth}"
+            self.model_file_name = f"bertopic_model_{self.bert_model}_{self.split_size}{self.chunk_size}_{self.clean_meth}{self.get_repr_str()}"
             self.emb_name = f"embeddings_{self.bert_model}_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
         else:
-            self.model_file_name = f"bertopic_model_{self.bert_model}_{self.split_size}_{self.clean_meth}"
+            self.model_file_name = f"bertopic_model_{self.bert_model}_{self.split_size}_{self.clean_meth}{self.get_repr_str()}"
             self.emb_name = f"embeddings_{self.bert_model}_{self.split_size}_{self.clean_meth}.pkl"
-
-        self.merged = False
 
     def initialize_topic_model(self, data):
         if self.model_from_file:
@@ -57,17 +72,90 @@ class Analysis:
         return topic_model
 
     def generate_topic_model(self, data):
+        """
+        Load and train topic model at runtime based on given input data
+
+        Args:
+            data (list[str]): text data
+
+        Returns:
+            topic_model (BERTopic): trained topic model object
+
+        """
         print("Initializing topic-model at runtime...")
+        # Get topic-model object
+        topic_model = self.get_topic_model_obj()
 
-        # Applying Vectorization to clean text
+        # Train topic-model
+        topic_model = self.train_topic_model(topic_model, data)
+
+        # Update topic-model
+        topic_model = self.update_topic_model(topic_model, data)
+
+        # Save topic-model
+        topic_model.save(os.path.join(self.models_path, self.model_file_name))
+        return topic_model
+
+    def get_topic_model_obj(self):
+        """
+        Get topic-model object of BERTopic module, applying correct cleaning and using MMR
+
+        Returns:
+            topic_model (BERTopic): topic-model object
+
+        """
+        # Initializing vectorizer to clean text and representation model, both as None if not used
+        vectorizer_model = None
+        representation_model = None
+
+        # Conditionally set vectorizer_model if using a stop words vectorizer
         if self.clean_meth == "vect":
-            print("Initializing topic model with stop words vectorizer...")
-            vectorizer_model = CountVectorizer(stop_words="english")
-            topic_model = BERTopic(vectorizer_model=vectorizer_model, embedding_model=self.bert_model)
-        else:
-            topic_model = BERTopic(embedding_model=self.bert_model)
+            print("Initializing topic model with stop words vectorizer.")
+            vectorizer_model = CountVectorizer(ngram_range=(1, 3),
+                                               stop_words="english",
+                                               min_df=0.01,
+                                               lowercase=False)
 
-        # Initializing topic model with pre-trained text embeddings or from text data
+            if self.use_keyphrase:
+                print("Using KeyPhrase as CountVectorizer.")
+                vectorizer_model = KeyphraseCountVectorizer(stop_words="english",
+                                                            spacy_pipeline="en_core_web_sm")
+
+        # Conditionally set representation_model if using MMR for topic fine-tuning
+        if self.use_mmr:
+            print("Applying topic fine-tuning with MMR.")
+            representation_model = MaximalMarginalRelevance(diversity=config.parameters["mmr_diversity"])
+
+        if self.use_pos:
+            print("Applying topic fine-tuning with Parts Of Speech.")
+            # representation_model = PartOfSpeech(config.parameters['spacy_mod_pos'])
+            representation_model = PartOfSpeech(config.parameters['spacy_mod_pos'], pos_patterns=config.parameters["pos_patterns"])
+
+        umap_model = umap.UMAP(n_neighbors=15,
+                               n_components=5,
+                               min_dist=0.0,
+                               metric='cosine',
+                               low_memory=False,
+                               random_state=config.parameters["random_state"])
+
+        # Create the topic model
+        topic_model = BERTopic(vectorizer_model=vectorizer_model,
+                               embedding_model=self.bert_model,
+                               representation_model=representation_model,
+                               umap_model=umap_model)
+        return topic_model
+
+    def train_topic_model(self, topic_model, data):
+        """
+        Train topic-model object on data, either pre-trained text embeddings or text data
+
+        Args:
+            topic_model (BERTopic): topic-model object, untrained
+            data (list[str]): text data
+
+        Returns:
+            topic_model (BERTopic): trained topic_model object of BERTopic module
+        """
         if self.mod_emb_from_file:
             print("Generating topic-model with pre-trained embeddings...")
             with open(os.path.join(self.emb_path, self.emb_name), "rb") as file:
@@ -77,11 +165,39 @@ class Analysis:
         else:
             print("Generating topic-model from text data...")
             topics, probs = topic_model.fit_transform(data)
+        return topic_model
 
-        # Saving topic-model
-        topic_model.save(os.path.join(self.models_path, self.model_file_name))
+    def update_topic_model(self, topic_model, data):
+        if self.update_topics:
+            print("Updating topic-model...")
+            vectorizer_model = CountVectorizer(ngram_range=(1, 3),
+                                               stop_words="english",
+                                               min_df=0.01)
+            topic_model.update_topics(data, vectorizer_model=vectorizer_model)
         return topic_model
 
     def get_model_file_name(self):
         return self.model_file_name
+
+    def get_repr_str(self):
+        """
+        Get str of representation model values, used for bertopic model file name;
+        T means preceding value is True, F means it is False.
+        mmr: use MMR or not;
+        p: use PoS (Parts-of-Speech) for topic fine-tuning or not;
+        kp: use KeyPhrase as CountVectorizer to filter stop words and noun phrases.
+
+        Returns:
+            str: representation model values in str
+        """
+        # if self.use_mmr and self.use_pos:
+        #     return f"_mmr{self.use_mmr}_p{self.use_pos}"
+        # elif self.use_mmr and not self.use_pos:
+        #     return f"_mmr{self.use_mmr}"
+        # elif self.use_pos and not self.use_mmr:
+        #     return f"_p{self.use_pos}"
+        # else:
+        #     return ""
+        return f"_mmr{bool_ind(self.use_mmr)}_p{bool_ind(self.use_pos)}_kp{bool_ind(self.use_keyphrase)}"
+
 

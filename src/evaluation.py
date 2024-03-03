@@ -9,7 +9,8 @@ class Evaluation:
     def __init__(self):
         print("\nEval object created")
 
-    def calculate_coherence(self, topic_model, texts):
+
+    def calculate_coherence(self, topic_model, texts, metrics):
         print("Calculating coherence...")
         topics = np.array(topic_model.topics_)  # Topic id for each document, [-1, -1, 58, 17, 23, -1, ...]
         documents = pd.DataFrame({"Document": texts,
@@ -35,10 +36,9 @@ class Evaluation:
         # based on the BERTopic paper.
         # For c_v, values range between [0, 1] where 1 indicates perfect association. Reasonably good performance is coherence > 0.5 (from
         # Computational Social Science Book)
-        coherence_metrics = ['c_v', 'c_npmi']
-        dict = {}
 
-        for metric in coherence_metrics:
+        out_dict = {}
+        for metric in metrics:
             coherence_model = CoherenceModel(topics=topic_words,
                                              texts=tokens,
                                              corpus=corpus,
@@ -46,9 +46,9 @@ class Evaluation:
                                              coherence=metric)
             coherence = coherence_model.get_coherence()
             print(f"Coherence score {metric}: {coherence:.4f}")
-            dict[metric] = coherence
+            out_dict[metric] = coherence
 
-        return dict
+        return out_dict
 
     def calculate_diversity(self, topic_model):
         # words_output = []  # 2-D list with topic words

@@ -20,6 +20,7 @@ class RedEmbeddingsPreProcess:
             clean_meth (str): Text clean method. (def for default, ft for filter-text function,
                               vect for vectorization param in BERTopic)
             split_size (str): Text split size. (chunk, sentence, or sentence-pairs)
+            chunk_size (str): size or number of characters in text chunks
             bert_model (str): Pre-trained sentence BERT model name, defined in config.
             random_state (int): Random state value used in UMAP function, for reproducibility over runs
             red_emb_name (str): reduced embeddings file name, used when saving to file

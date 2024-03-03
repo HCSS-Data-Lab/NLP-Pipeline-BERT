@@ -10,5 +10,7 @@
 bertopic_model
 !.gitignore
 !requirements.txt
-__pycache__/*
 get-pip.py
+input/
+output/
+__pycache__/*

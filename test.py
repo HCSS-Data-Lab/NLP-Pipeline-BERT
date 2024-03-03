@@ -1,23 +1,62 @@
+import re
+
+import numpy as np
+import math
 import os
-from sentence_transformers import SentenceTransformer
-import pickle
 import pandas as pd
+
+# from src.visualize_documents_func import visualize_documents_
+
+from scipy.spatial import ConvexHull
+import plotly.graph_objects as go
+
 import matplotlib.pyplot as plt
-
-
-
-
 
 
 
 if __name__ == "__main__":
 
-    dict_ = {}
 
-    dict_["test"] = 5
-    dict_["test2"] = 10
+    pattern = "\[\[|\]\]|ParlaMint.+?\s"
+    test = ["ParlaMint-NL_2014-04-16-tweedekamer-2.u1	There are now enough"]
 
-    print(dict_)
+    for t in test:
+        new = re.sub(pattern, "", t)
+        print(new)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

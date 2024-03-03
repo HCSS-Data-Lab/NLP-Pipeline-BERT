@@ -2,6 +2,7 @@ import os
 from tqdm import tqdm
 import spacy
 import pickle
+import re
 
 import config
 
@@ -93,6 +94,8 @@ class TextPreProcess:
         self.bodies_path = text_bodies_path
         self.splits_path = splits_path
 
+        self.project = self.get_project_name()
+
         self.clean_meth = config.parameters["clean_meth"]
         self.split_size = config.parameters["split_size"]
         self.chunk_size = config.parameters["chunk_size"]
@@ -175,6 +178,10 @@ class TextPreProcess:
         for text in text_names:
             with open(os.path.join(self.bodies_path, text), "r", encoding="utf-8") as file:
                 text_body = file.read()
+
+                if config.parameters[f"filter_{self.project}"]:
+                    text_body = re.sub(config.parameters[f"filter_pattern_{self.project}"], "", text_body)
+
             texts.append(text_body)
         return texts
 
@@ -221,6 +228,10 @@ class TextPreProcess:
             chunks = make_chunks(text, self.chunk_size)
             chunks_out.extend(chunks)
         return chunks_out
+
+    def get_project_name(self):
+        path_components = self.bodies_path.split(os.sep)
+        return path_components[-2]  # Second to last element of path is project name
 
     def get_text_bodies_path(self):
         return self.bodies_path
