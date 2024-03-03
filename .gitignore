@@ -1,6 +1,5 @@
 *.pkl
 *.npy
-*.txt
 *.png
 *.html
 *.pickle
@@ -12,3 +11,4 @@ bertopic_model
 !.gitignore
 !requirements.txt
 __pycache__/*
+get-pip.py
