@@ -1,5 +1,4 @@
 import os
-
 import config
 from src.texts_pp import TextPreProcess
 from src.embeddings_pp import EmbeddingsPreProcess
@@ -7,15 +6,14 @@ from src.red_embeddings_pp import RedEmbeddingsPreProcess
 
 class PreProcess:
 
-    def __init__(self, in_folder, out_folder, project):
+    def __init__(self, project_root, project):
         """
         PreProcess takes as parameters input folder, output folder, and project and stores
         sub-folders for all data: text-bodies, split text-bodies, embeddings, and models.
         From PreProcess the TextPreProcess and EmbeddingsPreprocess classes are initialized and called.
 
         Parameters:
-            in_folder (str): Directory path to the folder containing input text data.
-            out_folder (str): Directory path to the folder designated for output data.
+            project_root (str): Directory path to the folder containing input text data.
             project (str): Identifier for the project, used in naming subdirectories.
 
         Attributes:
@@ -24,18 +22,16 @@ class PreProcess:
             model_path (str): Directory path where models are stored.
             split_texts_path (str): Directory path where split texts are stored as .pkl dict file.
         """
-
-        self.in_folder = in_folder
+        self.project_root = project_root
         self.project = project
         if self.project == "ParlaMint":
-            self.text_bodies_path = os.path.join(in_folder, project, "2014")
+            self.text_bodies_path = os.path.join(self.project_root, 'input', project, "2014")
         else:
-            self.text_bodies_path = os.path.join(in_folder, project, "text_bodies")
+            self.text_bodies_path = os.path.join(self.project_root, 'input', project, "text_bodies")
 
-        self.out_folder = out_folder
-        self.split_texts_path = os.path.join(out_folder, project, "texts")
-        self.emb_path = os.path.join(out_folder, project, "embeddings")
-        self.model_path = os.path.join(out_folder, project, "models")
+        self.split_texts_path = os.path.join(self.project_root, 'output', project, "texts")
+        self.emb_path = os.path.join(self.project_root, 'output', project, "embeddings")
+        self.model_path = os.path.join(self.project_root, 'output', project, "models")
 
         self.create_output_folders()
 
@@ -87,7 +83,7 @@ class PreProcess:
         """
         Create output folders if they do not exist
         """
-        folders = [self.out_folder, self.split_texts_path, self.emb_path, self.model_path]
+        folders = [os.path.join(self.project_root, 'output'), self.split_texts_path, self.emb_path, self.model_path]
         for folder in folders:
             if not os.path.exists(folder):
                 os.makedirs(folder)

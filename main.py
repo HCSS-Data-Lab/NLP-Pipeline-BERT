@@ -1,26 +1,27 @@
 import os
-
 from src.preprocess import PreProcess
 from src.analysis import Analysis
 from src.plotting import Plotting
 from src.evaluation import Evaluation
+from src.RAG import RAG
 from src.merge import Merge
+
+
 
 if __name__ == '__main__':
 
     """
     TODO:
+    - Do not refer to local folders (find a way to define projectroot agnosticly that also works within devcontainer)
     - Add making automatic folders for project
+    - Add option to not install sentence-transformers (and make it default)
     
     """
 
+    project_root = os.environ.get(r'C:\Data\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
+    project = "Politie"
 
-    input_folder = r"C:\Users\ArneEichholtz\PycharmProjects\NLP-Pipeline-BERT\input"
-    output_folder = r"C:\Users\ArneEichholtz\PycharmProjects\NLP-Pipeline-BERT\output"
-    project = "ParlaMint"
-
-    preprocess = PreProcess(in_folder=input_folder,
-                            out_folder=output_folder,
+    preprocess = PreProcess(project_root=project_root,
                             project=project)
 
     # Initializing text data
@@ -37,7 +38,7 @@ if __name__ == '__main__':
     # Initialize topic-model
     mod_from_file = True
     mod_emb_from_file = True
-    path = os.path.join(output_folder, project)
+    path = os.path.join(project_root, 'output', project)
 
     analysis = Analysis(path, mod_from_file, mod_emb_from_file)
     topic_model = analysis.initialize_topic_model(texts)
@@ -45,19 +46,22 @@ if __name__ == '__main__':
     # Plotting
     model_name = analysis.get_model_file_name()
     num_texts = len(texts)
-    folder = os.path.join(output_folder, "figures")
+    folder = os.path.join(project_root, 'output', "figures")
     
     # Change to True after adding labels and summary in .py file
+    RAG_from_file=True
     summarize_labels=False
-    summarize_docs=False
+    summarize_docs=True
+    rag = RAG(embeddings, texts, RAG_from_file, path=os.path.join(path, 'RAG'))
 
     plotting = Plotting(topic_model=topic_model,
                         reduced_embeddings=reduced_embeddings,
                         model_name=model_name,
                         docs=texts,
-                        # summarize_docs=summarize_docs,
-                        # summarize_labels=summarize_labels,
-                        folder=folder)
+                        summarize_docs=summarize_docs,
+                        summarize_labels=summarize_labels,
+                        folder=folder,
+                        rag=rag)
     plotting.plot()
 
 

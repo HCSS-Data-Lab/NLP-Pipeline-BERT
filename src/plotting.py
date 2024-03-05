@@ -28,7 +28,7 @@ def get_num_docs_topic(hover_labels):
 
 class Plotting:
 
-    def __init__(self, topic_model, reduced_embeddings, model_name, docs, folder="", save_html=False, merged=False, plot_non_docs=False, summarize_labels=False, summarize_docs=False):
+    def __init__(self, topic_model, reduced_embeddings, model_name, docs, folder="", save_html=False, merged=False, plot_non_docs=False, summarize_labels=False, summarize_docs=False, rag=None):
         # Parameters
         self.topic_model = topic_model
         self.red_emb = reduced_embeddings
@@ -40,6 +40,7 @@ class Plotting:
         self.merged = merged
         self.summarize_labels = summarize_labels
         self.summarize_docs = summarize_docs
+        self.RAG=rag
 
         # Variables from topic-model object
         self.topics = self.get_topics()
@@ -66,7 +67,7 @@ class Plotting:
         words_legend = self.top_n_words(n_topics=self.num_topics, n_words=self.n_words_legend)
 
         if self.summarize_labels:
-            legend_labels = get_summary_labels(words_legend)
+            legend_labels = get_summary_labels(words_legend, RAG=self.RAG)
             self.topic_model.set_topic_labels(legend_labels)
         else:
             legend_labels = self.make_legend_labels(words_legend)
@@ -75,7 +76,7 @@ class Plotting:
         print("Number of docs sampled: ", len(indices))
 
         if self.summarize_docs:
-            hover_labels = get_summary_sampled_docs(self.docs, indices)
+            hover_labels = get_summary_sampled_docs(self.docs, indices, RAG=self.RAG)
         else:
             hover_labels = self.make_hover_labels()
 
@@ -110,7 +111,7 @@ class Plotting:
         Returns:
             sampled_indices (lst[int]): sampled topic indices
         """
-        np.random.seed(0)
+        np.random.seed(1)
         sampled_indices = []
         unique_topics = np.unique(self.topics)
         for t in unique_topics:

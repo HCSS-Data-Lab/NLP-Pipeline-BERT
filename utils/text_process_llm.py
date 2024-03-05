@@ -1,29 +1,29 @@
 from typing import List
+from src.RAG import RAG
 
-def get_summary_sampled_docs(docs: List[str], indices: List[int]):
+def get_summary_sampled_docs(docs: List[str], indices: List[int], RAG):
     """
-    TODO:
-    Get summary of sampled docs
-
+    Get all the responses of the docs limits by summarizing it with RAG-GPT3.5 turbo
     Args:
-        docs:
-        indices:
-
+        words_legend (List[str])
+        RAG: (RAG class object) 
     Returns:
-
+        words_legend (List[str]): 
     """
-    pass
+    print('Getting doc labels from RAG...')
+    return RAG.summarize_doc(docs)
 
-def get_summary_labels(words_legend: List[str]):
+def get_summary_labels(words_legend: List[str], RAG):
     """
-    TODO:
-    Get summary of topic labels
-
+    Get all the responses of the words topics by enhancing it with RAG-GPT3.5 turbo based on the text
     Args:
-        words_legend: 
-    
+        words_legend (List[str])
+        RAG: (RAG class object) 
+    Returns:
+        words_legend (List[str]): 
     """
-    pass
+    print('Getting word labels from RAG...')
+    return RAG.summarize_words(words_legend)
 
     
     
