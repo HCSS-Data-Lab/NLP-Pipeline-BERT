@@ -71,13 +71,13 @@ class RAG():
         Returns:
             response (List[str]): the output response text
         """
-        qa_prompt = PromptTemplate(config.parameters["query_docs_label"])
+        #qa_prompt = PromptTemplate(config.parameters["query_docs_label"])
         summarizer = TreeSummarize()
         responses = []
         for doc in random.sample(docs, 5):
             response = summarizer.get_response(config.parameters["query_docs_label"],doc)
-            print(doc, 'response',response)
             responses.append(response)
+        print(responses)
         return responses
 
         
