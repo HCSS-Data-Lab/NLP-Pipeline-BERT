@@ -47,7 +47,7 @@ parameters = {
     # RAG parameters
     'OPENAI_API_KEY': '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', #HCSS open_AI key
     'query_for_topic_labels':'Summarize these topic_labels in at MOST 3 words (captialized, without comma):',
-    'query_docs_label':'Summarize this texts in at MOST 3 terms (captialize the first letter of every word and separate by comma):'
+    'query_docs_label':'Summarize this texts in at MOST 3 terms and at most 5 words (captialize the first letter of every word and separate by comma):'
 }
 
 

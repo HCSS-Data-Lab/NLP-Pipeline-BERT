@@ -12,10 +12,11 @@ if __name__ == '__main__':
 
     """
     TODO:
+    - Maybe use logger instead of print statements (as we can also log configurations) and bring logging to the main instead of in submodules 
     - Do not refer to local folders (find a way to define projectroot agnosticly that also works within devcontainer)
     - Add making automatic folders for project
-    - Add option to not install sentence-transformers (and make it default)
-    
+    - Add option to not install sentence-transformers (and make use of cheap default embedding for development).
+    - In general it might also be great to have a dev set that we can use to do test runs (especially because ).    
     """
 
     project_root = os.environ.get(r'C:\Data\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
@@ -48,9 +49,9 @@ if __name__ == '__main__':
     num_texts = len(texts)
     folder = os.path.join(project_root, 'output', "figures")
     
-    # Change to True after adding labels and summary in .py file
+    # Initiate RAG, enhance topic labels based on RAG and summarize docs
     RAG_from_file=True
-    summarize_labels=False
+    summarize_labels=True 
     summarize_docs=True
     rag = RAG(embeddings, texts, RAG_from_file, path=os.path.join(path, 'RAG'))
 
