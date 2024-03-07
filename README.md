@@ -7,6 +7,9 @@ This repository does the following:
 - Reduce the dimensionality of the embeddings by mapping them to a 2-dim space
 - Running topic modeling analysis with BERTopic module
 - Plotting the results
+    -   (Optional): Create a retrieval augmented generator
+    -   (Optional): Enhance topics labels from this generator
+    -   (Optional): Create doc labels from this generator
 - (Optional): Merging topic output to improve results
 - (Optional): Evaluate topic output by calculating coherence 
 
@@ -25,6 +28,11 @@ Specify in `main.py` whether to load split texts, embeddings, reduced embeddings
 python main.py
 ```
 
+## devcontainer
+
+Dev container is being build to ensure similarity between virtual environments.
+
+
 ## Folder structure
 
 The project folder is structured as follows:
@@ -42,12 +50,14 @@ The project folder is structured as follows:
     ├── evaluation.py
     ├── merge.py
     ├── plotting.py
-    ├── preprocess.py   
+    ├── preprocess.py 
+    ├── RAG.py 
     ├── red_embeddings_pp.py                         
     └── texts_pp.py
 │                                      
-├── utils                            
-    └── visualize_documents_func.py                                      
+├── utils     
+    ├── text_process_llm.py                       
+    └── visualize_func.py                                      
 │                                      
 ├── .gitignore
 │
