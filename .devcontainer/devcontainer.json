@@ -1,8 +1,8 @@
 {
 	"name": "Python Dev Container",
 	"build": {
-		"context": "..",
-		"dockerfile": "Dockerfile"
+		"dockerfile": "../Dockerfile",
+		"target": "dev"
 	},
 	"customizations": {
 		"vscode": {
