@@ -52,7 +52,7 @@ class RAG():
         """
         print("Initiate RAG") #Create RAG from embeddings or load existing RAG
         if not self.RAG_from_file:
-            self.create_vector_store_index(self.path)
+            self.create_vector_store_index()
         storage_context = StorageContext.from_defaults(persist_dir=self.path)
         index = load_index_from_storage(storage_context)
         
@@ -61,7 +61,7 @@ class RAG():
         responses = []
         for topic_word in topics:
             response = query_engine.query(config.parameters["query_for_topic_labels"]+','.join(topic_word))
-            responses.append(response.response)
+            responses.append(response.response)    
         return responses
 
     async def summarize_doc(self, docs):

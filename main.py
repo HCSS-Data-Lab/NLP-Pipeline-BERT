@@ -9,7 +9,6 @@ from src.merge import Merge
 
 
 if __name__ == '__main__':
-
     """
     TODO:
     - Maybe use logger instead of print statements (as we can also log configurations) and bring logging to the main instead of in submodules 
@@ -18,10 +17,8 @@ if __name__ == '__main__':
     - Add option to not install sentence-transformers (and make use of cheap default embedding for development).
     - In general it might also be great to have a dev set that we can use to do test runs (especially because ).    
     """
-
-    project_root = os.environ.get(r'C:\Data\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
+    project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
     project = "Politie"
-
     preprocess = PreProcess(project_root=project_root,
                             project=project)
 
@@ -50,7 +47,7 @@ if __name__ == '__main__':
     folder = os.path.join(project_root, 'output', "figures")
     
     # Initiate RAG, enhance topic labels based on RAG and summarize docs
-    RAG_from_file=True
+    RAG_from_file=False
     summarize_labels=True 
     summarize_docs=True
     rag = RAG(embeddings, texts, RAG_from_file, path=os.path.join(path, 'RAG'))

@@ -40,12 +40,14 @@ parameters = {
 
     # Plotting parameters
     'n_total': 50,   # Total number of topics to show in the fig
-    'sample': 1.0,    # Sample (fraction) of docs to show in plot
+    'sample': 0.005,    # Sample (fraction) of docs to show in plot
     'n_words_legend': 3,    # Number of words to use in the description in the legend
     'n_words_hover': 6,    # Number of words to display when hovering over figure
     
     # RAG parameters
     'OPENAI_API_KEY': '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', #HCSS open_AI key
+    'create_new_docs': False,
+    'create_new_topics': True,
     'query_for_topic_labels':'Summarize these topic_labels in at MOST 3 words (captialized, without comma):',
     'query_docs_label':'Summarize this texts in at MOST 3 terms and at most 5 words (captialize the first letter of every word and separate by comma):'
 }

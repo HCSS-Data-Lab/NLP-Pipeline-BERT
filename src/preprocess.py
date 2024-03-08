@@ -32,6 +32,7 @@ class PreProcess:
         self.split_texts_path = os.path.join(self.project_root, 'output', project, "texts")
         self.emb_path = os.path.join(self.project_root, 'output', project, "embeddings")
         self.model_path = os.path.join(self.project_root, 'output', project, "models")
+        self.labels = os.path.join(self.project_root, 'output', project, "labels")
 
         self.create_output_folders()
 
@@ -83,7 +84,7 @@ class PreProcess:
         """
         Create output folders if they do not exist
         """
-        folders = [os.path.join(self.project_root, 'output'), self.split_texts_path, self.emb_path, self.model_path]
+        folders = [os.path.join(self.project_root, 'output'), self.split_texts_path, self.emb_path, self.model_path, self.labels]
         for folder in folders:
             if not os.path.exists(folder):
                 os.makedirs(folder)

@@ -25,7 +25,7 @@ def get_sample_indices(topic_model, sample=1.0):
     np.random.seed(0)
     topic_per_doc = topic_model.topics_
     indices = []
-    for topic in set(topic_per_doc):
+    for topic in set(topic_per_doc[:50]):
         s = np.where(np.array(topic_per_doc) == topic)[0]
         size = int(len(s) * sample)
         indices.extend(np.random.choice(s, size=size, replace=False))
