@@ -26,20 +26,6 @@ def get_num_docs_topic(hover_labels):
     """
     return len(hover_labels) - hover_labels.count("")
 
-
-def make_legend_labels(words_legend):
-    """
-    Function to make default legend labels, which is the first words_legend words of each
-    topic separated by ','
-
-    Returns:
-        legend_labels (lst[str]): legend labels
-    """
-    print("Making legend labels...")
-    legend_labels = [f"{i}: " + ", ".join(w) for i, w in enumerate(words_legend)]
-    return legend_labels  # legend_labels contains outlier topic label '0: the, and, of' but this is skipped automatically
-
-
 class Plotting:
 
     def __init__(self, topic_model, reduced_embeddings, model_name, docs, folder="", save_html=False, merged=False, plot_non_docs=False, summarize_labels=False, summarize_docs=False, rag=None):
@@ -54,7 +40,7 @@ class Plotting:
         self.merged = merged
         self.summarize_labels = summarize_labels
         self.summarize_docs = summarize_docs
-        self.RAG = rag
+        self.RAG=rag
 
         # Variables from topic-model object
         self.topics = self.get_topics()
@@ -67,10 +53,6 @@ class Plotting:
         self.n_words_hover = config.plotting_parameters["n_words_hover"]
         self.plot_non_docs = plot_non_docs
         self.fig_title = self.get_fig_title()
-
-        if not os.path.exists(self.folder):
-            print(f"Creating output folder for figures: {self.folder}")
-            os.makedirs(self.folder)
 
     def plot(self):
         """
@@ -87,14 +69,13 @@ class Plotting:
             legend_labels = get_summary_labels(words_legend, RAG=self.RAG)
             self.topic_model.set_topic_labels(legend_labels)
         else:
-            legend_labels = make_legend_labels(words_legend)
-            self.topic_model.set_topic_labels(legend_labels)
+            legend_labels = self.make_legend_labels(words_legend)
 
         indices = get_sample_indices(self.topic_model, sample=self.sample)
         print("Number of docs sampled: ", len(indices))
 
         if self.summarize_docs:
-            hover_labels = get_summary_sampled_docs(self.docs, indices, self.RAG)
+            hover_labels = get_summary_sampled_docs(self.docs, indices, RAG=self.RAG)
         else:
             hover_labels = self.make_hover_labels()
 
@@ -129,7 +110,7 @@ class Plotting:
         Returns:
             sampled_indices (lst[int]): sampled topic indices
         """
-        np.random.seed(0)
+        np.random.seed(1)
         sampled_indices = []
         unique_topics = np.unique(self.topics)
         for t in unique_topics:
@@ -139,6 +120,19 @@ class Plotting:
             sampled_indices.extend(sampled_inds_topic)
 
         return sampled_indices
+
+    def make_legend_labels(self, words_legend):
+        """
+        Function to make legend labels, which is the first n_words_legend words of each
+        topic separated by ','. Set as labels via set_topic_labels() function within BERTopic.
+
+        Returns:
+            legend_labels (lst[str]): legend labels
+        """
+        print("Making legend labels...")
+        legend_labels = [f"{i}: " + ", ".join(w) for i, w in enumerate(words_legend)]
+        self.topic_model.set_topic_labels(legend_labels)  # legend_labels contains outlier topic label '0: the, and, of' but this is skipped automatically
+        return legend_labels
 
     def top_n_words(self, n_topics=10, n_words=10):
         """
@@ -241,13 +235,12 @@ class Plotting:
         return f"plot_mn{self.model_name}_n{self.n_total}_s{self.sample}.html"
 
     def get_fig_title(self):
-        # OLD TITLE:
+        # OLD TITLE
         # self.fig_title = f"Text Data | Documents & Topics (merged)\n{self.model_name}" if self.merged else f"Text Data | Documents & Topics (unmerged)\n{self.model_name}"
         if self.merged:
-            return f"(merged)\n{self.model_name}_sam{config.plotting_parameters['sample']}"
+            return f"(merged)\n{self.model_name}_sam{config.parameters['sample']}"
         else:
-            return f"(unmerged)\n{self.model_name}_sam{config.plotting_parameters['sample']}"
+            return f"(unmerged)\n{self.model_name}_sam{config.parameters['sample']}"
 
     def get_sample_docs(self):
         pass
-

@@ -93,4 +93,3 @@ class EmbeddingsPreProcess:
             pickle.dump({'embeddings': embeddings, 'text_split_size': self.split_size, 'bert_model': self.bert_model}, file,
                         protocol=pickle.HIGHEST_PROTOCOL)
         return embeddings
-

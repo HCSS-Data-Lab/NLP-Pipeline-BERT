@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # NLP Pipeline BERT
 
 This repository does the following:
@@ -5,10 +6,13 @@ This repository does the following:
 - Pre-process the text bodies in the following way: split them in specified sizes (chunks with chunk_size number of character; sentences; or sentence pairs)
 - Make embeddings from the split text parts
 - Running topic modeling analysis with BERTopic module, which works in the following way:
-  - Cluster high-dimensional vectors with HDBSCAN clustering algorithm;
-  - Extract topics from clusters with c-TF-IDF algorithm;
-  - Reduce the dimensionality of the embeddings by mapping them to a 2-dim space.
+    - Cluster high-dimensional vectors with HDBSCAN clustering algorithm;
+    - Extract topics from clusters with c-TF-IDF algorithm;
+    - Reduce the dimensionality of the embeddings by mapping them to a 2-dim space.
 - Plotting the results
+    - (Optional): Create a retrieval augmented generator
+    - (Optional): Enhance topics labels from this generator
+    - (Optional): Create doc labels from this generator
 - (Optional): Merging topic output to improve results
 - (Optional): Evaluate topic output by calculating coherence 
 
@@ -33,6 +37,10 @@ The `requirements.txt` is up to date.
 ```commandline
 python main.py
 ```
+
+## devcontainer
+
+Dev container is being build to ensure similarity between virtual environments.
 
 ## Folder structure
 

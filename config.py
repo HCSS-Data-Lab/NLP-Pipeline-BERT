@@ -1,4 +1,3 @@
-
 # BOOL variables whether to load data objects from file or not
 LOAD_TEXT_SPLITS_FROM_FILE = True
 LOAD_EMBEDDINGS_FROM_FILE = True
@@ -55,4 +54,11 @@ plotting_parameters = {
     'n_words_hover': 6    # Number of words to display when hovering over figure
 }
 
-
+rag_parameters = {
+    # RAG parameters
+    'OPENAI_API_KEY': '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', #HCSS open_AI key
+    'create_new_docs': False,
+    'create_new_topics': True,
+    'query_for_topic_labels':'Summarize these topic_labels in at MOST 3 words (captialized, without comma):',
+    'query_docs_label':'Summarize this texts in at MOST 3 terms and at most 5 words (captialize the first letter of every word and separate by comma):'
+}

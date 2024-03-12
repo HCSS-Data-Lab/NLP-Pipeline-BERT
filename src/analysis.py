@@ -192,5 +192,3 @@ class Analysis:
             str: representation model values in str
         """
         return f"_mmr{bool_ind(self.use_mmr)}_p{bool_ind(self.use_pos)}_kp{bool_ind(self.use_keyphrase)}"
-
-
