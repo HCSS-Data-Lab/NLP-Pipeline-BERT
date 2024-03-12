@@ -10,51 +10,47 @@ if __name__ == '__main__':
 
     """
     TODO:
-    - Add making automatic folders for project
-    - Clean up plotting class
-    
-    
+    - Split up pre-processing part of old repository, make separate preproc repo. Option to add several preproc.
+    options, for instance also Grobid
+    - Contributor to BERTopic package for Convex Hulls.
     """
 
+    # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd())  # Put root project here
+    # project_root = r"C:\Users\ArneEichholtz\PycharmProjects\NLP-Pipeline-BERT"
 
-    input_folder = r"C:\Users\ArneEichholtz\PycharmProjects\NLP-Pipeline-BERT\input"
-    output_folder = r"C:\Users\ArneEichholtz\PycharmProjects\NLP-Pipeline-BERT\output"
-    project = "ParlaMint"
-
-    preprocess = PreProcess(in_folder=input_folder,
-                            out_folder=output_folder,
+    project_root = os.getcwd()  # This should work when running it from the NLP-Pipeline-BERT folder
+    project = "Politie"
+    preprocess = PreProcess(project_root=project_root,
                             project=project)
 
     # Initializing text data
-    splits_from_file = True
-    texts = preprocess.initialize_texts(splits_from_file=splits_from_file)
+    texts = preprocess.initialize_texts()
 
-    # Initialize embeddings
-    emb_from_file = True
-    embeddings = preprocess.initialize_embeddings(emb_from_file=emb_from_file, data=texts)
+    # Initialize embeddings and reduced embeddings
+    embeddings = preprocess.initialize_embeddings(data=texts)
+    reduced_embeddings = preprocess.initialize_red_embeddings(embeddings=embeddings)
 
-    red_from_file = True
-    reduced_embeddings = preprocess.initialize_red_embeddings(red_from_file=red_from_file, embeddings=embeddings)
-
-    # Initialize topic-model
-    mod_from_file = True
-    mod_emb_from_file = True
-    path = os.path.join(output_folder, project)
-
-    analysis = Analysis(path, mod_from_file, mod_emb_from_file)
+    # Initialize analysis obj and topic-model
+    output_folder = os.path.join(project_root, "output", project)
+    analysis = Analysis(output_folder)
     topic_model = analysis.initialize_topic_model(texts)
 
     # Plotting
     model_name = analysis.get_model_file_name()
     num_texts = len(texts)
     folder = os.path.join(output_folder, "figures")
+
+    summarize_labels = False
+    summarize_docs = False
+
     plotting = Plotting(topic_model=topic_model,
                         reduced_embeddings=reduced_embeddings,
                         model_name=model_name,
                         docs=texts,
+                        summarize_labels=summarize_labels,
+                        summarize_docs=summarize_docs,
                         folder=folder)
     plotting.plot()
-
 
     #################################################################
     # Merging and Evaluation below (optional)

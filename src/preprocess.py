@@ -1,21 +1,19 @@
 import os
 
-import config
 from src.texts_pp import TextPreProcess
 from src.embeddings_pp import EmbeddingsPreProcess
 from src.red_embeddings_pp import RedEmbeddingsPreProcess
 
 class PreProcess:
 
-    def __init__(self, in_folder, out_folder, project):
+    def __init__(self, project_root, project):
         """
         PreProcess takes as parameters input folder, output folder, and project and stores
         sub-folders for all data: text-bodies, split text-bodies, embeddings, and models.
         From PreProcess the TextPreProcess and EmbeddingsPreprocess classes are initialized and called.
 
         Parameters:
-            in_folder (str): Directory path to the folder containing input text data.
-            out_folder (str): Directory path to the folder designated for output data.
+            project_root (str): Directory path to the folder containing input text data.
             project (str): Identifier for the project, used in naming subdirectories.
 
         Attributes:
@@ -24,51 +22,55 @@ class PreProcess:
             model_path (str): Directory path where models are stored.
             split_texts_path (str): Directory path where split texts are stored as .pkl dict file.
         """
-
-        self.in_folder = in_folder
+        self.project_root = project_root
         self.project = project
-        if self.project == "ParlaMint":
-            self.text_bodies_path = os.path.join(in_folder, project, "2014")
-        else:
-            self.text_bodies_path = os.path.join(in_folder, project, "text_bodies")
 
-        self.out_folder = out_folder
-        self.split_texts_path = os.path.join(out_folder, project, "texts")
-        self.emb_path = os.path.join(out_folder, project, "embeddings")
-        self.model_path = os.path.join(out_folder, project, "models")
+        self.input_folder = os.path.join(self.project_root, "input", project)
+        if not os.path.exists(self.input_folder):
+            raise ValueError(f"No project folder in input for project name {self.project}. The path {self.input_folder} does not exist. Create it and make sure it contains a folder text_bodies.")
+
+        self.text_bodies_path = os.path.join(self.input_folder, "text_bodies")
+        if not os.path.exists(self.text_bodies_path):
+            raise ValueError(f"No text bodies folder. The path {self.text_bodies_path} does not exist. Create it and make sure it contains text bodies as .txt files.")
+
+        if self.project == "ParlaMint":
+            self.text_bodies_path = os.path.join(self.text_bodies_path, "2014")  # Add year here
+
+        self.output_folder = os.path.join(self.project_root, "output", project)
+
+        self.split_texts_path = os.path.join(self.output_folder, "texts")
+        self.emb_path = os.path.join(self.output_folder, "embeddings")
+        self.model_path = os.path.join(self.output_folder, "models")
+        self.labels_path = os.path.join(self.output_folder, "labels")
 
         self.create_output_folders()
 
-    def initialize_texts(self, splits_from_file):
+    def initialize_texts(self):
         """
         Initialize texts
-
-        Args:
-            splits_from_file: Load split texts saved in file or read and split text bodies at runtime.
 
         Returns:
             texts (list[str]): split texts
         """
-        texts_pp = TextPreProcess(splits_from_file, self.text_bodies_path, self.split_texts_path)
+        texts_pp = TextPreProcess(self.text_bodies_path, self.split_texts_path)
         texts = texts_pp.get_texts()
         return texts
 
-    def initialize_embeddings(self, emb_from_file, data):
+    def initialize_embeddings(self, data):
         """
         Initialize embeddings
 
         Args:
-            emb_from_file: Load embeddings saved in file or initialize embeddings at runtime based on text data.
             data: Text data used for generating embeddings.
 
         Returns:
             embeddings (torch.Tensor): text embeddings, each doc as a 768-dim vector. Shape: (num docs, 768)
         """
-        embeddings_pp = EmbeddingsPreProcess(emb_from_file, self.emb_path)
+        embeddings_pp = EmbeddingsPreProcess(self.emb_path)
         embeddings = embeddings_pp.get_embeddings(data)
         return embeddings
 
-    def initialize_red_embeddings(self, red_from_file, embeddings):
+    def initialize_red_embeddings(self, embeddings):
         """
         Initialize reduced embeddings, ie embeddings mapped to 2 dimensions
 
@@ -79,7 +81,7 @@ class PreProcess:
         Returns:
             reduced_embeddings (np.ndarray): reduced embeddings as 2-dim np array
         """
-        red_emb_pp = RedEmbeddingsPreProcess(red_from_file, self.emb_path)
+        red_emb_pp = RedEmbeddingsPreProcess(self.emb_path)
         reduced_embeddings = red_emb_pp.get_red_embeddings(embeddings)
         return reduced_embeddings
 
@@ -87,7 +89,7 @@ class PreProcess:
         """
         Create output folders if they do not exist
         """
-        folders = [self.out_folder, self.split_texts_path, self.emb_path, self.model_path]
+        folders = [self.output_folder, self.split_texts_path, self.emb_path, self.model_path, self.labels_path]
         for folder in folders:
             if not os.path.exists(folder):
                 os.makedirs(folder)

@@ -16,16 +16,16 @@ def bool_ind(bool_val):
 
 class Analysis:
 
-    def __init__(self, out_path, model_from_file, mod_emb_from_file):
+    def __init__(self, out_path):
         """
         Class Analysis handles running the topic modeling analysis with the BERTopic module.
 
         Parameters:
             out_path (str): path to output folder with folders "models" and "embeddings"
-            model_from_file (bool): Use model saved in file or not
-            mod_emb_from_file (bool): Use embeddings from file for model or not
 
         Attributes:
+            model_from_file (bool): Use model saved in file or not
+            mod_emb_from_file (bool): Use embeddings from file for model or not
             clean_meth (str): Text clean method. (def for default, ft for filter-text function,
                               vect for vectorization param in BERTopic)
             split_size (str): Text split size. (chunk, sentence, or sentence-pairs)
@@ -39,17 +39,18 @@ class Analysis:
         self.models_path = os.path.join(out_path, "models")
         self.emb_path = os.path.join(out_path, "embeddings")
 
-        self.mod_emb_from_file = mod_emb_from_file
-        self.model_from_file = model_from_file
+        self.mod_emb_from_file = config.LOAD_TOPIC_MODEL_FROM_FILE
+        self.model_from_file = config.LOAD_MODEL_EMBEDDINGS_FROM_FILE
 
-        self.clean_meth = config.parameters["clean_meth"]
-        self.split_size = config.parameters["split_size"]
-        self.chunk_size = config.parameters["chunk_size"]
-        self.bert_model = config.parameters["bert_model"]
-        self.use_mmr = config.parameters["use_mmr"]
-        self.use_pos = config.parameters["use_pos"]
-        self.update_topics = config.parameters["update_topics"]
-        self.use_keyphrase = config.parameters["use_keyphrase"]
+        self.clean_meth = config.texts_parameters["clean_meth"]
+        self.split_size = config.texts_parameters["split_size"]
+        self.chunk_size = config.texts_parameters["chunk_size"]
+
+        self.bert_model = config.model_parameters["bert_model"]
+        self.use_mmr = config.bertopic_parameters["use_mmr"]
+        self.use_pos = config.bertopic_parameters["use_pos"]
+        self.update_topics = config.bertopic_parameters["update_topics"]
+        self.use_keyphrase = config.bertopic_parameters["use_keyphrase"]
 
         if self.split_size == "chunk":
             self.model_file_name = f"bertopic_model_{self.bert_model}_{self.split_size}{self.chunk_size}_{self.clean_meth}{self.get_repr_str()}"
@@ -124,19 +125,19 @@ class Analysis:
         # Conditionally set representation_model if using MMR for topic fine-tuning
         if self.use_mmr:
             print("Applying topic fine-tuning with MMR.")
-            representation_model = MaximalMarginalRelevance(diversity=config.parameters["mmr_diversity"])
+            representation_model = MaximalMarginalRelevance(diversity=config.bertopic_parameters["mmr_diversity"])
 
         if self.use_pos:
             print("Applying topic fine-tuning with Parts Of Speech.")
             # representation_model = PartOfSpeech(config.parameters['spacy_mod_pos'])
-            representation_model = PartOfSpeech(config.parameters['spacy_mod_pos'], pos_patterns=config.parameters["pos_patterns"])
+            representation_model = PartOfSpeech(config.bertopic_parameters['spacy_mod_pos'], pos_patterns=config.bertopic_parameters["pos_patterns"])
 
         umap_model = umap.UMAP(n_neighbors=15,
                                n_components=5,
                                min_dist=0.0,
                                metric='cosine',
                                low_memory=False,
-                               random_state=config.parameters["random_state"])
+                               random_state=config.bertopic_parameters["random_state"])
 
         # Create the topic model
         topic_model = BERTopic(vectorizer_model=vectorizer_model,
@@ -190,14 +191,6 @@ class Analysis:
         Returns:
             str: representation model values in str
         """
-        # if self.use_mmr and self.use_pos:
-        #     return f"_mmr{self.use_mmr}_p{self.use_pos}"
-        # elif self.use_mmr and not self.use_pos:
-        #     return f"_mmr{self.use_mmr}"
-        # elif self.use_pos and not self.use_mmr:
-        #     return f"_p{self.use_pos}"
-        # else:
-        #     return ""
         return f"_mmr{bool_ind(self.use_mmr)}_p{bool_ind(self.use_pos)}_kp{bool_ind(self.use_keyphrase)}"
 
 

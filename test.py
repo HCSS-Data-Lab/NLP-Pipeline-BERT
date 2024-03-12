@@ -17,13 +17,7 @@ import matplotlib.pyplot as plt
 if __name__ == "__main__":
 
 
-    pattern = "\[\[|\]\]|ParlaMint.+?\s"
-    test = ["ParlaMint-NL_2014-04-16-tweedekamer-2.u1	There are now enough"]
-
-    for t in test:
-        new = re.sub(pattern, "", t)
-        print(new)
-
+    print(os.getcwd())
 
 
 
