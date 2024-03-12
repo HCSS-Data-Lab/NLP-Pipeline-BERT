@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # NLP Pipeline BERT
 
 This repository does the following:
@@ -22,8 +21,8 @@ The `requirements.txt` is up to date.
 
 ## Running code
 - Run script `main.py`, after specifying in the main:
-  - `project_root`, which should be the folder `NLP-Pipeline-BERT`. The `project_root` should contain a folder `input`, which should contain a folder with the project name, for instance `Politie`, which should contain a folder `text_bodies` with input files in `.txt` format.
-  - `project`, the project name, should correspond to a project name in the `input` folder.
+  - `project_root`: which should be the folder `NLP-Pipeline-BERT`. The `project_root` should contain a folder `input`, which should contain a folder with the project name, for instance `Politie`, which should contain a folder `text_bodies` with input files in `.txt` format.
+  - `project`: the project name, should correspond to a project name in the `input` folder.
 - Specify parameters in `config.py`.
 - Initializing split texts, embeddings, reduced embeddings, and a trained topic model object at runtime takes several hours, depending on the dataset. To facilitate loading these data objects from a saved file, bool variables in `config.py` are specified and can be changed:
   - Loading split texts from file (LOAD_TEXT_SPLITS_FROM_FILE);
