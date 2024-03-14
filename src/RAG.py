@@ -8,8 +8,8 @@ import config
 import asyncio
 
 #OpenAI settings (key and model)
-os.environ['OPENAI_API_KEY'] = config.parameters["OPENAI_API_KEY"] #Should move to Gitignore (but since we are under closed HCSS repo, we keep it for now (ask James))
-llm = OpenAI(model="gpt-3.5-turbo", temperature=0.3) #
+os.environ['OPENAI_API_KEY'] = config.rag_parameters["OPENAI_API_KEY"] #Should move to Gitignore (but since we are under closed HCSS repo, we keep it for now (ask James))
+llm = OpenAI(model="gpt-3.5-turbo", temperature=0.3)
 
 class RAG():
     def __init__(self, embeddings, texts, RAG_from_file, path):
@@ -30,13 +30,13 @@ class RAG():
         self.embeddings = embeddings
         self.texts = texts
         self.RAG_from_file = RAG_from_file
-        self.path=path
+        self.path = path
         
     def create_vector_store_index(self):
         """
         Create a vector store index based on embeddings and texts and save in appropriate folder.
         """
-        nodes = [TextNode(text=self.texts[i], id_=str(i), embeddings = self.embeddings[i]) for i in range(0,len(self.texts))]
+        nodes = [TextNode(text=self.texts[i], id_=str(i), embeddings=self.embeddings[i]) for i in range(0, len(self.texts))]
         index = VectorStoreIndex(nodes)
         index.storage_context.persist(persist_dir=self.path)
 
@@ -50,7 +50,7 @@ class RAG():
         Returns:
             response (List[str]): the output response text
         """
-        print("Initiate RAG") #Create RAG from embeddings or load existing RAG
+        print("Initiate RAG")  # Create RAG from embeddings or load existing RAG
         if not self.RAG_from_file:
             self.create_vector_store_index()
         storage_context = StorageContext.from_defaults(persist_dir=self.path)

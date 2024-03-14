@@ -46,8 +46,8 @@ if __name__ == '__main__':
     
     # Initiate RAG, enhance topic labels based on RAG and summarize docs
     RAG_from_file = False
-    summarize_labels = True
-    summarize_docs = True
+    summarize_labels = False
+    summarize_docs = False
     rag = RAG(embeddings, texts, RAG_from_file, path=os.path.join(output_folder, 'RAG'))
 
     plotting = Plotting(topic_model=topic_model,
@@ -56,8 +56,8 @@ if __name__ == '__main__':
                         docs=texts,
                         summarize_docs=summarize_docs,
                         summarize_labels=summarize_labels,
-                        folder=folder,
-                        rag=rag)
+                        rag=rag,
+                        folder=folder)
     plotting.plot()
 
     #################################################################
