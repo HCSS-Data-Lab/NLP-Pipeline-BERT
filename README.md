@@ -5,13 +5,14 @@ This repository does the following:
 - Pre-process the text bodies in the following way: split them in specified sizes (chunks with chunk_size number of character; sentences; or sentence pairs)
 - Make embeddings from the split text parts
 - Running topic modeling analysis with BERTopic module, which works in the following way:
-    - Cluster high-dimensional vectors with HDBSCAN clustering algorithm;
+    - Cluster text embeddings (high-dimensional vectors) with HDBSCAN clustering algorithm;
     - Extract topics from clusters with c-TF-IDF algorithm;
-    - Reduce the dimensionality of the embeddings by mapping them to a 2-dim space.
+    - Reduce the dimensionality of the embeddings by mapping to a 2-dim space.
 - Plotting the results
     - (Optional): Create a retrieval augmented generator
     - (Optional): Enhance topics labels from this generator
     - (Optional): Create doc labels from this generator
+    - Plotting the documents, clustered as topics using (modified) default BERTopic visualize_documents function.
 - (Optional): Merging topic output to improve results
 - (Optional): Evaluate topic output by calculating coherence 
 
@@ -51,7 +52,19 @@ The project folder is structured as follows:
 ├── .github
 │
 ├── .idea                                                   
-│                                      
+│
+├── input
+    └── [project name]
+            └── text_bodies  # This input folder structure is required
+│
+├── output
+    └── [project name]
+            ├── embeddings
+            ├── figures
+            ├── labels
+            ├── models
+            └── texts  # This output folder structure is not required, if the folders do not exist they will be created at runtime.
+│                                         
 ├── src
     ├── analysis.py
     ├── embeddings_pp.py
