@@ -1,17 +1,15 @@
 # BOOL variables whether to load data objects from file or not
-LOAD_TEXT_SPLITS_FROM_FILE = True
-LOAD_EMBEDDINGS_FROM_FILE = True
-LOAD_REDUCED_EMBEDDINGS_FROM_FILE = True
-LOAD_TOPIC_MODEL_FROM_FILE = True
-LOAD_MODEL_EMBEDDINGS_FROM_FILE = True
+LOAD_TEXT_SPLITS_FROM_FILE = False
+LOAD_EMBEDDINGS_FROM_FILE = False
+LOAD_REDUCED_EMBEDDINGS_FROM_FILE = False
+LOAD_TOPIC_MODEL_FROM_FILE = False
+LOAD_MODEL_EMBEDDINGS_FROM_FILE = False
 
-filter_parameters = {
-    # Text filter parameters, used when reading text bodies
-    # If True, a filter pattern should also be defined.
+clean_parameters = {
     'filter_Politie': False,
 
     'filter_ParlaMint': True,
-    'filter_pattern_ParlaMint': "\[\[|\]\]|ParlaMint.+?\s",  # Clean regex for ParlaMint data: remove brackets and datestamp starting with ParlaMint
+    'pattern_ParlaMint': "\[\[|\]\]|ParlaMint.+?\s",  # Clean regex for ParlaMint data: remove brackets and datestamp starting with ParlaMint
 }
 
 texts_parameters = {

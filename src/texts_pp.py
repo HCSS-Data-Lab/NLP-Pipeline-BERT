@@ -179,8 +179,8 @@ class TextPreProcess:
             with open(os.path.join(self.bodies_path, text), "r", encoding="utf-8") as file:
                 text_body = file.read()
 
-                if config.filter_parameters[f"filter_{self.project}"]:
-                    text_body = re.sub(config.filter_parameters[f"filter_pattern_{self.project}"], "", text_body)
+                # if config.filter_parameters[f"filter_{self.project}"]:
+                #     text_body = re.sub(config.filter_parameters[f"filter_pattern_{self.project}"], "", text_body)
 
             texts.append(text_body)
         return texts
@@ -199,6 +199,8 @@ class TextPreProcess:
         """
         if self.split_size == "chunk":
             splits = self.chunk_texts(texts)
+        elif self.split_size == "semantic":
+            splits = self.semantic_chunk_texts(texts)
         elif self.split_size == "sentence":
             splits = sentencize_text(texts)
         elif self.split_size == "sentence-pairs":
@@ -228,6 +230,19 @@ class TextPreProcess:
             chunks = make_chunks(text, self.chunk_size)
             chunks_out.extend(chunks)
         return chunks_out
+
+    def semantic_chunk_texts(self, texts):
+        """
+        TODO:
+        Add semantic chunking here
+        Args:
+            texts:
+
+        Returns:
+
+        """
+        return 0
+
 
     def get_project_name(self):
         path_components = self.bodies_path.split(os.sep)

@@ -6,7 +6,7 @@ from src.red_embeddings_pp import RedEmbeddingsPreProcess
 
 class PreProcess:
 
-    def __init__(self, project_root, project):
+    def __init__(self, project_root, project, year="2022"):
         """
         PreProcess takes as parameters input folder, output folder, and project and stores
         sub-folders for all data: text-bodies, split text-bodies, embeddings, and models.
@@ -30,13 +30,13 @@ class PreProcess:
             raise ValueError(f"No project folder in input for project name {self.project}. The path {self.input_folder} does not exist. Create it and make sure it contains a folder text_bodies.")
 
         self.text_bodies_path = os.path.join(self.input_folder, "text_bodies")
-        if not os.path.exists(self.text_bodies_path):
-            raise ValueError(f"No text bodies folder. The path {self.text_bodies_path} does not exist. Create it and make sure it contains text bodies as .txt files.")
+        # if not os.path.exists(self.text_bodies_path):
+        #     raise ValueError(f"No text bodies folder. The path {self.text_bodies_path} does not exist. Create it and make sure it contains text bodies as .txt files.")
 
         if self.project == "ParlaMint":
-            self.text_bodies_path = os.path.join(self.text_bodies_path, "2014")  # Add year here
+            self.text_bodies_path = os.path.join(self.text_bodies_path, year)
 
-        self.output_folder = os.path.join(self.project_root, "output", project)
+        self.output_folder = os.path.join(self.project_root, "output", project, year)
 
         self.split_texts_path = os.path.join(self.output_folder, "texts")
         self.emb_path = os.path.join(self.output_folder, "embeddings")
@@ -93,3 +93,9 @@ class PreProcess:
         for folder in folders:
             if not os.path.exists(folder):
                 os.makedirs(folder)
+
+    def get_input_folder(self):
+        return self.input_folder
+
+    def get_text_bodies_path(self):
+        return self.text_bodies_path

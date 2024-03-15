@@ -1,5 +1,8 @@
 import os
+
+import config
 from src.preprocess import PreProcess
+from src.text_cleaning import TextCleaning
 from src.analysis import Analysis
 from src.plotting import Plotting
 from src.evaluation import Evaluation
@@ -16,6 +19,7 @@ if __name__ == '__main__':
     - In general it might also be great to have a dev set that we can use to do test runs (especially because ).   
     
     TODO:
+    - Fix year in output folder
     - Split up pre-processing part of old repository, make separate preproc repo. Option to add several preproc.
     options, for instance also Grobid
     - Contributor to BERTopic package for Convex Hulls.
@@ -23,9 +27,15 @@ if __name__ == '__main__':
     """
     # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
     project_root = os.getcwd()
-    project = "Politie"
+    project = "ParlaMint"
+    year = "2022"
     preprocess = PreProcess(project_root=project_root,
-                            project=project)
+                            project=project,
+                            year=year)
+
+    if config.clean_parameters[f"filter_{project}"]:
+        text_clean_obj = TextCleaning(project_root, project)
+        text_clean_obj.run_text_cleaning()
 
     # Initializing text data
     texts = preprocess.initialize_texts()
@@ -43,7 +53,7 @@ if __name__ == '__main__':
     model_name = analysis.get_model_file_name()
     num_texts = len(texts)
     folder = os.path.join(output_folder, "figures")
-    
+
     # Initiate RAG, enhance topic labels based on RAG and summarize docs
     RAG_from_file = False
     summarize_labels = False
