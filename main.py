@@ -15,7 +15,8 @@ if __name__ == '__main__':
     - Do not refer to local folders (find a way to define projectroot agnosticly that also works within devcontainer)
     - Add making automatic folders for project
     - Add option to not install sentence-transformers (and make use of cheap default embedding for development).
-    - In general it might also be great to have a dev set that we can use to do test runs (especially because ).    
+    - In general it might also be great to have a dev set that we can use to do test runs (especially because ). 
+    - Fix and time initializing RAG (fix subsequent queries)   
     """
     project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
     project = "Politie"
@@ -47,11 +48,11 @@ if __name__ == '__main__':
     folder = os.path.join(project_root, 'output', "figures")
     
     # Initiate RAG, enhance topic labels based on RAG and summarize docs
-    RAG_from_file=False
+    RAG_from_file=True
     summarize_labels=True 
     summarize_docs=True
     rag = RAG(embeddings, texts, RAG_from_file, path=os.path.join(path, 'RAG'))
-
+    
     plotting = Plotting(topic_model=topic_model,
                         reduced_embeddings=reduced_embeddings,
                         model_name=model_name,

@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from scipy.spatial import ConvexHull
+import config
 
 from umap import UMAP
 from typing import List, Union
@@ -23,9 +24,10 @@ def add_convex_hulls(fig, topic_per_doc, embeddings_2d, topic_range):
 
 def get_sample_indices(topic_model, sample=1.0):
     np.random.seed(0)
+    num_topics_in_fig = config.parameters["n_total"]
     topic_per_doc = topic_model.topics_
     indices = []
-    for topic in set(topic_per_doc[:50]):
+    for topic in list(set(topic_per_doc))[:num_topics_in_fig]:
         s = np.where(np.array(topic_per_doc) == topic)[0]
         size = int(len(s) * sample)
         indices.extend(np.random.choice(s, size=size, replace=False))
@@ -205,6 +207,7 @@ def visualize_documents_(topic_model,
     for name, topic in zip(names, unique_topics):
         if topic in topics and topic != -1:
             selection = df.loc[df.topic == topic, :]
+            print(selection)
             selection["text"] = ""
 
             if not hide_annotations:

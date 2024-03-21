@@ -1,10 +1,7 @@
-
-
 parameters = {
 
     # Text filter parameters, used when reading text bodies
     'filter_Politie': False,
-
     'filter_ParlaMint': True,
     'filter_pattern_ParlaMint': "\[\[|\]\]|ParlaMint.+?\s",  # Clean regex for ParlaMint data: remove brackets and datestamp starting with ParlaMint
 
@@ -40,16 +37,20 @@ parameters = {
 
     # Plotting parameters
     'n_total': 50,   # Total number of topics to show in the fig
-    'sample': 0.005,    # Sample (fraction) of docs to show in plot
+    'sample': 1,    # Sample (fraction) of docs to show in plot
     'n_words_legend': 3,    # Number of words to use in the description in the legend
     'n_words_hover': 6,    # Number of words to display when hovering over figure
     
     # RAG parameters
-    'OPENAI_API_KEY': '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', #HCSS open_AI key
     'create_new_docs': False,
-    'create_new_topics': True,
-    'query_for_topic_labels':'Summarize these topic_labels in at MOST 3 words (captialized, without comma):',
-    'query_docs_label':'Summarize this texts in at MOST 3 terms and at most 5 words (captialize the first letter of every word and separate by comma):'
+    'create_new_topics': False,
+    'query_for_topic_labels':"""Summarize these labels in one (sense-making) term that consists of
+                                at MOST 4 words (captialize the first letter of every word, do NOT separate by comma):""",
+    'query_docs_label':'Summarize this texts in at MOST 3 terms and at most 5 words (captialize the first letter of every word and separate by comma):',
+    'RAG_n_words_legend':10, # Number of noun frases to use to enhance the topic labels
+    'LLM-model':"gpt-3.5-turbo",
+    'temperature':0.3,
+    'article_retrievement':10
 }
 
 

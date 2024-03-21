@@ -49,6 +49,7 @@ class Plotting:
         # Plotting parameters
         self.n_total = config.parameters["n_total"]
         self.sample = config.parameters["sample"]
+        self.RAG_n_words_legend = config.parameters["RAG_n_words_legend"]
         self.n_words_legend = config.parameters["n_words_legend"]
         self.n_words_hover = config.parameters["n_words_hover"]
         self.plot_non_docs = plot_non_docs
@@ -64,12 +65,14 @@ class Plotting:
         fig is saved to html if so specified.
         """
         print("Plotting documents...")
-        words_legend = self.top_n_words(n_topics=self.num_topics, n_words=self.n_words_legend)
 
         if self.summarize_labels:
+            words_legend = self.top_n_words(n_topics=self.num_topics, n_words=self.RAG_n_words_legend)
             legend_labels = get_summary_labels(words_legend, RAG=self.RAG)
+            print(legend_labels)
             self.topic_model.set_topic_labels(legend_labels)
         else:
+            words_legend = self.top_n_words(n_topics=self.num_topics, n_words=self.n_words_legend)
             legend_labels = self.make_legend_labels(words_legend)
 
         indices = get_sample_indices(self.topic_model, sample=self.sample)
