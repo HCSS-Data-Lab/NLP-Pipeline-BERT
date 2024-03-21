@@ -30,13 +30,13 @@ class PreProcess:
             raise ValueError(f"No project folder in input for project name {self.project}. The path {self.input_folder} does not exist. Create it and make sure it contains a folder text_bodies.")
 
         self.text_bodies_path = os.path.join(self.input_folder, "text_bodies")
+        self.output_folder = os.path.join(self.project_root, "output", project)
         # if not os.path.exists(self.text_bodies_path):
         #     raise ValueError(f"No text bodies folder. The path {self.text_bodies_path} does not exist. Create it and make sure it contains text bodies as .txt files.")
 
         if self.project == "ParlaMint":
             self.text_bodies_path = os.path.join(self.text_bodies_path, year)
-
-        self.output_folder = os.path.join(self.project_root, "output", project, year)
+            self.output_folder = os.path.join(self.output_folder, year)
 
         self.split_texts_path = os.path.join(self.output_folder, "texts")
         self.emb_path = os.path.join(self.output_folder, "embeddings")
@@ -89,8 +89,7 @@ class PreProcess:
         """
         Create output folders if they do not exist
         """
-        folders = [self.output_folder, self.split_texts_path, self.emb_path, self.model_path, self.labels_path]
-        for folder in folders:
+        for folder in [self.output_folder, self.split_texts_path, self.emb_path, self.model_path, self.labels_path]:
             if not os.path.exists(folder):
                 os.makedirs(folder)
 

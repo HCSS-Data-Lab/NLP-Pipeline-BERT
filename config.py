@@ -1,11 +1,13 @@
 # BOOL variables whether to load data objects from file or not
-LOAD_TEXT_SPLITS_FROM_FILE = False
-LOAD_EMBEDDINGS_FROM_FILE = False
-LOAD_REDUCED_EMBEDDINGS_FROM_FILE = False
-LOAD_TOPIC_MODEL_FROM_FILE = False
-LOAD_MODEL_EMBEDDINGS_FROM_FILE = False
+LOAD_TEXT_SPLITS_FROM_FILE = True
+LOAD_EMBEDDINGS_FROM_FILE = True
+LOAD_REDUCED_EMBEDDINGS_FROM_FILE = True
+LOAD_TOPIC_MODEL_FROM_FILE = True
+LOAD_MODEL_EMBEDDINGS_FROM_FILE = True
 
 clean_parameters = {
+    'filter_test': False,
+    'filter_SKC': False,
     'filter_Politie': False,
 
     'filter_ParlaMint': True,
@@ -14,14 +16,16 @@ clean_parameters = {
 
 texts_parameters = {
     'clean_meth': 'vect',  # Text clean method: def (default, no cleaning), vect (vectorization), or ft (filter-texts function)
-    'split_size': 'chunk',  # Text split size: chunk, sentence or sentence-pairs
-    'chunk_size': 500,  # Number of characters in chunk
+    'split_size': 'chunk_len',  # Text split size: chunk, chunk_len, sentence or sentence-pairs
+    'chunk_size': 512,  # Number of characters in chunk
 }
 
 model_parameters = {
     # 'bert_model': 'all-MiniLM-L6-v2',  # A: Default model for BERTopic
     'bert_model': 'multi-qa-MiniLM-L6-cos-v1',  # B: The best small performer with large sequence length
     # 'bert_model': 'all-mpnet-base-v2',  # C: Current sentence-BERT state-of-the-art
+
+    # 'bert_model': 'mixedbread-ai/mxbai-embed-large-v1',  # Best small performer from MTEB
 }
 
 bertopic_parameters = {

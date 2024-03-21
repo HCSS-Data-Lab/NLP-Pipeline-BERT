@@ -19,7 +19,6 @@ if __name__ == '__main__':
     - In general it might also be great to have a dev set that we can use to do test runs (especially because ).   
     
     TODO:
-    - Fix year in output folder
     - Split up pre-processing part of old repository, make separate preproc repo. Option to add several preproc.
     options, for instance also Grobid
     - Contributor to BERTopic package for Convex Hulls.
@@ -28,14 +27,14 @@ if __name__ == '__main__':
     # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
     project_root = os.getcwd()
     project = "ParlaMint"
-    year = "2022"
+    year = "2015"
     preprocess = PreProcess(project_root=project_root,
                             project=project,
                             year=year)
 
-    if config.clean_parameters[f"filter_{project}"]:
-        text_clean_obj = TextCleaning(project_root, project)
-        text_clean_obj.run_text_cleaning()
+    if config.clean_parameters[f"filter_{project}"]:  # In config change filter into False to turn it off
+        text_cleaning = TextCleaning(project_root, project)
+        text_cleaning.read_clean_raw_texts(year=year)  # Add the year as param hear to clean text for the specific year
 
     # Initializing text data
     texts = preprocess.initialize_texts()
@@ -46,7 +45,7 @@ if __name__ == '__main__':
 
     # Initialize topic-model
     output_folder = os.path.join(project_root, "output", project)
-    analysis = Analysis(output_folder)
+    analysis = Analysis(out_path=output_folder, year=year)
     topic_model = analysis.initialize_topic_model(texts)
 
     # Plotting
@@ -87,7 +86,7 @@ if __name__ == '__main__':
         topic_model.merge_topics(texts, topics_to_merge)
 
     # Evaluation, calculate coherence
-    evaluate_topics = False
+    evaluate_topics = True
     if evaluate_topics:
         evaluation = Evaluation()
         metrics = ["c_v", "c_npmi"]
@@ -95,7 +94,6 @@ if __name__ == '__main__':
         print(coherence_dict)
 
         # div = evaluation.calculate_diversity(topic_model)
-
 
 
 
