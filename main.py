@@ -27,7 +27,7 @@ if __name__ == '__main__':
     # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
     project_root = os.getcwd()
     project = "ParlaMint"
-    year = "2015"
+    year = "2022"
     preprocess = PreProcess(project_root=project_root,
                             project=project,
                             year=year)
@@ -86,7 +86,7 @@ if __name__ == '__main__':
         topic_model.merge_topics(texts, topics_to_merge)
 
     # Evaluation, calculate coherence
-    evaluate_topics = True
+    evaluate_topics = False
     if evaluate_topics:
         evaluation = Evaluation()
         metrics = ["c_v", "c_npmi"]

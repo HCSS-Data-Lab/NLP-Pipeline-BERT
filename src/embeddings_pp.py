@@ -87,9 +87,6 @@ class EmbeddingsPreProcess:
             embeddings (torch.Tensor): text embeddings, each doc as a 768-dim vector. Shape: (num docs, 768)
         """
         print("Initializing embeddings at runtime...")
-        print("Emb path: ", self.path)
-        print("Embedding name: ", self.embedding_name)
-
         model = SentenceTransformer(self.bert_model)
         embeddings = model.encode(data, show_progress_bar=True)
 
