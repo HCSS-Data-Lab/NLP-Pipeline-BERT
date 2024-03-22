@@ -28,7 +28,7 @@ def get_num_docs_topic(hover_labels):
 
 class Plotting:
 
-    def __init__(self, topic_model, reduced_embeddings, model_name, docs, folder="", save_html=False, merged=False, plot_non_docs=False, summarize_labels=False, summarize_docs=False, rag=None):
+    def __init__(self, topic_model, reduced_embeddings, model_name, docs, folder="", save_html=False, merged=False, plot_non_docs=False, summarize_labels=False, summarize_docs=False, rag=None, year=None):
         # Parameters
         self.topic_model = topic_model
         self.red_emb = reduced_embeddings
@@ -40,7 +40,7 @@ class Plotting:
         self.merged = merged
         self.summarize_labels = summarize_labels
         self.summarize_docs = summarize_docs
-        self.RAG=rag
+        self.RAG = rag
 
         # Variables from topic-model object
         self.topics = self.get_topics()
@@ -53,6 +53,7 @@ class Plotting:
         self.n_words_legend = config.plotting_parameters["n_words_legend"]
         self.n_words_hover = config.plotting_parameters["n_words_hover"]
         self.plot_non_docs = plot_non_docs
+        self.year = year
         self.fig_title = self.get_fig_title()
 
     def plot(self):
@@ -68,11 +69,10 @@ class Plotting:
         if self.summarize_labels:
             words_legend = self.top_n_words(n_topics=self.num_topics, n_words=self.RAG_n_words_legend)
             legend_labels = get_summary_labels(words_legend, RAG=self.RAG)
-            print(legend_labels)
-            self.topic_model.set_topic_labels(legend_labels)
         else:
             words_legend = self.top_n_words(n_topics=self.num_topics, n_words=self.n_words_legend)
             legend_labels = self.make_legend_labels(words_legend)
+        self.topic_model.set_topic_labels(legend_labels)
 
         indices = get_sample_indices(self.topic_model, sample=self.sample)
         print("Number of docs sampled: ", len(indices))
@@ -134,8 +134,7 @@ class Plotting:
         """
         print("Making legend labels...")
         legend_labels = [f"{i}: " + ", ".join(w) for i, w in enumerate(words_legend)]
-        self.topic_model.set_topic_labels(legend_labels)  # legend_labels contains outlier topic label '0: the, and, of' but this is skipped automatically
-        return legend_labels
+        return legend_labels  # legend_labels contains outlier topic label '0: the, and, of' but this is skipped automatically
 
     def top_n_words(self, n_topics=10, n_words=10):
         """
@@ -235,15 +234,15 @@ class Plotting:
             print(f"Plotting all documents. Number of docs: {self.num_docs}")
 
     def get_param_str(self):
-        return f"plot_mn{self.model_name}_n{self.n_total}_s{self.sample}.html"
+        return f"plot_mn{self.model_name}_n{self.n_total}_s{self.sample}_y{self.year}.html"
 
     def get_fig_title(self):
         # OLD TITLE
         # self.fig_title = f"Text Data | Documents & Topics (merged)\n{self.model_name}" if self.merged else f"Text Data | Documents & Topics (unmerged)\n{self.model_name}"
         if self.merged:
-            return f"(merged)\n{self.model_name}_sam{config.parameters['sample']}"
+            return f"(merged)\n{self.model_name}_sam{config.plotting_parameters['sample']}"
         else:
-            return f"(unmerged)\n{self.model_name}_sam{config.parameters['sample']}"
+            return f"(unmerged)\n{self.model_name}_sam{config.plotting_parameters['sample']}"
 
     def get_sample_docs(self):
         pass

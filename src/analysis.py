@@ -17,7 +17,7 @@ def bool_ind(bool_val):
 
 class Analysis:
 
-    def __init__(self, out_path, year="2022"):
+    def __init__(self, out_path):
         """
         Class Analysis handles running the topic modeling analysis with the BERTopic module.
 
@@ -38,8 +38,6 @@ class Analysis:
         """
 
         self.project_name = os.path.basename(out_path)
-        if self.project_name == "ParlaMint":
-            out_path = os.path.join(out_path, year)
 
         self.models_path = os.path.join(out_path, "models")
         self.emb_path = os.path.join(out_path, "embeddings")
@@ -52,7 +50,8 @@ class Analysis:
         self.chunk_size = config.texts_parameters["chunk_size"]
 
         self.bert_model = config.model_parameters["bert_model"]
-        self.bert_model_str = self.bert_model.split("/")[-1]
+        self.bert_model_str = self.bert_model.split("/")[-1]  # When model name is like 'mixedbread-ai/mxb...', only take the second part
+
         self.use_mmr = config.bertopic_parameters["use_mmr"]
         self.use_pos = config.bertopic_parameters["use_pos"]
         self.update_topics = config.bertopic_parameters["update_topics"]

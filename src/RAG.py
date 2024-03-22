@@ -16,7 +16,7 @@ embed_model = HuggingFaceEmbeddings(model_name="sentence-transformers/" + config
 SERVICE_CONTEXT = ServiceContext.from_defaults(embed_model=embed_model)
 
 
-class RAG():
+class RAG:
     def __init__(self, embeddings, texts, RAG_from_file, path):
         """
         Create a RAG from the embeddings and texts that summarizes docs and enhances topic labels.

@@ -209,7 +209,6 @@ def visualize_documents_(topic_model,
     for name, topic in zip(names, unique_topics):
         if topic in topics and topic != -1:
             selection = df.loc[df.topic == topic, :]
-            print(selection)
             selection["text"] = ""
 
             if not hide_annotations:
