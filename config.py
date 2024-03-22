@@ -9,7 +9,6 @@ filter_parameters = {
     # Text filter parameters, used when reading text bodies
     # If True, a filter pattern should also be defined.
     'filter_Politie': False,
-
     'filter_ParlaMint': True,
     'filter_pattern_ParlaMint': "\[\[|\]\]|ParlaMint.+?\s",  # Clean regex for ParlaMint data: remove brackets and datestamp starting with ParlaMint
 }
@@ -56,9 +55,15 @@ plotting_parameters = {
 
 rag_parameters = {
     # RAG parameters
-    'OPENAI_API_KEY': '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', #HCSS open_AI key
     'create_new_docs': False,
-    'create_new_topics': True,
-    'query_for_topic_labels':'Summarize these topic_labels in at MOST 3 words (captialized, without comma):',
-    'query_docs_label':'Summarize this texts in at MOST 3 terms and at most 5 words (captialize the first letter of every word and separate by comma):'
+    'create_new_topics': False,
+    'query_for_topic_labels':"""Summarize these labels in one (sense-making) term that consists of
+                                at MOST 4 words (captialize the first letter of every word, do NOT separate by comma):""",
+    'query_docs_label':'Summarize this texts in at MOST 3 terms and at most 5 words (captialize the first letter of every word and separate by comma):',
+    'RAG_n_words_legend':10, # Number of noun frases to use to enhance the topic labels
+    'LLM-model':"gpt-3.5-turbo",
+    'temperature':0.3,
+    'article_retrievement':10
 }
+
+

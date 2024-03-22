@@ -49,13 +49,20 @@ def get_summary_labels(words_legend: List[str], RAG):
     if os.path.exists(labels_path+'/topic_labels.pkl') and config.parameters["create_new_topics"]==False:
         print(f'Reloading stored topic labels of {len(words_legend)} labels...')
         with open(labels_path+'/topic_labels.pkl', 'rb') as file:
-            summarized_topics = pickle.load(file)
+            words_legend = pickle.load(file)
     else:
-        print(f'Getting topic labels from RAG asynchronously of {len(words_legend)} texts...')
-        summarized_topics = RAG.summarize_words(words_legend)
+        print(f"Getting topic labels from RAG asynchronously of {len(words_legend[:config.parameters['n_total']])} texts...")
+        words_legend = RAG.summarize_words(words_legend)
+        #summarized_topics = [item.split(', ') for item in summarized_topics]
+        #words_legend = [summarized_topics[i] if i < config.parameters['n_total'] else words_legend[i] for i in range(len(words_legend))]
 
     #Save the summarized docs
     with open(labels_path+'/topic_labels.pkl', 'wb') as file:
-        pickle.dump(summarized_topics, file)
+        pickle.dump(words_legend, file)
 
-    return summarized_topics
+    return words_legend
+
+    
+    
+
+
