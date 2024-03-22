@@ -6,7 +6,7 @@ import config
 
 class EmbeddingsPreProcess:
 
-    def __init__(self, emb_from_file, emb_path):
+    def __init__(self, emb_path):
         """
         Class EmbeddingsPreProcess stores the variables needed to initialize the embeddings: emb_from_file,
         embeddings path, text clean-method, and text split-size. It also handles the functionality to
@@ -14,11 +14,11 @@ class EmbeddingsPreProcess:
         based on input text data.
 
         Parameters:
-            emb_from_file (bool): Boolean indicator whether to load existing embeddings from file or generate them
-                                  at runtime from text data.
             emb_path (str): Directory path where embeddings are stored.
 
         Attributes:
+            emb_from_file (bool): Boolean indicator whether to load existing embeddings from file or generate them
+                                  at runtime from text data.
             clean_meth (str): Text clean method. (def for default, ft for filter-text function,
                               vect for vectorization param in BERTopic)
             split_size (str): Text split size. (chunk, sentence, or sentence-pairs)
@@ -26,12 +26,12 @@ class EmbeddingsPreProcess:
             embedding_name (str): Embedding filename based on split_size and clean_method.
         """
 
-        self.emb_from_file = emb_from_file
+        self.emb_from_file = config.LOAD_EMBEDDINGS_FROM_FILE
         self.path = emb_path
-        self.clean_meth = config.parameters["clean_meth"]
-        self.split_size = config.parameters["split_size"]
-        self.chunk_size = config.parameters["chunk_size"]
-        self.bert_model = config.parameters["bert_model"]
+        self.clean_meth = config.texts_parameters["clean_meth"]
+        self.split_size = config.texts_parameters["split_size"]
+        self.chunk_size = config.texts_parameters["chunk_size"]
+        self.bert_model = config.model_parameters["bert_model"]
 
         if self.split_size == "chunk":
             self.embedding_name = f"embeddings_{self.bert_model}_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
@@ -93,4 +93,3 @@ class EmbeddingsPreProcess:
             pickle.dump({'embeddings': embeddings, 'text_split_size': self.split_size, 'bert_model': self.bert_model}, file,
                         protocol=pickle.HIGHEST_PROTOCOL)
         return embeddings
-

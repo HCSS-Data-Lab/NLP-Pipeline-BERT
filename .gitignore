@@ -13,6 +13,7 @@ bertopic_model
 get-pip.py
 input/
 output/
+webapp/
 __pycache__/*
 __pycache__
 *.env

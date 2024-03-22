@@ -71,7 +71,7 @@ def filter_texts(texts):
 
 class TextPreProcess:
 
-    def __init__(self, splits_from_file, text_bodies_path, splits_path):
+    def __init__(self, text_bodies_path, splits_path):
         """
         Class TextPreProcess stores the variables needed in text preprocessing: splits from file,
         text-bodies path, split-texts path, text clean method and text split size. It also handles
@@ -79,26 +79,26 @@ class TextPreProcess:
         and splitting texts at runtime.
 
         Parameters:
-            splits_from_file (bool): Load split texts from file or read and split text bodies at runtime
             text_bodies_path (str): Directory path where text bodies are stored.
             splits_path (str): Directory path where split texts are stored.
 
         Attributes:
+            splits_from_file (bool): Load split texts from file or read and split text bodies at runtime
             clean_meth (str): Text clean method. (def for default, ft for filter-text function,
                               vect for vectorization param in BERTopic)
             split_size (str): Text split size. (chunk, sentence, or sentence-pairs)
             texts_split_name (str): Text split .pkl dictionary filename
         """
 
-        self.splits_from_file = splits_from_file
+        self.splits_from_file = config.LOAD_TEXT_SPLITS_FROM_FILE
         self.bodies_path = text_bodies_path
         self.splits_path = splits_path
 
         self.project = self.get_project_name()
 
-        self.clean_meth = config.parameters["clean_meth"]
-        self.split_size = config.parameters["split_size"]
-        self.chunk_size = config.parameters["chunk_size"]
+        self.clean_meth = config.texts_parameters["clean_meth"]
+        self.split_size = config.texts_parameters["split_size"]
+        self.chunk_size = config.texts_parameters["chunk_size"]
 
         if self.split_size == "chunk":
             self.texts_split_name = f"texts_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
@@ -179,8 +179,8 @@ class TextPreProcess:
             with open(os.path.join(self.bodies_path, text), "r", encoding="utf-8") as file:
                 text_body = file.read()
 
-                if config.parameters[f"filter_{self.project}"]:
-                    text_body = re.sub(config.parameters[f"filter_pattern_{self.project}"], "", text_body)
+                if config.filter_parameters[f"filter_{self.project}"]:
+                    text_body = re.sub(config.filter_parameters[f"filter_pattern_{self.project}"], "", text_body)
 
             texts.append(text_body)
         return texts

@@ -6,7 +6,7 @@ import config
 
 class RedEmbeddingsPreProcess:
 
-    def __init__(self, red_from_file, emb_path):
+    def __init__(self, emb_path):
         """
         Class RedEmbeddingsPreProcess stores the variables used for reduced embeddings
         preprocessing and handles all the functionality of loading or generating
@@ -26,14 +26,14 @@ class RedEmbeddingsPreProcess:
             red_emb_name (str): reduced embeddings file name, used when saving to file
         """
 
-        self.red_from_file = red_from_file
+        self.red_from_file = config.LOAD_REDUCED_EMBEDDINGS_FROM_FILE
         self.path = emb_path
-        self.clean_meth = config.parameters["clean_meth"]
-        self.split_size = config.parameters["split_size"]
-        self.chunk_size = config.parameters["chunk_size"]
-        self.bert_model = config.parameters["bert_model"]
+        self.clean_meth = config.texts_parameters["clean_meth"]
+        self.split_size = config.texts_parameters["split_size"]
+        self.chunk_size = config.texts_parameters["chunk_size"]
+        self.bert_model = config.model_parameters["bert_model"]
 
-        self.random_state = config.parameters["random_state"]
+        self.random_state = config.bertopic_parameters["random_state"]
 
         if self.split_size == "chunk":
             self.red_emb_name = f"red_embeddings_{self.bert_model}_{self.split_size}{self.chunk_size}_{self.clean_meth}.npy"

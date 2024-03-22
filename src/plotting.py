@@ -47,14 +47,13 @@ class Plotting:
         self.num_topics = self.get_num_topics()
 
         # Plotting parameters
-        self.n_total = config.parameters["n_total"]
-        self.sample = config.parameters["sample"]
-        self.RAG_n_words_legend = config.parameters["RAG_n_words_legend"]
-        self.n_words_legend = config.parameters["n_words_legend"]
-        self.n_words_hover = config.parameters["n_words_hover"]
+        self.n_total = config.plotting_parameters["n_total"]
+        self.sample = config.plotting_parameters["sample"]
+        self.RAG_n_words_legend = config.rag_parameters["RAG_n_words_legend"]
+        self.n_words_legend = config.plotting_parameters["n_words_legend"]
+        self.n_words_hover = config.plotting_parameters["n_words_hover"]
         self.plot_non_docs = plot_non_docs
         self.fig_title = self.get_fig_title()
-
 
     def plot(self):
         """
@@ -239,6 +238,7 @@ class Plotting:
         return f"plot_mn{self.model_name}_n{self.n_total}_s{self.sample}.html"
 
     def get_fig_title(self):
+        # OLD TITLE
         # self.fig_title = f"Text Data | Documents & Topics (merged)\n{self.model_name}" if self.merged else f"Text Data | Documents & Topics (unmerged)\n{self.model_name}"
         if self.merged:
             return f"(merged)\n{self.model_name}_sam{config.parameters['sample']}"
@@ -247,4 +247,3 @@ class Plotting:
 
     def get_sample_docs(self):
         pass
-
