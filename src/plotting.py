@@ -241,9 +241,9 @@ class Plotting:
         # OLD TITLE
         # self.fig_title = f"Text Data | Documents & Topics (merged)\n{self.model_name}" if self.merged else f"Text Data | Documents & Topics (unmerged)\n{self.model_name}"
         if self.merged:
-            return f"(merged)\n{self.model_name}_sam{config.parameters['sample']}"
+            return f"(merged)\n{self.model_name}_sam{config.plotting_parameters['sample']}"
         else:
-            return f"(unmerged)\n{self.model_name}_sam{config.parameters['sample']}"
+            return f"(unmerged)\n{self.model_name}_sam{config.plotting_parameters['sample']}"
 
     def get_sample_docs(self):
         pass
