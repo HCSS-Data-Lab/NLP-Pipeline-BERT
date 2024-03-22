@@ -6,13 +6,14 @@ This repository does the following:
 - Pre-process the text bodies in the following way: split them in specified sizes (chunks with chunk_size number of character; sentences; or sentence pairs)
 - Make embeddings from the split text parts
 - Running topic modeling analysis with BERTopic module, which works in the following way:
-    - Cluster high-dimensional vectors with HDBSCAN clustering algorithm;
+    - Cluster text embeddings (high-dimensional vectors) with HDBSCAN clustering algorithm;
     - Extract topics from clusters with c-TF-IDF algorithm;
-    - Reduce the dimensionality of the embeddings by mapping them to a 2-dim space.
+    - Reduce the dimensionality of the embeddings by mapping to a 2-dim space.
 - Plotting the results
     - (Optional): Create a retrieval augmented generator
     - (Optional): Enhance topics labels from this generator
     - (Optional): Create doc labels from this generator
+    - Plotting the documents, clustered as topics using (modified) default BERTopic visualize_documents function.
 - (Optional): Merging topic output to improve results
 - (Optional): Evaluate topic output by calculating coherence 
 
@@ -22,8 +23,8 @@ The `requirements.txt` is up to date.
 
 ## Running code
 - Run script `main.py`, after specifying in the main:
-  - `project_root`, which should be the folder `NLP-Pipeline-BERT`. The `project_root` should contain a folder `input`, which should contain a folder with the project name, for instance `Politie`, which should contain a folder `text_bodies` with input files in `.txt` format.
-  - `project`, the project name, should correspond to a project name in the `input` folder.
+  - `project_root`: which should be the folder `NLP-Pipeline-BERT`. The `project_root` should contain a folder `input`, which should contain a folder with the project name, for instance `Politie`, which should contain a folder `text_bodies` with input files in `.txt` format.
+  - `project`: the project name, should correspond to a project name in the `input` folder.
 - Specify parameters in `config.py`.
 - Initializing split texts, embeddings, reduced embeddings, and a trained topic model object at runtime takes several hours, depending on the dataset. To facilitate loading these data objects from a saved file, bool variables in `config.py` are specified and can be changed:
   - Loading split texts from file (LOAD_TEXT_SPLITS_FROM_FILE);
@@ -52,7 +53,22 @@ The project folder is structured as follows:
 ├── .github
 │
 ├── .idea                                                   
-│                                      
+│
+├── input
+    └── [project name]
+            ├── raw_texts if project=ParlaMint
+                    └── [year] if project=ParlaMint            
+            └── text_bodies
+                    └── [year] if project=ParlaMint
+│
+├── output
+    └── [project name]
+        └── [year] if project=ParlaMint
+            ├── embeddings
+            ├── figures
+            ├── models
+            └── texts  # This output folder structure is not required, if the folders do not exist they will be created at runtime.
+│                                         
 ├── src
     ├── analysis.py
     ├── embeddings_pp.py

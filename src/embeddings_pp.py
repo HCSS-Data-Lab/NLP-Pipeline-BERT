@@ -32,11 +32,12 @@ class EmbeddingsPreProcess:
         self.split_size = config.texts_parameters["split_size"]
         self.chunk_size = config.texts_parameters["chunk_size"]
         self.bert_model = config.model_parameters["bert_model"]
+        self.bert_model_str = self.bert_model.split("/")[-1]
 
         if self.split_size == "chunk":
-            self.embedding_name = f"embeddings_{self.bert_model}_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
+            self.embedding_name = f"embeddings_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
         else:
-            self.embedding_name = f"embeddings_{self.bert_model}_{self.split_size}_{self.clean_meth}.pkl"
+            self.embedding_name = f"embeddings_{self.bert_model_str}_{self.split_size}_{self.clean_meth}.pkl"
 
     def get_embeddings(self, data):
         """

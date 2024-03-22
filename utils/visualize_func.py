@@ -7,6 +7,8 @@ import config
 from umap import UMAP
 from typing import List, Union
 
+import config
+
 def add_convex_hulls(fig, topic_per_doc, embeddings_2d, topic_range):
     for id in topic_range:
         if id != -1:
@@ -24,14 +26,14 @@ def add_convex_hulls(fig, topic_per_doc, embeddings_2d, topic_range):
 
 def get_sample_indices(topic_model, sample=1.0):
     np.random.seed(0)
-    num_topics_in_fig = config.parameters["n_total"]
+    num_topics_in_fig = config.plotting_parameters["n_total"]
     topic_per_doc = topic_model.topics_
-    indices = []
+    sample_indices = []
     for topic in list(set(topic_per_doc))[:num_topics_in_fig]:
-        s = np.where(np.array(topic_per_doc) == topic)[0]
-        size = int(len(s) * sample)
-        indices.extend(np.random.choice(s, size=size, replace=False))
-    indices = np.array(indices)
+        indices_for_topic = np.where(np.array(topic_per_doc) == topic)[0]  # Indices for topic of for-loop
+        size = int(len(indices_for_topic) * sample)  # Size (number of) samples for this topic
+        sample_indices.extend(np.random.choice(indices_for_topic, size=size, replace=False))
+    indices = np.array(sample_indices)
     return indices
 
 def visualize_documents_(topic_model,

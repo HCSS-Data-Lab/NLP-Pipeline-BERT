@@ -11,6 +11,7 @@ bertopic_model
 !.gitignore
 !requirements.txt
 get-pip.py
+test.py
 input/
 output/
 webapp/

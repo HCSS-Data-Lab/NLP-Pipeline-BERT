@@ -4,6 +4,7 @@ from bertopic.representation import MaximalMarginalRelevance
 from bertopic.representation import PartOfSpeech
 from sklearn.feature_extraction.text import CountVectorizer
 from keyphrase_vectorizers import KeyphraseCountVectorizer
+from sentence_transformers import SentenceTransformer
 
 import time
 import os
@@ -16,7 +17,7 @@ def bool_ind(bool_val):
 
 class Analysis:
 
-    def __init__(self, out_path):
+    def __init__(self, out_path, year="2022"):
         """
         Class Analysis handles running the topic modeling analysis with the BERTopic module.
 
@@ -36,28 +37,33 @@ class Analysis:
             emb_name (str): name for embeddings used for saving/loading from file.
         """
 
+        self.project_name = os.path.basename(out_path)
+        if self.project_name == "ParlaMint":
+            out_path = os.path.join(out_path, year)
+
         self.models_path = os.path.join(out_path, "models")
         self.emb_path = os.path.join(out_path, "embeddings")
 
-        self.mod_emb_from_file = config.LOAD_TOPIC_MODEL_FROM_FILE
-        self.model_from_file = config.LOAD_MODEL_EMBEDDINGS_FROM_FILE
+        self.model_from_file = config.LOAD_TOPIC_MODEL_FROM_FILE
+        self.mod_emb_from_file = config.LOAD_MODEL_EMBEDDINGS_FROM_FILE
 
         self.clean_meth = config.texts_parameters["clean_meth"]
         self.split_size = config.texts_parameters["split_size"]
         self.chunk_size = config.texts_parameters["chunk_size"]
 
         self.bert_model = config.model_parameters["bert_model"]
+        self.bert_model_str = self.bert_model.split("/")[-1]
         self.use_mmr = config.bertopic_parameters["use_mmr"]
         self.use_pos = config.bertopic_parameters["use_pos"]
         self.update_topics = config.bertopic_parameters["update_topics"]
         self.use_keyphrase = config.bertopic_parameters["use_keyphrase"]
 
         if self.split_size == "chunk":
-            self.model_file_name = f"bertopic_model_{self.bert_model}_{self.split_size}{self.chunk_size}_{self.clean_meth}{self.get_repr_str()}"
-            self.emb_name = f"embeddings_{self.bert_model}_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
+            self.model_file_name = f"bertopic_model_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}{self.get_repr_str()}"
+            self.emb_name = f"embeddings_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
         else:
-            self.model_file_name = f"bertopic_model_{self.bert_model}_{self.split_size}_{self.clean_meth}{self.get_repr_str()}"
-            self.emb_name = f"embeddings_{self.bert_model}_{self.split_size}_{self.clean_meth}.pkl"
+            self.model_file_name = f"bertopic_model_{self.bert_model_str}_{self.split_size}_{self.clean_meth}{self.get_repr_str()}"
+            self.emb_name = f"embeddings_{self.bert_model_str}_{self.split_size}_{self.clean_meth}.pkl"
 
     def initialize_topic_model(self, data):
         if self.model_from_file:

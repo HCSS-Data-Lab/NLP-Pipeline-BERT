@@ -1,4 +1,6 @@
 import os
+from typing import List
+
 from tqdm import tqdm
 import spacy
 import pickle
@@ -24,32 +26,47 @@ def make_chunks(text, max_length):
         text = text[max_length:]
     return chunks
 
+def truncate_sentences(sentences: List[str], max_len: int = 512) -> List[str]:
+    """
+    Truncate sentences to max length
+
+    Returns:
+        List[str]: truncated sentences
+    """
+    return [i for s in sentences for i in make_chunks(s, max_len)]
+
 def sentencize_text(texts):
     """
     TODO:
-    - Use Spacy Sentencizer to make sentences, splitting on . is imprecise
+    - Use Spacy Sentencizer to make sentences, splitting on .?! is imprecise
 
-    Splits input texts into sentences.
+    Splits input texts into sentences, keep sentences of each document in a separate list
 
     Args:
-        texts (list[str]): text bodies
+        texts (List[str]): text bodies
 
     Returns:
-        list[str]: A list of sentences extracted from the input texts.
+        List[List[str]]: A list of list with sentences for each input text
     """
-    return [sentence for t in texts for sentence in t.split(".")]
+    delimiters = ['.', '?', '!']
+    pattern = '\s|'.join(map(re.escape, delimiters))  # Add whitespace \s, regex OR delim |, and add backslash with escape
+    return [re.split(pattern, text) for text in texts]
 
-def pair_sentences(sentences):
+def pair_sentences(text_sentences):
     """
     Pair sentences together
 
     Args:
-        sentences (list[str])
+        text_sentences (List[List[str]]): lst of lst with sentence of each document
 
     Returns:
-        list[str]: paired sentences
+        List[str]: paired sentences
     """
-    return [(sentences[i]+""+sentences[i+1] if i+1 < len(sentences) else sentences[i]) for i in range(0, len(sentences), 2)]
+    sentence_pairs = []
+    for text in text_sentences:
+        pairs = [(text[i]+". "+text[i+1] if i+1 < len(text) else text[i]) for i in range(0, len(text), 2)]
+        sentence_pairs.append(pairs)
+    return sentence_pairs
 
 def filter_texts(texts):
     """
@@ -178,10 +195,6 @@ class TextPreProcess:
         for text in text_names:
             with open(os.path.join(self.bodies_path, text), "r", encoding="utf-8") as file:
                 text_body = file.read()
-
-                if config.filter_parameters[f"filter_{self.project}"]:
-                    text_body = re.sub(config.filter_parameters[f"filter_pattern_{self.project}"], "", text_body)
-
             texts.append(text_body)
         return texts
 
@@ -199,11 +212,14 @@ class TextPreProcess:
         """
         if self.split_size == "chunk":
             splits = self.chunk_texts(texts)
+        elif self.split_size == "chunk_len":
+            text_sentences = sentencize_text(texts)
+            splits = self.chunk_sents_len(text_sentences)
         elif self.split_size == "sentence":
             splits = sentencize_text(texts)
         elif self.split_size == "sentence-pairs":
-            sentences = sentencize_text(texts)
-            splits = pair_sentences(sentences)
+            text_sentences = sentencize_text(texts)
+            splits = pair_sentences(text_sentences)
         else:
             raise ValueError(
                 f"split_size: {self.split_size} is undefined. Valid options are 'chunk', 'sentence', or 'sentence-pairs'.")
@@ -228,6 +244,52 @@ class TextPreProcess:
             chunks = make_chunks(text, self.chunk_size)
             chunks_out.extend(chunks)
         return chunks_out
+
+    def chunk_sents_len(self, text_sentences: List[List[str]]):
+        """
+        Chunk sentences together in chunks of at most max_len length
+
+        Args:
+            text_sentences: sentences, which is the text split on "."
+
+        Returns:
+            chunks (List[List[str]]): sentence chunks
+        """
+        chunks = []
+        for sentences in text_sentences:
+            trunc_sentences = truncate_sentences(sentences, self.chunk_size)
+            lens = [len(s) for s in trunc_sentences]  # Sentence lengths
+            sent_indices = self.get_sent_chunk_inds(lens)  # Sentence indices to chunk together
+            chunks_text = [". ".join([trunc_sentences[i] for i in inds]) for inds in sent_indices]  # Make chunks from the sentence indices
+            chunks.extend(chunks_text)
+        return chunks
+
+    def get_sent_chunk_inds(self, lens: List[int]):
+        """
+        Find indices of sentences to chunk together to from sentence chunks of at most max_len length
+
+        Returns:
+            List[List[int]]: Lst of lst with sentence indices to be chunked
+        """
+        cumsum = 0  # Cumulative sum
+        inds = []  # Indices for a chunk
+        chunk_inds = []  # Lst of lst with indices
+
+        for i, l in enumerate(lens):
+            if cumsum + l < self.chunk_size:
+                cumsum += l
+                inds.append(i)
+            else:
+                if inds:
+                    chunk_inds.append(inds)  # Only add to output lst if inds non-empty
+                if l >= self.chunk_size:
+                    chunk_inds.append([i])  # The case where l itself is > max_len
+                cumsum = l if l < self.chunk_size else 0
+                inds = [i] if l < self.chunk_size else []
+            if i == len(lens) - 1:  # Add the rest indices to chunk_inds output
+                chunk_inds.append(inds)
+
+        return chunk_inds
 
     def get_project_name(self):
         path_components = self.bodies_path.split(os.sep)
