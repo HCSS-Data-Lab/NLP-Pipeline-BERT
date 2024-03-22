@@ -55,13 +55,16 @@ The project folder is structured as follows:
 │
 ├── input
     └── [project name]
-            └── text_bodies  # This input folder structure is required
+            ├── raw_texts if project=ParlaMint
+                    └── [year] if project=ParlaMint            
+            └── text_bodies
+                    └── [year] if project=ParlaMint
 │
 ├── output
     └── [project name]
+        └── [year] if project=ParlaMint
             ├── embeddings
             ├── figures
-            ├── labels
             ├── models
             └── texts  # This output folder structure is not required, if the folders do not exist they will be created at runtime.
 │                                         

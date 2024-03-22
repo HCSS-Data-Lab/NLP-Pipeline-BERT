@@ -27,7 +27,7 @@ if __name__ == '__main__':
     # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
     project_root = os.getcwd()
     project = "ParlaMint"
-    year = "2022"
+    year = "2015"
     preprocess = PreProcess(project_root=project_root,
                             project=project,
                             year=year)
