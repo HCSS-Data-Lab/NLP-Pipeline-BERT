@@ -94,10 +94,3 @@ if __name__ == '__main__':
         print(coherence_dict)
 
         # div = evaluation.calculate_diversity(topic_model)
-
-
-
-
-
-
-

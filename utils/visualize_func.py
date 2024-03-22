@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from scipy.spatial import ConvexHull
+import config
 
 from umap import UMAP
 from typing import List, Union
@@ -208,6 +209,7 @@ def visualize_documents_(topic_model,
     for name, topic in zip(names, unique_topics):
         if topic in topics and topic != -1:
             selection = df.loc[df.topic == topic, :]
+            print(selection)
             selection["text"] = ""
 
             if not hide_annotations:

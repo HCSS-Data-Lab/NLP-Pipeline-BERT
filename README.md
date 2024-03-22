@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # NLP Pipeline BERT
 
 This repository does the following:

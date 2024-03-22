@@ -98,3 +98,4 @@ class PreProcess:
 
     def get_text_bodies_path(self):
         return self.text_bodies_path
+
