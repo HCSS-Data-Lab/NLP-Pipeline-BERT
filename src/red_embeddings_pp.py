@@ -32,13 +32,14 @@ class RedEmbeddingsPreProcess:
         self.split_size = config.texts_parameters["split_size"]
         self.chunk_size = config.texts_parameters["chunk_size"]
         self.bert_model = config.model_parameters["bert_model"]
+        self.bert_model_str = self.bert_model.split("/")[-1]
 
         self.random_state = config.bertopic_parameters["random_state"]
 
         if self.split_size == "chunk":
-            self.red_emb_name = f"red_embeddings_{self.bert_model}_{self.split_size}{self.chunk_size}_{self.clean_meth}.npy"
+            self.red_emb_name = f"red_embeddings_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}.npy"
         else:
-            self.red_emb_name = f"red_embeddings_{self.bert_model}_{self.split_size}_{self.clean_meth}.npy"
+            self.red_emb_name = f"red_embeddings_{self.bert_model_str}_{self.split_size}_{self.clean_meth}.npy"
 
     def get_red_embeddings(self, embeddings):
         if self.red_from_file:

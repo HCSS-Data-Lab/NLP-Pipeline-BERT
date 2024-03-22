@@ -10,7 +10,6 @@ import pickle
 import time
 from llama_index.llms.openai import OpenAI
 from llama_index.core import ServiceContext
-from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from dotenv import load_dotenv
 load_dotenv()
 import config

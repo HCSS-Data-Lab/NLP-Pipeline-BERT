@@ -16,6 +16,7 @@ def get_summary_sampled_docs(docs: List[str], indices: List[int], RAG):
     """
     labels_path = os.path.join(RAG.path, "labels")
     if os.path.exists(labels_path+'/doc_labels.pkl') and config.rag_parameters["create_new_docs"]==False:
+    if os.path.exists(labels_path+'/doc_labels.pkl') and config.rag_parameters["create_new_docs"]==False:
         print(f'Reloading stored doc labels of {len(indices)} texts...')
         with open(labels_path+'/doc_labels.pkl', 'rb') as file:
             docs = pickle.load(file)
@@ -61,8 +62,3 @@ def get_summary_labels(words_legend: List[str], RAG):
         pickle.dump(words_legend, file)
 
     return words_legend
-
-    
-    
-
-

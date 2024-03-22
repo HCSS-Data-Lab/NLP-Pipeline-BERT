@@ -1,5 +1,8 @@
 import os
+
+import config
 from src.preprocess import PreProcess
+from src.text_cleaning import TextCleaning
 from src.analysis import Analysis
 from src.plotting import Plotting
 from src.evaluation import Evaluation
@@ -21,10 +24,17 @@ if __name__ == '__main__':
     - Contributor to BERTopic package for Convex Hulls.
     
     """
-    project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
-    project = "Politie"
+    # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
+    project_root = os.getcwd()
+    project = "ParlaMint"
+    year = "2015"
     preprocess = PreProcess(project_root=project_root,
-                            project=project)
+                            project=project,
+                            year=year)
+
+    if config.clean_parameters[f"filter_{project}"]:  # In config change filter into False to turn it off
+        text_cleaning = TextCleaning(project_root, project)
+        text_cleaning.read_clean_raw_texts(year=year)  # Add the year as param hear to clean text for the specific year
 
     # Initializing text data
     texts = preprocess.initialize_texts()
@@ -35,18 +45,18 @@ if __name__ == '__main__':
 
     # Initialize topic-model
     output_folder = os.path.join(project_root, "output", project)
-    analysis = Analysis(output_folder)
+    analysis = Analysis(out_path=output_folder, year=year)
     topic_model = analysis.initialize_topic_model(texts)
 
     # Plotting
     model_name = analysis.get_model_file_name()
     num_texts = len(texts)
     folder = os.path.join(output_folder, "figures")
-    
+
     # Initiate RAG, enhance topic labels based on RAG and summarize docs
-    RAG_from_file = True
-    summarize_labels = True
-    summarize_docs = True
+    RAG_from_file = False
+    summarize_labels = False
+    summarize_docs = False
     rag = RAG(embeddings, texts, RAG_from_file, path=os.path.join(output_folder, 'RAG'))
 
     plotting = Plotting(topic_model=topic_model,
@@ -55,8 +65,8 @@ if __name__ == '__main__':
                         docs=texts,
                         summarize_docs=summarize_docs,
                         summarize_labels=summarize_labels,
-                        folder=folder,
-                        rag=rag)
+                        rag=rag,
+                        folder=folder)
     plotting.plot()
 
     #################################################################
@@ -84,11 +94,3 @@ if __name__ == '__main__':
         print(coherence_dict)
 
         # div = evaluation.calculate_diversity(topic_model)
-
-
-
-
-
-
-
-

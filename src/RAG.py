@@ -15,6 +15,7 @@ llm = OpenAI(model=config.rag_parameters['LLM-model'], temperature=config.rag_pa
 embed_model = HuggingFaceEmbeddings(model_name="sentence-transformers/"+config.model_parameters['bert_model'])
 SERVICE_CONTEXT = ServiceContext.from_defaults(embed_model=embed_model)
 
+
 class RAG():
     def __init__(self, embeddings, texts, RAG_from_file, path):
         """
@@ -34,28 +35,29 @@ class RAG():
         self.embeddings = embeddings
         self.texts = texts
         self.RAG_from_file = RAG_from_file
-        self.path=path
-        
+        self.path = path
+
     def create_vector_store_index(self, topics):
         """
         Create a vector store index based on embeddings and texts and save in appropriate folder.
         """
 
-        nodes = [IndexNode(text=self.texts[i], index_id=str(i), embedding = self.embeddings[i].tolist()) for i in range(len(self.texts))]
+        nodes = [IndexNode(text=self.texts[i], index_id=str(i), embedding=self.embeddings[i].tolist()) for i in
+                 range(len(self.texts))]
         index = VectorStoreIndex(nodes)
         index.storage_context.persist(persist_dir=self.path)
 
     def summarize_words(self, topics):
         """
         TODO: Put similarity_top_k and LLM in configuration
-        Summarize the words corresponding to topics, based on the vector store index. 
+        Summarize the words corresponding to topics, based on the vector store index.
         Either load or create the RAG from embeddings. Then create query engine and loop over all topics to enhance the topic description.
         Args:
             topics (List[str]): List of topics consisting of strings of the topic words
         Returns:
             response (List[str]): the output response text
         """
-        print("Initiate RAG") #Create RAG from embeddings or load existing RAG
+        print("Initiate RAG")  # Create RAG from embeddings or load existing RAG
         start_time = time.time()
         if not self.RAG_from_file:
             self.create_vector_store_index(topics)
@@ -73,7 +75,7 @@ class RAG():
     async def summarize_doc(self, docs):
         """
         Asynchronously loop over the selected docs to be summarized. Define method for summarization (Tree Summarize)
-        
+
         Args:
             docs (List[str]): List of text documents to summarize
         Returns:
