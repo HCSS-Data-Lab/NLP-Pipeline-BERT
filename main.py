@@ -44,7 +44,7 @@ if __name__ == '__main__':
     folder = os.path.join(output_folder, "figures")
     
     # Initiate RAG, enhance topic labels based on RAG and summarize docs
-    RAG_from_file = False
+    RAG_from_file = True
     summarize_labels = True
     summarize_docs = True
     rag = RAG(embeddings, texts, RAG_from_file, path=os.path.join(output_folder, 'RAG'))

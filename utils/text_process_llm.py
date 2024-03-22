@@ -15,7 +15,7 @@ def get_summary_sampled_docs(docs: List[str], indices: List[int], RAG):
         summarized_docs (List[str]): 
     """
     labels_path = os.path.join(RAG.path, "labels")
-    if os.path.exists(labels_path+'/doc_labels.pkl') and config.parameters["create_new_docs"]==False:
+    if os.path.exists(labels_path+'/doc_labels.pkl') and config.rag_parameters["create_new_docs"]==False:
         print(f'Reloading stored doc labels of {len(indices)} texts...')
         with open(labels_path+'/doc_labels.pkl', 'rb') as file:
             docs = pickle.load(file)
@@ -46,12 +46,12 @@ def get_summary_labels(words_legend: List[str], RAG):
     """
     print('Getting topic labels from RAG...')
     labels_path = os.path.join(RAG.path, "labels")
-    if os.path.exists(labels_path+'/topic_labels.pkl') and config.parameters["create_new_topics"]==False:
+    if os.path.exists(labels_path+'/topic_labels.pkl') and config.rag_parameters["create_new_topics"]==False:
         print(f'Reloading stored topic labels of {len(words_legend)} labels...')
         with open(labels_path+'/topic_labels.pkl', 'rb') as file:
             words_legend = pickle.load(file)
     else:
-        print(f"Getting topic labels from RAG asynchronously of {len(words_legend[:config.parameters['n_total']])} texts...")
+        print(f"Getting topic labels from RAG asynchronously of {len(words_legend[:config.plotting_parameters['n_total']])} texts...")
         words_legend = RAG.summarize_words(words_legend)
         #summarized_topics = [item.split(', ') for item in summarized_topics]
         #words_legend = [summarized_topics[i] if i < config.parameters['n_total'] else words_legend[i] for i in range(len(words_legend))]

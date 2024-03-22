@@ -28,7 +28,7 @@ def get_num_docs_topic(hover_labels):
 
 class Plotting:
 
-    def __init__(self, topic_model, reduced_embeddings, model_name, docs, folder="", save_html=False, merged=False, plot_non_docs=False, summarize_labels=False, summarize_docs=False, rag=None):
+    def __init__(self, topic_model, reduced_embeddings, model_name, docs, folder="", save_html=True, merged=False, plot_non_docs=False, summarize_labels=False, summarize_docs=False, rag=None):
         # Parameters
         self.topic_model = topic_model
         self.red_emb = reduced_embeddings
@@ -241,9 +241,10 @@ class Plotting:
         # OLD TITLE
         # self.fig_title = f"Text Data | Documents & Topics (merged)\n{self.model_name}" if self.merged else f"Text Data | Documents & Topics (unmerged)\n{self.model_name}"
         if self.merged:
-            return f"(merged)\n{self.model_name}_sam{config.parameters['sample']}"
+            return f"(merged)\n{self.model_name}_sam{config.plotting_parameters['sample']}"
         else:
-            return f"(unmerged)\n{self.model_name}_sam{config.parameters['sample']}"
-
+            return f"(unmerged)\n{self.model_name}_sam{config.plotting_parameters['sample']}"
+        
+        
     def get_sample_docs(self):
         pass

@@ -8,12 +8,11 @@ from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 import config
 import time
 from dotenv import load_dotenv
-from sentence_transformers import SentenceTransformer
 
 
 load_dotenv()
-llm = OpenAI(model=config.parameters['LLM-model'], temperature=config.parameters['temperature']) #
-embed_model = HuggingFaceEmbeddings(model_name="sentence-transformers/"+config.parameters['bert_model'])
+llm = OpenAI(model=config.rag_parameters['LLM-model'], temperature=config.rag_parameters['temperature']) #
+embed_model = HuggingFaceEmbeddings(model_name="sentence-transformers/"+config.model_parameters['bert_model'])
 SERVICE_CONTEXT = ServiceContext.from_defaults(embed_model=embed_model)
 
 class RAG():
@@ -64,10 +63,10 @@ class RAG():
         index = load_index_from_storage(storage_context, service_context=SERVICE_CONTEXT)
         print('Creating or initiating the RAG took in total:', time.time() - start_time)
         print("Get new labels from RAG") #Create query engine and deposit topics in query enginer
-        query_engine = index.as_query_engine(similarity_top_k=config.parameters['article_retrievement'], llm=llm) 
+        query_engine = index.as_query_engine(similarity_top_k=config.rag_parameters['article_retrievement'], llm=llm) 
         responses = [] 
         for topic_word in topics:
-            response = query_engine.query(config.parameters["query_for_topic_labels"]+':'.join(topic_word))
+            response = query_engine.query(config.rag_parameters["query_for_topic_labels"]+':'.join(topic_word))
             responses.append(response.response)    
         return responses
 
@@ -88,6 +87,6 @@ class RAG():
         return responses
 
     async def get_async_doc_response(self, summarizer, doc):
-        response = await summarizer.aget_response(config.parameters["query_docs_label"],doc)
+        response = await summarizer.aget_response(config.rag_parameters["query_docs_label"],doc)
         return response
             
