@@ -4,6 +4,9 @@ LOAD_EMBEDDINGS_FROM_FILE = True
 LOAD_REDUCED_EMBEDDINGS_FROM_FILE = True
 LOAD_TOPIC_MODEL_FROM_FILE = True
 LOAD_MODEL_EMBEDDINGS_FROM_FILE = True
+LOAD_RAG_FROM_FILE = True
+GENAI_TOPIC_LABELS, LOAD_GENAI_TOPIC_LABELS = True, True #It's only when the first is True that the second can be true
+GENAI_DOC_LABELS, LOAD_GENAI_DOC_LABELS = False, False #It's only when the first is True that the second can be true
 
 clean_parameters = {
     'filter_test': False,

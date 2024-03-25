@@ -51,20 +51,15 @@ if __name__ == '__main__':
     # Plotting
     model_name = analysis.get_model_file_name()
     num_texts = len(texts)
-    folder = os.path.join(output_folder, "figures")
+    folder = os.path.join(output_folder, year, "figures")
 
     # Initiate RAG, enhance topic labels based on RAG and summarize docs
-    RAG_from_file = False
-    summarize_labels = False
-    summarize_docs = False
-    rag = RAG(embeddings, texts, RAG_from_file, path=os.path.join(output_folder, 'RAG'))
+    rag = RAG(embeddings, texts, path=os.path.join(output_folder, year, 'RAG'))
 
     plotting = Plotting(topic_model=topic_model,
                         reduced_embeddings=reduced_embeddings,
                         model_name=model_name,
                         docs=texts,
-                        summarize_docs=summarize_docs,
-                        summarize_labels=summarize_labels,
                         rag=rag,
                         folder=folder)
     plotting.plot()

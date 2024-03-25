@@ -18,3 +18,5 @@ webapp/
 __pycache__/*
 __pycache__
 *.env
+test.py
+example.py

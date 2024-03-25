@@ -17,7 +17,7 @@ SERVICE_CONTEXT = ServiceContext.from_defaults(embed_model=embed_model)
 
 
 class RAG():
-    def __init__(self, embeddings, texts, RAG_from_file, path):
+    def __init__(self, embeddings, texts, path):
         """
         Create a RAG from the embeddings and texts that summarizes docs and enhances topic labels.
         Parameters:
@@ -34,7 +34,7 @@ class RAG():
         """
         self.embeddings = embeddings
         self.texts = texts
-        self.RAG_from_file = RAG_from_file
+        self.RAG_from_file = config.LOAD_RAG_FROM_FILE
         self.path = path
 
     def create_vector_store_index(self, topics):
