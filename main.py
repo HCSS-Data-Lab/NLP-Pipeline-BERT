@@ -64,33 +64,33 @@ if __name__ == '__main__':
     analysis = Analysis(out_path=output_folder)
     topic_model = analysis.initialize_topic_model(texts)
 
-    # # Plotting
-    # model_name = analysis.get_model_file_name()
-    # num_texts = len(texts)
-    #
-    # if project == "ParlaMint":
-    #     folder = os.path.join(output_folder, year, "figures")
-    # else:
-    #     folder = os.path.join(output_folder, "figures")
-    # os.makedirs(folder, exist_ok=True)
-    #
-    # # Initiate RAG, enhance topic labels based on RAG and summarize docs
-    # RAG_from_file = False
-    # summarize_labels = False
-    # summarize_docs = False
-    # rag = RAG(embeddings, texts, RAG_from_file, path=os.path.join(output_folder, 'RAG'))
-    #
-    # plotting = Plotting(topic_model=topic_model,
-    #                     reduced_embeddings=reduced_embeddings,
-    #                     model_name=model_name,
-    #                     docs=texts,
-    #                     summarize_docs=summarize_docs,
-    #                     summarize_labels=summarize_labels,
-    #                     rag=rag,
-    #                     folder=folder,
-    #                     year=year,
-    #                     save_html=True)
-    # plotting.plot()
+    # Plotting
+    model_name = analysis.get_model_file_name()
+    num_texts = len(texts)
+
+    if project == "ParlaMint":
+        folder = os.path.join(output_folder, year, "figures")
+    else:
+        folder = os.path.join(output_folder, "figures")
+    os.makedirs(folder, exist_ok=True)
+
+    # Initiate RAG, enhance topic labels based on RAG and summarize docs
+    RAG_from_file = False
+    summarize_labels = False
+    summarize_docs = False
+    rag = RAG(embeddings, texts, RAG_from_file, path=os.path.join(output_folder, 'RAG'))
+
+    plotting = Plotting(topic_model=topic_model,
+                        reduced_embeddings=reduced_embeddings,
+                        model_name=model_name,
+                        docs=texts,
+                        summarize_docs=summarize_docs,
+                        summarize_labels=summarize_labels,
+                        rag=rag,
+                        folder=folder,
+                        year=year,
+                        save_html=True)
+    plotting.plot()
 
     #################################################################
     # Merging and Evaluation below (optional)
