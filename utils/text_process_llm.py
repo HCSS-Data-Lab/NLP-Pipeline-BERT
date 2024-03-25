@@ -52,11 +52,11 @@ def get_summary_labels(words_legend: List[str], RAG):
         with open(labels_path+'/topic_labels.pkl', 'rb') as file:
             words_legend = pickle.load(file)
     else:
-        print(f"Getting topic labels from RAG asynchronously of {len(words_legend[:config.plotting_parameters['n_total']])} texts...")
-        words_legend = RAG.summarize_words(words_legend)
+        print(f"Getting topic labels from RAG synchronously of {len(words_legend[:config.plotting_parameters['n_total']])} texts...")
+        summarized_topics = RAG.summarize_words(words_legend[:config.plotting_parameters['n_total']])
         #summarized_topics = [item.split(', ') for item in summarized_topics]
-        #words_legend = [summarized_topics[i] if i < config.parameters['n_total'] else words_legend[i] for i in range(len(words_legend))]
-
+        words_legend = [summarized_topics[i] if i < config.parameters['n_total'] else words_legend[i] for i in range(len(words_legend))]
+    
     #Save the summarized docs
     with open(labels_path+'/topic_labels.pkl', 'wb') as file:
         pickle.dump(words_legend, file)

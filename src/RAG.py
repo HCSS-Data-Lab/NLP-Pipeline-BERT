@@ -36,6 +36,7 @@ class RAG():
         self.texts = texts
         self.RAG_from_file = RAG_from_file
         self.path = path
+        print(self.RAG_from_file, self.path)
 
     def create_vector_store_index(self, topics):
         """
@@ -69,6 +70,7 @@ class RAG():
         responses = [] 
         for topic_word in topics:
             response = query_engine.query(config.rag_parameters["query_for_topic_labels"]+':'.join(topic_word))
+            print(response.response)
             responses.append(response.response)    
         return responses
 
