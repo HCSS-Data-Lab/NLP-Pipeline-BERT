@@ -27,9 +27,6 @@ if __name__ == '__main__':
     options, for instance also Grobid
     - Contributor to BERTopic package for Convex Hulls.
     
-    - Fix years in names in folders
-    - Fix preprocess file name
-    
     """
     # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
     project_root = os.getcwd()
