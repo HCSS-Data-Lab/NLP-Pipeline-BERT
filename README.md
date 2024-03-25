@@ -55,10 +55,10 @@ The project folder is structured as follows:
 │
 ├── input
     └── [project name]
-            ├── raw_texts if project=ParlaMint
-                    └── [year] if project=ParlaMint            
-            └── text_bodies
-                    └── [year] if project=ParlaMint
+            ├── raw_texts  # if project=ParlaMint
+                    └── [year]         
+            └── text_bodies  # Folder text_bodies is required for all projects, if project=ParlaMint is is created from raw_texts
+                    └── [year]
 │
 ├── output
     └── [project name]
