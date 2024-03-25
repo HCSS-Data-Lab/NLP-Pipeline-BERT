@@ -28,7 +28,7 @@ def get_num_docs_topic(hover_labels):
 
 class Plotting:
 
-    def __init__(self, topic_model, reduced_embeddings, model_name, docs, folder="", save_html=True, merged=False, plot_non_docs=False, summarize_labels=False, summarize_docs=False, rag=None):
+    def __init__(self, topic_model, reduced_embeddings, model_name, docs, folder="", save_html=True, merged=False, plot_non_docs=False, rag=None):
         # Parameters
         self.topic_model = topic_model
         self.red_emb = reduced_embeddings
@@ -38,8 +38,8 @@ class Plotting:
         self.folder = folder
         self.save_html = save_html
         self.merged = merged
-        self.summarize_labels = summarize_labels
-        self.summarize_docs = summarize_docs
+        self.summarize_labels = config.GENAI_TOPIC_LABELS
+        self.summarize_docs = config.GENAI_DOC_LABELS
         self.RAG=rag
 
         # Variables from topic-model object
@@ -68,9 +68,10 @@ class Plotting:
         if self.summarize_labels:
             words_legend = self.top_n_words(n_topics=self.num_topics, n_words=self.RAG_n_words_legend)
             legend_labels = get_summary_labels(words_legend, RAG=self.RAG)
-            print(legend_labels)
-            self.topic_model.set_topic_labels(legend_labels)
+            size_legend_labels = self.complement_enhanced_labels_with_size(legend_labels)
+            self.topic_model.set_topic_labels(size_legend_labels)
         else:
+            print('hoi')
             words_legend = self.top_n_words(n_topics=self.num_topics, n_words=self.n_words_legend)
             legend_labels = self.make_legend_labels(words_legend)
 
@@ -185,6 +186,16 @@ class Plotting:
         hover_labels = [hover_labels_size[t] if t != -1 else "" for t in topics]  # For index=-1, hover_label is "" because outlier docs are not plotted
         return hover_labels
 
+    def complement_enhanced_labels_with_size(self, labels):
+        """
+        Add topic size to the enhanced labels
+        """
+        counts = self.topic_model.topic_sizes_  # Count or size of all topics
+        size_non_topic = counts[-1]  # The non-topic is indexed at -1
+        total = self.num_docs - size_non_topic  # Total is the total number of classified documents, so subtract size of non-topic docs
+        enhanced_labels = [words+ f" ({counts[i] / total * 100:.2f}%)" for i, words in enumerate(labels)]  # Combining words and topic size in single str
+        return enhanced_labels
+
     def make_plot_embeddings(self):
         """
         Make plot embeddings, so if self.plot_non_docs is False, filter out from the reduced embeddings
@@ -242,10 +253,8 @@ class Plotting:
         # self.fig_title = f"Text Data | Documents & Topics (merged)\n{self.model_name}" if self.merged else f"Text Data | Documents & Topics (unmerged)\n{self.model_name}"
         if self.merged:
             return f"(merged)\n{self.model_name}_sam{config.plotting_parameters['sample']}"
-            return f"(merged)\n{self.model_name}_sam{config.plotting_parameters['sample']}"
         else:
             return f"(unmerged)\n{self.model_name}_sam{config.plotting_parameters['sample']}"
-        
         
     def get_sample_docs(self):
         pass
