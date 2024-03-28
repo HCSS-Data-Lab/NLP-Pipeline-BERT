@@ -5,15 +5,12 @@ import glob
 
 """
     TODO:
-    - Add (empty) input folder to github so that right structure is imported when cloned (check if this works)
     - Add create RAG folder to init_folders
-    - Move TextCleaning forward in data pipeline, so that it comes before InitFolder, in main under swim lanes. (?)
+    - Move TextCleaning forward in data pipeline, so that it comes before InitFolder, in main under swim lanes.
     - Make txt output file with topic output: topics, top n terms, topic size
 
     TODO long term:
     - Simplify regex in config for different projects/data, name by alias
-    - 
-    
 """
 
 if __name__ == "__main__":

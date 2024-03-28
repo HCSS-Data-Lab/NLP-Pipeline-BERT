@@ -46,53 +46,53 @@ if __name__ == '__main__':
         translate_obj = Translate(project_root=project_root, project=project, year=year)
         translate_obj.translate_text(from_last_added=True)
 
-    # # Initializing text data
-    # text_bodies_path = init_folders.get_text_bodies_path()
-    # split_texts_path = init_folders.get_split_texts_path()
-    # texts_pp = TextPreProcess(text_bodies_path, split_texts_path)
-    # texts = texts_pp.get_texts()
-    #
-    # # Initialize embeddings and reduced embeddings
-    # emb_path = init_folders.get_emb_path()
-    # embeddings_pp = EmbeddingsPreProcess(emb_path)
-    # embeddings = embeddings_pp.get_embeddings(texts)
-    #
-    # # Initialize reduced embeddings
-    # red_emb_pp = RedEmbeddingsPreProcess(emb_path)
-    # reduced_embeddings = red_emb_pp.get_red_embeddings(embeddings)
-    #
-    # # Initialize topic-model
-    # output_folder = os.path.join(project_root, "output", project, year)
-    # analysis = Analysis(out_path=output_folder)
-    # topic_model = analysis.initialize_topic_model(texts)
-    #
-    # # Plotting
-    # model_name = analysis.get_model_file_name()
-    # num_texts = len(texts)
-    #
-    # if project == "ParlaMint":
-    #     folder = os.path.join(output_folder, year, "figures")
-    # else:
-    #     folder = os.path.join(output_folder, "figures")
-    # os.makedirs(folder, exist_ok=True)
-    #
-    # # Initiate RAG, enhance topic labels based on RAG and summarize docs
-    # RAG_from_file = False
-    # summarize_labels = False
-    # summarize_docs = False
-    # rag = RAG(embeddings, texts, RAG_from_file, path=os.path.join(output_folder, 'RAG'))
-    #
-    # plotting = Plotting(topic_model=topic_model,
-    #                     reduced_embeddings=reduced_embeddings,
-    #                     model_name=model_name,
-    #                     docs=texts,
-    #                     summarize_docs=summarize_docs,
-    #                     summarize_labels=summarize_labels,
-    #                     rag=rag,
-    #                     folder=folder,
-    #                     year=year,
-    #                     save_html=True)
-    # plotting.plot()
+    # Initializing text data
+    text_bodies_path = init_folders.get_text_bodies_path()
+    split_texts_path = init_folders.get_split_texts_path()
+    texts_pp = TextPreProcess(text_bodies_path, split_texts_path)
+    texts = texts_pp.get_texts()
+
+    # Initialize embeddings and reduced embeddings
+    emb_path = init_folders.get_emb_path()
+    embeddings_pp = EmbeddingsPreProcess(emb_path)
+    embeddings = embeddings_pp.get_embeddings(texts)
+
+    # Initialize reduced embeddings
+    red_emb_pp = RedEmbeddingsPreProcess(emb_path)
+    reduced_embeddings = red_emb_pp.get_red_embeddings(embeddings)
+
+    # Initialize topic-model
+    output_folder = os.path.join(project_root, "output", project, year)
+    analysis = Analysis(out_path=output_folder)
+    topic_model = analysis.initialize_topic_model(texts)
+
+    # Plotting
+    model_name = analysis.get_model_file_name()
+    num_texts = len(texts)
+
+    if project == "ParlaMint":
+        folder = os.path.join(output_folder, year, "figures")
+    else:
+        folder = os.path.join(output_folder, "figures")
+    os.makedirs(folder, exist_ok=True)
+
+    # Initiate RAG, enhance topic labels based on RAG and summarize docs
+    RAG_from_file = False
+    summarize_labels = False
+    summarize_docs = False
+    rag = RAG(embeddings, texts, RAG_from_file, path=os.path.join(output_folder, 'RAG'))
+
+    plotting = Plotting(topic_model=topic_model,
+                        reduced_embeddings=reduced_embeddings,
+                        model_name=model_name,
+                        docs=texts,
+                        summarize_docs=summarize_docs,
+                        summarize_labels=summarize_labels,
+                        rag=rag,
+                        folder=folder,
+                        year=year,
+                        save_html=True)
+    plotting.plot()
 
     #################################################################
     # Merging and Evaluation below (optional)
