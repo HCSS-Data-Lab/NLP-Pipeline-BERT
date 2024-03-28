@@ -2,16 +2,18 @@
 LOAD_TEXT_SPLITS_FROM_FILE = True
 LOAD_EMBEDDINGS_FROM_FILE = True
 LOAD_REDUCED_EMBEDDINGS_FROM_FILE = True
-LOAD_TOPIC_MODEL_FROM_FILE = True
+LOAD_TOPIC_MODEL_FROM_FILE = False
 LOAD_MODEL_EMBEDDINGS_FROM_FILE = True
 
 clean_parameters = {
-    'filter_test': False,
-    'filter_SKC': False,
-    'filter_Politie': False,
+    'clean_text': False,  # General bool whether to apply text cleaning
+    'regex_ParlaMint': "\[\[|\]\]|ParlaMint.+?\s",  # Project-specific regex for ParlaMint data: remove brackets and datestamp starting with ParlaMint
+}
 
-    'filter_ParlaMint': False,
-    'pattern_ParlaMint': "\[\[|\]\]|ParlaMint.+?\s",  # Clean regex for ParlaMint data: remove brackets and datestamp starting with ParlaMint
+translate_param = {
+    'translate': True,
+    'target_lang': 'en',
+    'source_lang': 'nl'
 }
 
 texts_parameters = {
@@ -60,8 +62,8 @@ rag_parameters = {
     # RAG parameters
     'create_new_docs': False,
     'create_new_topics': False,
-    'query_for_topic_labels':"""Summarize these labels in one (sense-making) term that consists of
-                                at MOST 4 words (captialize the first letter of every word, do NOT separate by comma):""",
+    'query_for_topic_labels': """Summarize these labels in one (sense-making) term that consists of
+                            at MOST 4 words (captialize the first letter of every word, do NOT separate by comma):""",
     'query_docs_label':'Summarize this texts in at MOST 3 terms and at most 5 words (captialize the first letter of every word and separate by comma):',
     'RAG_n_words_legend':10, # Number of noun frases to use to enhance the topic labels
     'LLM-model':"gpt-3.5-turbo",

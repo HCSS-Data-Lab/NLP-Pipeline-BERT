@@ -55,18 +55,17 @@ The project folder is structured as follows:
 │
 ├── input
     └── [project name]
-            ├── raw_texts  # if project=ParlaMint
-                    └── [year]         
-            └── text_bodies  # Folder text_bodies is required for all projects, if project=ParlaMint is is created from raw_texts
-                    └── [year]
+          └── [year] 
+              ├── raw_texts  # If project=ParlaMint, there must be a folder raw_texts; text_bodies is created with text cleaning
+              └── text_bodies  # Folder text_bodies must exist
 │
 ├── output
     └── [project name]
-        └── [year] if project=ParlaMint
+        └── [year]
             ├── embeddings
             ├── figures
             ├── models
-            └── texts  # This output folder structure is not required, if the folders do not exist they will be created at runtime.
+            └── texts  # This output folder structure is not required, if the folders do not exist they will be created at runtime
 │                                         
 ├── src
     ├── analysis.py

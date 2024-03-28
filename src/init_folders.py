@@ -1,14 +1,11 @@
 import os
 
-from src.texts_pp import TextPreProcess
-from src.embeddings_pp import EmbeddingsPreProcess
-from src.red_embeddings_pp import RedEmbeddingsPreProcess
-
 class InitFolders:
 
     def __init__(self, project_root, project, year="2022"):
         """
-        InitFolders takes as parameters project_root, project, and year and initializes and saves
+        InitFolders takes as parameters project_root, project, and year and creates folder structure
+        initializes and saves
         sub-folders for all data: text-bodies, split text-bodies, embeddings, and models, and labels.
 
         Parameters:
@@ -28,13 +25,12 @@ class InitFolders:
         if not os.path.exists(self.input_folder):
             raise ValueError(f"No project folder in input for project name {self.project}. The path {self.input_folder} does not exist. Create it and make sure it contains a folder text_bodies.")
 
-        self.text_bodies_path = os.path.join(self.input_folder, "text_bodies", year)
+        self.text_bodies_path = os.path.join(self.input_folder, year, "text_bodies")
         self.output_folder = os.path.join(self.project_root, "output", project, year)
 
         self.split_texts_path = os.path.join(self.output_folder, "texts")
         self.emb_path = os.path.join(self.output_folder, "embeddings")
         self.model_path = os.path.join(self.output_folder, "models")
-        self.labels_path = os.path.join(self.output_folder, "labels")
 
         self.create_output_folders()
 
@@ -42,7 +38,7 @@ class InitFolders:
         """
         Create output folders if they do not exist
         """
-        for folder in [self.output_folder, self.split_texts_path, self.emb_path, self.model_path, self.labels_path]:
+        for folder in [self.output_folder, self.split_texts_path, self.emb_path, self.model_path]:
             os.makedirs(folder, exist_ok=True)
 
     def get_input_folder(self):
@@ -62,6 +58,3 @@ class InitFolders:
 
     def get_model_path(self):
         return self.model_path
-
-    def get_labels_path(self):
-        return self.labels_path

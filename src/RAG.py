@@ -12,7 +12,7 @@ from sentence_transformers import SentenceTransformer
 
 load_dotenv()
 llm = OpenAI(model=config.rag_parameters['LLM-model'], temperature=config.rag_parameters['temperature'])  #
-embed_model = HuggingFaceEmbeddings(model_name="sentence-transformers/" + config.rag_parameters['bert_model'])
+embed_model = HuggingFaceEmbeddings(model_name="sentence-transformers/" + config.model_parameters['bert_model'])
 SERVICE_CONTEXT = ServiceContext.from_defaults(embed_model=embed_model)
 
 

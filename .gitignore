@@ -7,13 +7,14 @@
 *_def
 *_ft
 *_vect
-bertopic_model
+bertopic_model*
 !.gitignore
 !requirements.txt
 get-pip.py
 test.py
-input/
-output/
+*.txt
+*.tsv
+*.zip
 webapp/
 __pycache__/*
 __pycache__
