@@ -16,7 +16,7 @@ from src.red_embeddings_pp import RedEmbeddingsPreProcess
 
 if __name__ == '__main__':
     """
-    TODO:
+    TODO: (Maarten)
     - Maybe use logger instead of print statements (as we can also log configurations) and bring logging to the main instead of in submodules 
     - Do not refer to local folders (find a way to define projectroot agnosticly that also works within devcontainer)
     - Add making automatic folders for project
@@ -33,8 +33,8 @@ if __name__ == '__main__':
     """
     # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
     project_root = os.getcwd()
-    project = "NOS"
-    year = "2022"
+    project = "ParlaMint"
+    year = "2015"
 
     if config.clean_parameters["clean_text"]:  # In config set clean_text to False to turn it off
         text_cleaning = TextCleaning(project_root, project, year)

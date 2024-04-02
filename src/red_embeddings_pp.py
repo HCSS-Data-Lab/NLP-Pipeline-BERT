@@ -31,7 +31,7 @@ class RedEmbeddingsPreProcess:
         self.clean_meth = config.texts_parameters["clean_meth"]
         self.split_size = config.texts_parameters["split_size"]
         self.chunk_size = config.texts_parameters["chunk_size"]
-        self.bert_model = config.model_parameters["bert_model"]
+        self.bert_model = config.model_parameters["emb_model"]
         self.bert_model_str = self.bert_model.split("/")[-1]
 
         self.random_state = config.bertopic_parameters["random_state"]
