@@ -73,8 +73,9 @@ The project folder is structured as follows:
     ├── evaluation.py
     ├── merge.py
     ├── plotting.py
-    ├── preprocess.py   
-    ├── red_embeddings_pp.py                         
+    ├── init_files.py   
+    ├── red_embeddings_pp.py  
+    ├── translate.py
     └── texts_pp.py
 │                                      
 ├── utils
