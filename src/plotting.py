@@ -201,17 +201,14 @@ class Plotting:
         Returns:
             plot_embeddings (np.array): 2d data points to plot
         """
-        if self.red_emb == None:
-            return None
+        if not self.plot_non_docs:
+            plot_embeddings = self.red_emb.copy()
+            topics = self.get_topics()
+            plot_embeddings[
+                (topics == -1) | (topics >= self.n_total)] = 0  # Set embedding to 0 when id=-1 or id >= n_total
         else:
-            if not self.plot_non_docs:
-                plot_embeddings = self.red_emb.copy()
-                topics = self.get_topics()
-                plot_embeddings[
-                    (topics == -1) | (topics >= self.n_total)] = 0  # Set embedding to 0 when id=-1 or id >= n_total
-            else:
-                plot_embeddings = self.red_emb
-            return plot_embeddings
+            plot_embeddings = self.red_emb
+        return plot_embeddings
 
     def get_topics(self):
         """
