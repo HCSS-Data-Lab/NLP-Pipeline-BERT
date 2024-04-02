@@ -8,10 +8,12 @@ from utils.text_process_llm import get_summary_labels
 
 import config
 
+
 def first_at_end(lst):
     """Append the first element of list at the end"""
     lst.append(lst.pop(0))
     return lst
+
 
 def get_num_docs_topic(hover_labels):
     """
@@ -26,9 +28,11 @@ def get_num_docs_topic(hover_labels):
     """
     return len(hover_labels) - hover_labels.count("")
 
+
 class Plotting:
 
-    def __init__(self, topic_model, reduced_embeddings, model_name, docs, folder="", save_html=False, merged=False, plot_non_docs=False, summarize_labels=False, summarize_docs=False, rag=None, year=None):
+    def __init__(self, topic_model, model_name, docs, reduced_embeddings=None, folder="", save_html=False, merged=False,
+                 plot_non_docs=False, summarize_labels=False, summarize_docs=False, rag=None, year=None):
         # Parameters
         self.topic_model = topic_model
         self.red_emb = reduced_embeddings
@@ -119,7 +123,8 @@ class Plotting:
         for t in unique_topics:
             indices = np.where(self.topics == t)[0]
             num_docs_for_topic = indices.shape[0]
-            sampled_inds_topic = np.random.choice(indices, size=int(sample_fraction * num_docs_for_topic), replace=False)
+            sampled_inds_topic = np.random.choice(indices, size=int(sample_fraction * num_docs_for_topic),
+                                                  replace=False)
             sampled_indices.extend(sampled_inds_topic)
 
         return sampled_indices
@@ -148,7 +153,8 @@ class Plotting:
             words_out (lst[lst[str]]): list of list of words
         """
         topic_words = self.topic_model.topic_representations_  # Words for each topic
-        top_n_topics = {k: topic_words[k] for k in range(-1, n_topics)}  # Start at -1 because topic indexing starts at -1
+        top_n_topics = {k: topic_words[k] for k in
+                        range(-1, n_topics)}  # Start at -1 because topic indexing starts at -1
 
         top_n_words_for_topics = []  # Out list will be 2d list with top n words for top m topics
         for values in top_n_topics.values():
@@ -171,17 +177,20 @@ class Plotting:
         # First, find text part of hover label
         words_hover = self.top_n_words(n_topics=self.num_topics, n_words=self.n_words_hover)
         hover_labels_text = [" | ".join(w) for w in words_hover]
-        hover_labels_text = first_at_end(hover_labels_text)  # Add first element 'the|of|and..' to and of list; its topics id=-1, so the elements can be indexed by topic id
+        hover_labels_text = first_at_end(
+            hover_labels_text)  # Add first element 'the|of|and..' to and of list; its topics id=-1, so the elements can be indexed by topic id
 
         # Second, assign the topic size to hoover labels
         counts = self.topic_model.topic_sizes_  # Count or size of all topics
         size_non_topic = counts[-1]  # The non-topic is indexed at -1
         total = self.num_docs - size_non_topic  # Total is the total number of classified documents, so subtract size of non-topic docs
-        hover_labels_size = [words + f" - Topic size: {counts[i] / total * 100:.2f}%" for i, words in enumerate(hover_labels_text)]  # Combining words and topic size in single str
+        hover_labels_size = [words + f" - Topic size: {counts[i] / total * 100:.2f}%" for i, words in
+                             enumerate(hover_labels_text)]  # Combining words and topic size in single str
 
         # Setting hover_labels
         topics = self.get_topics()
-        hover_labels = [hover_labels_size[t] if t != -1 else "" for t in topics]  # For index=-1, hover_label is "" because outlier docs are not plotted
+        hover_labels = [hover_labels_size[t] if t != -1 else "" for t in
+                        topics]  # For index=-1, hover_label is "" because outlier docs are not plotted
         return hover_labels
 
     def make_plot_embeddings(self):
@@ -192,13 +201,17 @@ class Plotting:
         Returns:
             plot_embeddings (np.array): 2d data points to plot
         """
-        if not self.plot_non_docs:
-            plot_embeddings = self.red_emb.copy()
-            topics = self.get_topics()
-            plot_embeddings[(topics == -1) | (topics >= self.n_total)] = 0  # Set embedding to 0 when id=-1 or id >= n_total
+        if self.red_emb == None:
+            return None
         else:
-            plot_embeddings = self.red_emb
-        return plot_embeddings
+            if not self.plot_non_docs:
+                plot_embeddings = self.red_emb.copy()
+                topics = self.get_topics()
+                plot_embeddings[
+                    (topics == -1) | (topics >= self.n_total)] = 0  # Set embedding to 0 when id=-1 or id >= n_total
+            else:
+                plot_embeddings = self.red_emb
+            return plot_embeddings
 
     def get_topics(self):
         """

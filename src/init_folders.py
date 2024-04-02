@@ -17,6 +17,9 @@ class InitFolders:
             emb_path (str): Directory path where embeddings are stored.
             model_path (str): Directory path where models are stored.
             split_texts_path (str): Directory path where split texts are stored as .pkl dict file.
+            fig_path (str): Directory path where figures are stored.
+            rag_path (str): Dir where RAG data is stored.
+            labels_path (str): Dir where labels from RAG are stored.
         """
         self.project_root = project_root
         self.project = project
@@ -31,6 +34,9 @@ class InitFolders:
         self.split_texts_path = os.path.join(self.output_folder, "texts")
         self.emb_path = os.path.join(self.output_folder, "embeddings")
         self.model_path = os.path.join(self.output_folder, "models")
+        self.fig_path = os.path.join(self.output_folder, "figures")
+        self.RAG_path = os.path.join(self.output_folder, "RAG")
+        self.labels_path = os.path.join(self.RAG_path, "labels")
 
         self.create_output_folders()
 
@@ -38,7 +44,7 @@ class InitFolders:
         """
         Create output folders if they do not exist
         """
-        for folder in [self.output_folder, self.split_texts_path, self.emb_path, self.model_path]:
+        for folder in [self.output_folder, self.split_texts_path, self.emb_path, self.model_path, self.fig_path, self.RAG_path,  self.labels_path]:
             os.makedirs(folder, exist_ok=True)
 
     def get_input_folder(self):
@@ -58,3 +64,12 @@ class InitFolders:
 
     def get_model_path(self):
         return self.model_path
+
+    def get_fig_path(self):
+        return self.fig_path
+
+    def get_rag_path(self):
+        return self.RAG_path
+
+    def get_labels_path(self):
+        return self.labels_path

@@ -56,8 +56,8 @@ The project folder is structured as follows:
 ├── input
     └── [project name]
           └── [year] 
-              ├── raw_texts  # If project=ParlaMint, there must be a folder raw_texts; text_bodies is created with text cleaning
-              └── text_bodies  # Folder text_bodies must exist
+              ├── raw_texts  # If project=ParlaMint, there must be a folder raw_texts; then text_bodies is created with TextCleaning class
+              └── text_bodies  # Else, folder text_bodies must exist
 │
 ├── output
     └── [project name]

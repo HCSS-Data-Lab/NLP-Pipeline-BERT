@@ -21,12 +21,14 @@ if __name__ == '__main__':
     - Do not refer to local folders (find a way to define projectroot agnosticly that also works within devcontainer)
     - Add making automatic folders for project
     - Add option to not install sentence-transformers (and make use of cheap default embedding for development).
-    - In general it might also be great to have a dev set that we can use to do test runs (especially because ).   
+    - In general it might also be great to have a dev set that we can use to do test runs (especially because ).  
     
     TODO:
     - Split up pre-processing part of old repository, make separate preproc repo. Option to add several preproc.
     options, for instance also Grobid
     - Contributor to BERTopic package for Convex Hulls.
+    - Make txt output file with topic output: topics, top n terms, topic size
+    - Simplify regex in config for different projects/data, name by alias 
     
     """
     # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
@@ -70,17 +72,12 @@ if __name__ == '__main__':
     model_name = analysis.get_model_file_name()
     num_texts = len(texts)
 
-    if project == "ParlaMint":
-        folder = os.path.join(output_folder, year, "figures")
-    else:
-        folder = os.path.join(output_folder, "figures")
-    os.makedirs(folder, exist_ok=True)
-
     # Initiate RAG, enhance topic labels based on RAG and summarize docs
     RAG_from_file = False
     summarize_labels = False
     summarize_docs = False
-    rag = RAG(embeddings, texts, RAG_from_file, path=os.path.join(output_folder, 'RAG'))
+    rag_path = init_folders.get_rag_path()
+    rag = RAG(embeddings, texts, RAG_from_file, path=rag_path)
 
     plotting = Plotting(topic_model=topic_model,
                         reduced_embeddings=reduced_embeddings,
@@ -89,7 +86,7 @@ if __name__ == '__main__':
                         summarize_docs=summarize_docs,
                         summarize_labels=summarize_labels,
                         rag=rag,
-                        folder=folder,
+                        folder=os.path.join(output_folder, "figures"),
                         year=year,
                         save_html=True)
     plotting.plot()

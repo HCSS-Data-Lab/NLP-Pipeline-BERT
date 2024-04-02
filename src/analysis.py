@@ -1,3 +1,4 @@
+import spacy
 from bertopic import BERTopic
 import umap
 from bertopic.representation import MaximalMarginalRelevance
@@ -49,8 +50,8 @@ class Analysis:
         self.split_size = config.texts_parameters["split_size"]
         self.chunk_size = config.texts_parameters["chunk_size"]
 
-        self.bert_model = config.model_parameters["bert_model"]
-        self.bert_model_str = self.bert_model.split("/")[-1]  # When model name is like 'mixedbread-ai/mxb...', only take the second part
+        self.emb_model = config.model_parameters["emb_model"]
+        self.bert_model_str = self.emb_model.split("/")[-1]  # When model name is like 'mixedbread-ai/mxb...', only take the second part
 
         self.use_mmr = config.bertopic_parameters["use_mmr"]
         self.use_pos = config.bertopic_parameters["use_pos"]
@@ -93,10 +94,11 @@ class Analysis:
         topic_model = self.get_topic_model_obj()
 
         # Train topic-model
-        topic_model = self.train_topic_model(topic_model, data)
+        topic_model = self.finetune_topic_model(topic_model, data)
 
         # Update topic-model
-        topic_model = self.update_topic_model(topic_model, data)
+        if self.update_topics:
+            topic_model = self.update_topic_model(topic_model, data)
 
         # Save topic-model
         topic_model.save(os.path.join(self.models_path, self.model_file_name))
@@ -117,11 +119,10 @@ class Analysis:
         # Conditionally set vectorizer_model if using a stop words vectorizer
         if self.clean_meth == "vect":
             print("Initializing topic model with stop words vectorizer.")
-            vectorizer_model = CountVectorizer(ngram_range=(1, 3),
-                                               # stop_words="english",
-                                               stop_words=['de', 'het', 'een', 'en', 'van', 'ik', 'te', 'dat', 'die', 'in', 'een', 'hij', 'het', 'niet', 'zijn', 'is', 'was', 'op', 'aan', 'met', 'als', 'voor', 'had', 'er', 'maar', 'om', 'hem', 'dan', 'zou', 'of', 'wat', 'mijn', 'men', 'dit', 'zo', 'door', 'over', 'ze', 'zich', 'bij', 'ook', 'tot', 'je', 'mij', 'uit', 'der', 'daar', 'haar', 'naar', 'heb', 'hoe', 'heeft', 'hebben', 'deze', 'u', 'want', 'nog', 'zal', 'me', 'zij', 'nu', 'ge', 'geen', 'omdat', 'iets', 'worden', 'toch', 'al', 'waren', 'veel', 'meer', 'doen', 'toen', 'moet', 'ben', 'zonder', 'kan', 'hun', 'dus', 'alles', 'onder', 'ja', 'eens', 'hier', 'wie', 'werd', 'altijd', 'doch', 'wordt', 'wezen', 'kunnen', 'ons', 'zelf', 'tegen', 'na', 'reeds', 'wil', 'kon', 'niets', 'uw', 'iemand', 'geweest', 'andere'],
-                                               min_df=0.01,
-                                               lowercase=False)
+            vectorizer_model = CountVectorizer(ngram_range=config.vectorizer_parameters["ngram_range"],
+                                               stop_words=config.vectorizer_parameters["stop_words"],
+                                               min_df=config.vectorizer_parameters["min_df"],
+                                               lowercase=config.vectorizer_parameters["lowercase"])
 
             if self.use_keyphrase:
                 print("Using KeyPhrase as CountVectorizer.")
@@ -138,6 +139,7 @@ class Analysis:
             # representation_model = PartOfSpeech(config.parameters['spacy_mod_pos'])
             representation_model = PartOfSpeech(config.bertopic_parameters['spacy_mod_pos'], pos_patterns=config.bertopic_parameters["pos_patterns"])
 
+        # For now these parameters are in the code and not in config because they never change, they are default bertopic params
         umap_model = umap.UMAP(n_neighbors=15,
                                n_components=5,
                                min_dist=0.0,
@@ -147,14 +149,14 @@ class Analysis:
 
         # Create the topic model
         topic_model = BERTopic(vectorizer_model=vectorizer_model,
-                               embedding_model=self.bert_model,
+                               embedding_model=self.emb_model,
                                representation_model=representation_model,
                                umap_model=umap_model)
         return topic_model
 
-    def train_topic_model(self, topic_model, data):
+    def finetune_topic_model(self, topic_model, data):
         """
-        Train topic-model object on data, either pre-trained text embeddings or text data
+        Fine-tune topic-model object on data, either pre-trained text embeddings or text data
 
         Args:
             topic_model (BERTopic): topic-model object, untrained
@@ -175,12 +177,15 @@ class Analysis:
         return topic_model
 
     def update_topic_model(self, topic_model, data):
-        if self.update_topics:
-            print("Updating topic-model...")
-            vectorizer_model = CountVectorizer(ngram_range=(1, 3),
-                                               stop_words="english",
-                                               min_df=0.01)
-            topic_model.update_topics(data, vectorizer_model=vectorizer_model)
+        """
+        Update the topic representation with (possibly) new parameters. Useful when running
+        analysis with parameter change, retraining topic model is not necessary.
+        """
+        print("Updating topic-model...")
+        vectorizer_model = CountVectorizer(ngram_range=(1, 3),
+                                           stop_words="english",
+                                           min_df=0.01)
+        topic_model.update_topics(data, vectorizer_model=vectorizer_model)
         return topic_model
 
     def get_model_file_name(self):
