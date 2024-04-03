@@ -5,6 +5,11 @@ LOAD_REDUCED_EMBEDDINGS_FROM_FILE = False
 LOAD_TOPIC_MODEL_FROM_FILE = False
 LOAD_MODEL_EMBEDDINGS_FROM_FILE = False
 
+sample_parameters = {
+    'sample': True,
+    'sample_size': 0.5
+}
+
 clean_parameters = {
     'clean_text': False,  # Bool indicator whether to apply text cleaning
     'regex_ParlaMint': "\[\[|\]\]|ParlaMint.+?\s",  # Project-specific regex for ParlaMint data: remove brackets and datestamp starting with ParlaMint
@@ -34,7 +39,6 @@ model_parameters = {
 }
 
 bertopic_parameters = {
-    'random_state': 0,
     'use_mmr': True,
     'mmr_diversity': 0.3,
 
@@ -54,12 +58,26 @@ bertopic_parameters = {
     'use_keyphrase': False,
 }
 
-vectorizer_parameters = {
+countvectorizer_parameters = {  # CountVectorizer
     'ngram_range': (1, 3),
     'stop_words': 'english',
     # 'stop_words': ['de', 'het', 'een', 'en', 'van', 'ik', 'te', 'dat', 'die', 'in', 'een', 'hij', 'het', 'niet', 'zijn', 'is', 'was', 'op', 'aan', 'met', 'als', 'voor', 'had', 'er', 'maar', 'om', 'hem', 'dan', 'zou', 'of', 'wat', 'mijn', 'men', 'dit', 'zo', 'door', 'over', 'ze', 'zich', 'bij', 'ook', 'tot', 'je', 'mij', 'uit', 'der', 'daar', 'haar', 'naar', 'heb', 'hoe', 'heeft', 'hebben', 'deze', 'u', 'want', 'nog', 'zal', 'me', 'zij', 'nu', 'ge', 'geen', 'omdat', 'iets', 'worden', 'toch', 'al', 'waren', 'veel', 'meer', 'doen', 'toen', 'moet', 'ben', 'zonder', 'kan', 'hun', 'dus', 'alles', 'onder', 'ja', 'eens', 'hier', 'wie', 'werd', 'altijd', 'doch', 'wordt', 'wezen', 'kunnen', 'ons', 'zelf', 'tegen', 'na', 'reeds', 'wil', 'kon', 'niets', 'uw', 'iemand', 'geweest', 'andere'],
     'min_df': 0.01,
     'lowercase': False
+}
+
+kpcountvectorizer_parameters = {  # KeyphraseCountVectorizer
+    'stop_words': 'english',
+    'spacy_pipeline': 'en_core_web_sm',
+}
+
+umap_parameters = {
+    'n_neighbors': 15,
+    'n_components': 5,
+    'min_dist': 0.0,
+    'metric': 'cosine',
+    'low_memory': False,
+    'random_state': 0,
 }
 
 plotting_parameters = {

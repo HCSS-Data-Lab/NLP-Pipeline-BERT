@@ -29,12 +29,33 @@ if __name__ == '__main__':
     - Contributor to BERTopic package for Convex Hulls.
     - Make txt output file with topic output: topics, top n terms, topic size
     - Simplify regex in config for different projects/data, name by alias 
+    - Think about hierarchy for code, add UI formatting for different tasks
     
+    DTM:
+    - Build dynamic topic modeling
+    - test different dataset sizes, start with small
+    - Corpus specific stop words
     """
+
     # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
     project_root = os.getcwd()
     project = "ParlaMint"
     year = "2015"
+
+    # dtm_years = [2019, 2020, 2021, 2022]
+
+    if config.sample_parameters["sample"]:
+        dtm_years = ["2019", "2020", "2021", "2020"]
+        
+        # Sample docs for each year
+        # In input/ParlaMint, we get folders 2019_s0.5, ... etc
+        # Make a folder with 19-22_s0.5 with all files
+        # Make timestamps for all files
+        # Set nr bins to len(years) * 4
+        # Make embeddings, red embeddings, etc. for docs in folder 19-22_s0.5
+
+        # Run topics_over_time function
+        pass
 
     if config.clean_parameters["clean_text"]:  # In config set clean_text to False to turn it off
         text_cleaning = TextCleaning(project_root, project, year)

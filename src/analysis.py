@@ -32,7 +32,7 @@ class Analysis:
                               vect for vectorization param in BERTopic)
             split_size (str): Text split size. (chunk, sentence, or sentence-pairs)
             chunk_size (str): size or number of characters in text chunks
-            bert_model (str): Pre-trained sentence BERT model name, defined in config.
+            emb_model (str): Pre-trained sentence BERT model name, defined in config.
             use_mmr (bool): Boolean indicator whether to use MMR for topic fine-tuning or not.
             model_file_name (str): name for topic-model when saving/loading from file.
             emb_name (str): name for embeddings used for saving/loading from file.
@@ -119,15 +119,11 @@ class Analysis:
         # Conditionally set vectorizer_model if using a stop words vectorizer
         if self.clean_meth == "vect":
             print("Initializing topic model with stop words vectorizer.")
-            vectorizer_model = CountVectorizer(ngram_range=config.vectorizer_parameters["ngram_range"],
-                                               stop_words=config.vectorizer_parameters["stop_words"],
-                                               min_df=config.vectorizer_parameters["min_df"],
-                                               lowercase=config.vectorizer_parameters["lowercase"])
+            vectorizer_model = CountVectorizer(**config.countvectorizer_parameters)
 
             if self.use_keyphrase:
                 print("Using KeyPhrase as CountVectorizer.")
-                vectorizer_model = KeyphraseCountVectorizer(stop_words="english",
-                                                            spacy_pipeline="en_core_web_sm")
+                vectorizer_model = KeyphraseCountVectorizer(**config.kpcountvectorizer_parameters)
 
         # Conditionally set representation_model if using MMR for topic fine-tuning
         if self.use_mmr:
@@ -139,13 +135,7 @@ class Analysis:
             # representation_model = PartOfSpeech(config.parameters['spacy_mod_pos'])
             representation_model = PartOfSpeech(config.bertopic_parameters['spacy_mod_pos'], pos_patterns=config.bertopic_parameters["pos_patterns"])
 
-        # For now these parameters are in the code and not in config because they never change, they are default bertopic params
-        umap_model = umap.UMAP(n_neighbors=15,
-                               n_components=5,
-                               min_dist=0.0,
-                               metric='cosine',
-                               low_memory=False,
-                               random_state=config.bertopic_parameters["random_state"])
+        umap_model = umap.UMAP(**config.umap_parameters)
 
         # Create the topic model
         topic_model = BERTopic(vectorizer_model=vectorizer_model,
