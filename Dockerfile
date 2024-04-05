@@ -27,6 +27,7 @@ FROM jupyter/base-notebook:python-3.9.13 as hcss-jupyternotebook-bert
 
 USER root
 RUN apt-get update
+RUN apt-get install htop -y
 RUN apt-get install python3-distutils -y
 RUN apt-get install python3-dev -y
 RUN apt-get install gcc -y
