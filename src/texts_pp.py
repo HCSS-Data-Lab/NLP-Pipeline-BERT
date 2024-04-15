@@ -43,14 +43,17 @@ def sentencize_text(texts):
     Splits input texts into sentences, keep sentences of each document in a separate list
 
     Args:
-        texts (List[str]): text bodies
+        texts (dict): text bodies
 
     Returns:
-        List[List[str]]: A list of list with sentences for each input text
+        text_sentences (dict): A list of list with sentences for each input text
     """
     delimiters = ['.', '?', '!']
     pattern = '\s|'.join(map(re.escape, delimiters))  # Add whitespace \s, regex OR delim |, and add backslash with escape
-    return [re.split(pattern, text) for text in texts]
+    text_sentences = {}
+    for text_name, text_body in texts.items():
+        text_sentences[text_name] = re.split(pattern, text_body)
+    return text_sentences
 
 def pair_sentences(text_sentences):
     """
@@ -106,7 +109,6 @@ class TextPreProcess:
             split_size (str): Text split size. (chunk, sentence, or sentence-pairs)
             texts_split_name (str): Text split .pkl dictionary filename
         """
-
         self.splits_from_file = config.LOAD_TEXT_SPLITS_FROM_FILE
         self.bodies_path = text_bodies_path
         self.splits_path = splits_path
@@ -117,10 +119,7 @@ class TextPreProcess:
         self.split_size = config.texts_parameters["split_size"]
         self.chunk_size = config.texts_parameters["chunk_size"]
 
-        if self.split_size == "chunk":
-            self.texts_split_name = f"texts_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
-        else:
-            self.texts_split_name = f"texts_{self.split_size}_{self.clean_meth}.pkl"
+        self.texts_split_name = f"texts_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
 
     def get_texts(self):
         """
@@ -128,15 +127,18 @@ class TextPreProcess:
         generate_split_texts() to read text bodies and split them at runtime.
 
         Returns:
-            texts (list[str]): split text data
+            texts (list[tuple(str, str)]): list of tuples with text title and chunk
         """
+        print(f"Split size: {self.split_size}")
         if self.splits_from_file:
             texts = self.load_split_texts()
         else:
             texts = self.generate_split_texts()
-        print(f"Split size: {self.split_size}")
-        print(f'{"Number of split texts:":<65}{len(texts):>10}\n')
-        return texts
+
+        # Collect text chunks from lst of tuples with text name (key) and chunk (value)
+        text_chunks = [chunk for value in texts.values() for chunk in value]
+        print(f'{"Text chunks:":<65}{len(text_chunks):>10}\n')
+        return text_chunks
 
     def load_split_texts(self):
         """
@@ -155,7 +157,7 @@ class TextPreProcess:
         else:
             raise ValueError(
                 f"Folder output/project/texts does not contain text .pkl dict file with split text size: {self.split_size} and text clean method: {self.clean_meth}. "
-                f"Generate it at runtime.")
+                f"Set LOAD_TEXT_SPLITS_FROM_FILE to False and generate split texts at runtime.")
 
     def generate_split_texts(self):
         """
@@ -171,7 +173,7 @@ class TextPreProcess:
         print("Read text bodies and splitting at runtime...")
         if os.listdir(self.bodies_path):  # Empty folder evaluates to 0
             text_bodies = self.read_input_texts()
-            split_texts = self.split_texts(text_bodies)
+            split_texts = self.split_texts(text_bodies)  # This will be a dict {name: [sentences]}
 
             with open(os.path.join(self.splits_path, self.texts_split_name), "wb") as file:
                 pickle.dump({'texts': split_texts, 'text_split_size': self.split_size}, file, protocol=pickle.HIGHEST_PROTOCOL)
@@ -182,20 +184,20 @@ class TextPreProcess:
 
     def read_input_texts(self):
         """
-        Read input text bodies saved as .txt from bodies_path folder.
+        Read input text_name bodies saved as .txt from bodies_path folder.
 
         Returns:
-            texts (lst[str]): text bodies
+            texts (dict): text_name bodies
 
         """
         text_names = sorted([text_file for text_file in os.listdir(self.bodies_path) if text_file.endswith('.txt')])
         print(f'{"Number of texts in folder:":<65}{len(text_names):>10}')
 
-        texts = []
-        for text in text_names:
-            with open(os.path.join(self.bodies_path, text), "r", encoding="utf-8") as file:
+        texts = {}
+        for text_name in text_names:
+            with open(os.path.join(self.bodies_path, text_name), "r", encoding="utf-8") as file:
                 text_body = file.read()
-            texts.append(text_body)
+            texts[text_name] = text_body
         return texts
 
     def split_texts(self, texts):
@@ -204,7 +206,7 @@ class TextPreProcess:
         function filter_texts() if clean_meth = "ft".
 
         Args:
-            texts (list[str]): input text bodies
+            texts (dict): input text bodies
 
         Returns:
             list[str]: split (and filtered) text pieces
@@ -222,7 +224,7 @@ class TextPreProcess:
             splits = pair_sentences(text_sentences)
         else:
             raise ValueError(
-                f"split_size: {self.split_size} is undefined. Valid options are 'chunk', 'sentence', or 'sentence-pairs'.")
+                f"split_size: {self.split_size} is undefined. Valid options are 'chunk', 'chunk_len', 'sentence', or 'sentence-pairs'.")
 
         if self.clean_meth == "ft":
             return filter_texts(splits)
@@ -245,23 +247,23 @@ class TextPreProcess:
             chunks_out.extend(chunks)
         return chunks_out
 
-    def chunk_sents_len(self, text_sentences: List[List[str]]):
+    def chunk_sents_len(self, text_sentences: dict):
         """
-        Chunk sentences together in chunks of at most max_len length
+        Chunk sentences together in chunks of at most chunk_size length
 
         Args:
-            text_sentences: sentences, which is the text split on "."
+            text_sentences (dict): sentences, which is the text split on "."
 
         Returns:
-            chunks (List[List[str]]): sentence chunks
+            chunks (dict): sentence chunks
         """
-        chunks = []
-        for sentences in text_sentences:
+        chunks = {}
+        for name, sentences in text_sentences.items():
             trunc_sentences = truncate_sentences(sentences, self.chunk_size)
             lens = [len(s) for s in trunc_sentences]  # Sentence lengths
             sent_indices = self.get_sent_chunk_inds(lens)  # Sentence indices to chunk together
             chunks_text = [". ".join([trunc_sentences[i] for i in inds]) for inds in sent_indices]  # Make chunks from the sentence indices
-            chunks.extend(chunks_text)
+            chunks[name] = chunks_text
         return chunks
 
     def get_sent_chunk_inds(self, lens: List[int]):

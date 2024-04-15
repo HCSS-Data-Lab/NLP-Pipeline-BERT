@@ -1,4 +1,5 @@
 import os
+import time
 
 import config
 from src.init_folders import InitFolders
@@ -8,11 +9,24 @@ from src.plotting import Plotting
 from src.evaluation import Evaluation
 from src.RAG import RAG
 from src.merge import Merge
-from src.translate import Translate
 
+from src.dtm import DynamicTopicModeling
 from src.texts_pp import TextPreProcess
 from src.embeddings_pp import EmbeddingsPreProcess
 from src.red_embeddings_pp import RedEmbeddingsPreProcess
+
+def get_year_str(keyword_theme, years):
+    """
+    Get year str used for tfidf input file selection for dynamic topic modeling, like 'security_vt0.8_2019_2020'
+    """
+    if config.dtm_parameters["tfidf_threshold_type"] == "value":
+        threshold_str = "vt"
+    elif config.dtm_parameters["tfidf_threshold_type"] == "document":
+        threshold_str = "dt"
+    else:
+        threshold_str = ""
+    return keyword_theme + f"_tfidf_{threshold_str}{config.dtm_parameters['tfidf_threshold']}_" + "_".join(years)
+
 
 if __name__ == '__main__':
     """
@@ -28,89 +42,137 @@ if __name__ == '__main__':
     options, for instance also Grobid
     - Contributor to BERTopic package for Convex Hulls.
     - Make txt output file with topic output: topics, top n terms, topic size
-    - Simplify regex in config for different projects/data, name by alias 
     - Think about hierarchy for code, add UI formatting for different tasks
-    
-    DTM:
-    - Build dynamic topic modeling
-    - test different dataset sizes, start with small
     - Corpus specific stop words
     """
 
-    # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
+    # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd())
     project_root = os.getcwd()
-    project = "ParlaMint"
-    year = "2015"
-
-    # dtm_years = [2019, 2020, 2021, 2022]
-
-    if config.sample_parameters["sample"]:
-        dtm_years = ["2019", "2020", "2021", "2020"]
-        
-        # Sample docs for each year
-        # In input/ParlaMint, we get folders 2019_s0.5, ... etc
-        # Make a folder with 19-22_s0.5 with all files
-        # Make timestamps for all files
-        # Set nr bins to len(years) * 4
-        # Make embeddings, red embeddings, etc. for docs in folder 19-22_s0.5
-
-        # Run topics_over_time function
-        pass
+    data = "ParlaMint"
+    task = "dtm"  # dtm, tm
+    # years = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"]
+    years = ["2019", "2020", "2021", "2022"]
+    country = "GB"
 
     if config.clean_parameters["clean_text"]:  # In config set clean_text to False to turn it off
-        text_cleaning = TextCleaning(project_root, project, year)
-        text_cleaning.read_clean_raw_texts()
+        for year in years:
+            text_cleaning = TextCleaning(project_root, data, year)
+            text_cleaning.read_clean_raw_texts()
+
+    # Do preprocessing for dynamic topic modeling
+    if task == "dtm":
+        dtm = DynamicTopicModeling(project_root, data, years)
+        keyword_theme = "defense"
+        keywords = [
+            "military",
+            "defense",
+            "armed forces",
+            # "security",
+            # "strategy",
+            "tactics",
+            "army",
+            "navy",
+            "air force",
+            "marines",
+            "weapons",
+            "warfare",
+            "combat",
+            # "intelligence",
+            "operations",
+            # "training",
+            # "logistics",
+            # "surveillance",
+            "cybersecurity",
+            "deterrence"]
+        # keywords = ["defense", "military"]
+
+        # keyword_theme = "security"
+        # keywords = ['safety', 'security', 'threat', 'protest', 'national security', 'demonstration', 'law enforcement',
+        #             'risk', 'police', 'danger', 'hazard', 'national security', 'law enforcement']
+
+        if config.dtm_parameters["keyword_find"] == "search":
+            year_str = keyword_theme + "_".join(years)
+            dtm.find_keyword_docs(year_str, keywords)
+
+        elif config.dtm_parameters["keyword_find"] == "tfidf":
+            year_str = get_year_str(keyword_theme, years)
+            dtm.find_keyword_docs_tfidf(keywords, year_str)
+
+        else:
+            # Adds docs from the years together in a folder, or when keywords_find=None
+            # year_str = keyword_theme + "_".join(years)
+            year_str = get_year_str(keyword_theme, years)
+    else:
+        year_str = years[0]
 
     init_folders = InitFolders(project_root=project_root,
-                               project=project,
-                               year=year)
+                               project=data,
+                               year=year_str)
 
-    if config.translate_param["translate"]:
-        translate_obj = Translate(project_root=project_root, project=project, year=year)
-        translate_obj.translate_text(from_last_added=True)
+    # if config.translate_param["translate"]:
+    #     from src.translate import Translate
+    #     for year in years:
+    #         translate_obj = Translate(project_root=project_root, project=data, year=year)
+    #         translate_obj.translate_text(from_last_added=True)
 
     # Initializing text data
-    text_bodies_path = init_folders.get_text_bodies_path()
     split_texts_path = init_folders.get_split_texts_path()
+    text_bodies_path = init_folders.get_text_bodies_path()
     texts_pp = TextPreProcess(text_bodies_path, split_texts_path)
-    texts = texts_pp.get_texts()
+    text_chunks = texts_pp.get_texts()
 
     # Initialize embeddings and reduced embeddings
     emb_path = init_folders.get_emb_path()
     embeddings_pp = EmbeddingsPreProcess(emb_path)
-    embeddings = embeddings_pp.get_embeddings(texts)
+    embeddings = embeddings_pp.get_embeddings(text_chunks)
 
     # Initialize reduced embeddings
     red_emb_pp = RedEmbeddingsPreProcess(emb_path)
     reduced_embeddings = red_emb_pp.get_red_embeddings(embeddings)
 
     # Initialize topic-model
-    output_folder = os.path.join(project_root, "output", project, year)
+    output_folder = os.path.join(project_root, "output", data, year_str)
     analysis = Analysis(out_path=output_folder)
-    topic_model = analysis.initialize_topic_model(texts)
+    topic_model = analysis.initialize_topic_model(text_chunks)
 
-    # Plotting
-    model_name = analysis.get_model_file_name()
-    num_texts = len(texts)
+    if task == "tm":
+        # Plotting
+        model_name = analysis.get_model_file_name()
+        num_texts = len(text_chunks)
 
-    # Initiate RAG, enhance topic labels based on RAG and summarize docs
-    RAG_from_file = False
-    summarize_labels = False
-    summarize_docs = False
-    rag_path = init_folders.get_rag_path()
-    rag = RAG(embeddings, texts, RAG_from_file, path=rag_path)
+        # Initiate RAG, enhance topic labels based on RAG and summarize docs
+        RAG_from_file = False
+        summarize_labels = False
+        summarize_docs = False
+        rag_path = init_folders.get_rag_path()
+        rag = RAG(embeddings, text_chunks, RAG_from_file, path=rag_path)
 
-    plotting = Plotting(topic_model=topic_model,
-                        reduced_embeddings=reduced_embeddings,
-                        model_name=model_name,
-                        docs=texts,
-                        summarize_docs=summarize_docs,
-                        summarize_labels=summarize_labels,
-                        rag=rag,
-                        folder=os.path.join(output_folder, "figures"),
-                        year=year,
-                        save_html=True)
-    plotting.plot()
+        plotting = Plotting(topic_model=topic_model,
+                            reduced_embeddings=reduced_embeddings,
+                            model_name=model_name,
+                            docs=text_chunks,
+                            summarize_docs=summarize_docs,
+                            summarize_labels=summarize_labels,
+                            rag=rag,
+                            folder=os.path.join(output_folder, "figures"),
+                            year=year_str,
+                            save_html=False)
+        plotting.plot()
+
+    elif task == "dtm":
+        timestamps_chunks = dtm.get_time_stamps(text_chunks)  # Timestamps and chunks
+        timestamps = [item["date"] for item in timestamps_chunks]  # Only Timestamps
+        print(f"Timestamps: ", len(timestamps))
+        print(f"Text chunks: ", len(text_chunks))
+
+        start = time.time()
+        topics_over_time = topic_model.topics_over_time(text_chunks, timestamps, datetime_format="%Y-%m-%d", nr_bins=len(years)*2)
+        print(f"Time elapsed for topics over time: {time.time() - start:.4f} seconds")
+        print("Visualizing topics over time...")
+        fig = topic_model.visualize_topics_over_time(topics_over_time, top_n_topics=10)
+        fig.write_html(os.path.join(output_folder, "figures", f"topics_over_time_{year_str}.html"))
+    else:
+        raise ValueError(f"The task {task} is undefined. Options are tm (topic modeling) and dtm (dynamic topic modeling)")
 
     #################################################################
     # Merging and Evaluation below (optional)

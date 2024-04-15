@@ -58,12 +58,8 @@ class Analysis:
         self.update_topics = config.bertopic_parameters["update_topics"]
         self.use_keyphrase = config.bertopic_parameters["use_keyphrase"]
 
-        if self.split_size == "chunk":
-            self.model_file_name = f"bertopic_model_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}{self.get_repr_str()}"
-            self.emb_name = f"embeddings_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
-        else:
-            self.model_file_name = f"bertopic_model_{self.bert_model_str}_{self.split_size}_{self.clean_meth}{self.get_repr_str()}"
-            self.emb_name = f"embeddings_{self.bert_model_str}_{self.split_size}_{self.clean_meth}.pkl"
+        self.model_file_name = f"bertopic_model_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}{self.get_repr_str()}"
+        self.emb_name = f"embeddings_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
 
     def initialize_topic_model(self, data):
         if self.model_from_file:

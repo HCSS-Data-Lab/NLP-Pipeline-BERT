@@ -3,16 +3,21 @@ LOAD_TEXT_SPLITS_FROM_FILE = False
 LOAD_EMBEDDINGS_FROM_FILE = False
 LOAD_REDUCED_EMBEDDINGS_FROM_FILE = False
 LOAD_TOPIC_MODEL_FROM_FILE = False
-LOAD_MODEL_EMBEDDINGS_FROM_FILE = False
-
-sample_parameters = {
-    'sample': True,
-    'sample_size': 0.5
-}
+LOAD_MODEL_EMBEDDINGS_FROM_FILE = True
 
 clean_parameters = {
     'clean_text': False,  # Bool indicator whether to apply text cleaning
     'regex_ParlaMint': "\[\[|\]\]|ParlaMint.+?\s",  # Project-specific regex for ParlaMint data: remove brackets and datestamp starting with ParlaMint
+}
+
+dtm_parameters = {
+    'keyword_find': 'None',  # None, search, tfidf
+
+    'tfidf_threshold_type': 'value',  # value, document
+    'tfidf_threshold': 0.8,
+
+    'sample': False,
+    'sample_size': 0.5
 }
 
 translate_param = {

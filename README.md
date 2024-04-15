@@ -92,7 +92,5 @@ The project folder is structured as follows:
 │
 ├── main.py
 │                                      
-├── requirements.txt
-│                                      
-└── test.py
+└── requirements.txt
 ```

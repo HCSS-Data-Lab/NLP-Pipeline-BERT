@@ -19,7 +19,7 @@ class TextCleaning:
         self.raw_texts_path = os.path.join(self.input_folder, year, "raw_texts")
 
         if not os.path.isdir(self.raw_texts_path):
-            raise ValueError(f"Input folder {self.input_folder}/{self.year} should contain a folder 'raw_texts' with texts to clean.")
+            raise ValueError(f"Input folder {self.input_folder}\\{self.year} should contain a folder 'raw_texts' with texts to clean.")
 
         self.output_folder = os.path.join(self.input_folder, year, "text_bodies")  # Saving cleaned texts in folder text_bodies
         os.makedirs(self.output_folder, exist_ok=True)

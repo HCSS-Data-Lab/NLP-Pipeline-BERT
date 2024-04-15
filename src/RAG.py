@@ -10,10 +10,10 @@ import time
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 
-load_dotenv()
-llm = OpenAI(model=config.rag_parameters['LLM-model'], temperature=config.rag_parameters['temperature'])  #
-embed_model = HuggingFaceEmbeddings(model_name="sentence-transformers/" + config.model_parameters['emb_model'])
-SERVICE_CONTEXT = ServiceContext.from_defaults(embed_model=embed_model)
+# load_dotenv()
+# llm = OpenAI(model=config.rag_parameters['LLM-model'], temperature=config.rag_parameters['temperature'])  #
+# embed_model = HuggingFaceEmbeddings(model_name="sentence-transformers/" + config.model_parameters['emb_model'])
+# SERVICE_CONTEXT = ServiceContext.from_defaults(embed_model=embed_model)
 
 
 class RAG:

@@ -1,8 +1,14 @@
 import os
 import pickle
 from sentence_transformers import SentenceTransformer
+from multiprocessing import Pool
+import numpy as np
+from itertools import repeat
 
 import config
+
+def encode_chunk(chunk, model):
+    return model.encode(chunk, show_progress_bar=True)
 
 class EmbeddingsPreProcess:
 
@@ -34,12 +40,9 @@ class EmbeddingsPreProcess:
         self.bert_model = config.model_parameters["emb_model"]
         self.bert_model_str = self.bert_model.split("/")[-1]
 
-        if self.split_size == "chunk":
-            self.embedding_name = f"embeddings_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
-        else:
-            self.embedding_name = f"embeddings_{self.bert_model_str}_{self.split_size}_{self.clean_meth}.pkl"
+        self.embedding_name = f"embeddings_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
 
-    def get_embeddings(self, data):
+    def get_embeddings(self, data, parallel=False):
         """
         Get embeddings by loading them from file with load_embeddings() or generate
         them at runtime based on input text data with generate_embeddings().
@@ -53,7 +56,10 @@ class EmbeddingsPreProcess:
         if self.emb_from_file:
             embeddings = self.load_embeddings()
         else:
-            embeddings = self.generate_embeddings(data)
+            if parallel:
+                embeddings = self.generate_embeddings_parallel(data)
+            else:
+                embeddings = self.generate_embeddings(data)
         print(f'{"Embeddings shape:":<65}{str(embeddings.shape):>10}\n')
         return embeddings
 
@@ -72,7 +78,8 @@ class EmbeddingsPreProcess:
             return data_dict['embeddings']
         else:
             raise ValueError(
-                f"Folder output/project/embeddings does not contain specified emb .pkl dict file. Generate it at runtime.")
+                f"Folder output/project/embeddings does not contain specified emb .pkl dict file. "
+                f"Set LOAD_EMBEDDINGS_FROM_FILE to False and generate embeddings at runtime.")
 
     def generate_embeddings(self, data):
         """
@@ -81,7 +88,7 @@ class EmbeddingsPreProcess:
         and bert_model as .pkl dict. Sentence BERT model name given by self.bert_model.
 
         Args:
-            data (list[str]): input text data
+            data (list[str]): input text data (chunks)
 
         Returns:
             embeddings (torch.Tensor): text embeddings, each doc as a 768-dim vector. Shape: (num docs, 768)
@@ -92,5 +99,24 @@ class EmbeddingsPreProcess:
 
         with open(os.path.join(self.path, self.embedding_name), "wb") as file:
             pickle.dump({'embeddings': embeddings, 'text_split_size': self.split_size, 'bert_model': self.bert_model}, file,
+                        protocol=pickle.HIGHEST_PROTOCOL)
+        return embeddings
+
+    def generate_embeddings_parallel(self, data):
+        print("Initializing embeddings in parallel...")
+        model = SentenceTransformer(self.bert_model)
+
+        num_processes = 4
+        process_chunks = [data[i::num_processes] for i in range(num_processes)]
+
+        with Pool() as p:
+            results = p.starmap(encode_chunk, zip(process_chunks, repeat(model)))
+
+        embeddings = np.concatenate(results, axis=0)
+
+        emb_name = self.embedding_name[:-4]+"_pT.pkl"  # Add 'pT' as parallel=True flag to embedding name
+        with open(os.path.join(self.path, emb_name), "wb") as file:
+            pickle.dump({'embeddings': embeddings, 'text_split_size': self.split_size, 'bert_model': self.bert_model},
+                        file,
                         protocol=pickle.HIGHEST_PROTOCOL)
         return embeddings
