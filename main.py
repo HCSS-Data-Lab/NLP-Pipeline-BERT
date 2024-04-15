@@ -52,7 +52,6 @@ if __name__ == '__main__':
     task = "dtm"  # dtm, tm
     # years = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"]
     years = ["2019", "2020", "2021", "2022"]
-    country = "GB"
 
     if config.clean_parameters["clean_text"]:  # In config set clean_text to False to turn it off
         for year in years:
@@ -119,7 +118,11 @@ if __name__ == '__main__':
     split_texts_path = init_folders.get_split_texts_path()
     text_bodies_path = init_folders.get_text_bodies_path()
     texts_pp = TextPreProcess(text_bodies_path, split_texts_path)
-    text_chunks = texts_pp.get_texts()
+    texts = texts_pp.get_texts()  # Text title and Chunk
+
+    # Collect text chunks
+    text_chunks = [chunk for value in texts.values() for chunk in value]
+    print(f'{"Text chunks:":<65}{len(text_chunks):>10}\n')
 
     # Initialize embeddings and reduced embeddings
     emb_path = init_folders.get_emb_path()
@@ -160,7 +163,7 @@ if __name__ == '__main__':
         plotting.plot()
 
     elif task == "dtm":
-        timestamps_chunks = dtm.get_time_stamps(text_chunks)  # Timestamps and chunks
+        timestamps_chunks = dtm.get_time_stamps(texts)  # Timestamps and chunks
         timestamps = [item["date"] for item in timestamps_chunks]  # Only Timestamps
         print(f"Timestamps: ", len(timestamps))
         print(f"Text chunks: ", len(text_chunks))

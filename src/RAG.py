@@ -7,9 +7,9 @@ from llama_index.core import ServiceContext
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 import config
 import time
-from dotenv import load_dotenv
-from sentence_transformers import SentenceTransformer
 
+# from dotenv import load_dotenv
+# from sentence_transformers import SentenceTransformer
 # load_dotenv()
 # llm = OpenAI(model=config.rag_parameters['LLM-model'], temperature=config.rag_parameters['temperature'])  #
 # embed_model = HuggingFaceEmbeddings(model_name="sentence-transformers/" + config.model_parameters['emb_model'])

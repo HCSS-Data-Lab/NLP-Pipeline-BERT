@@ -290,10 +290,10 @@ class DynamicTopicModeling:
         Find time stamps for input texts
 
         Args:
-            texts (dict): texts dictionary with text names (keys) and list of chunks (values)
+            texts (dict):
 
         Returns:
-            time_stamps (lst):
+            time_stamps (List[]):
         """
         time_stamps = []
         for text_name, chunks in texts.items():

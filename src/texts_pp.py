@@ -134,11 +134,7 @@ class TextPreProcess:
             texts = self.load_split_texts()
         else:
             texts = self.generate_split_texts()
-
-        # Collect text chunks from lst of tuples with text name (key) and chunk (value)
-        text_chunks = [chunk for value in texts.values() for chunk in value]
-        print(f'{"Text chunks:":<65}{len(text_chunks):>10}\n')
-        return text_chunks
+        return texts
 
     def load_split_texts(self):
         """
