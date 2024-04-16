@@ -10,22 +10,37 @@ from src.evaluation import Evaluation
 from src.RAG import RAG
 from src.merge import Merge
 
+from src.doc_selection import DocSelection
 from src.dtm import DynamicTopicModeling
 from src.texts_pp import TextPreProcess
 from src.embeddings_pp import EmbeddingsPreProcess
 from src.red_embeddings_pp import RedEmbeddingsPreProcess
 
-def get_year_str(keyword_theme, years):
+def get_year_str(task, years, keyword_theme=None):
     """
     Get year str used for tfidf input file selection for dynamic topic modeling, like 'security_vt0.8_2019_2020'
     """
-    if config.dtm_parameters["tfidf_threshold_type"] == "value":
-        threshold_str = "vt"
-    elif config.dtm_parameters["tfidf_threshold_type"] == "document":
-        threshold_str = "dt"
+    if task == "tm":
+        # E.g. '2020'
+        return years[0]
+
+    elif task == "dtm":
+        selection_method = config.doc_selection_parameters["doc_selection_method"]
+        if selection_method == "search":
+            # E.g. 'security_search_2019_2020'
+            return keyword_theme + "_search_" + "_".join(years)
+
+        elif selection_method == "tfidf":
+            if config.doc_selection_parameters["tfidf_threshold_type"] == "value":
+                threshold_str = "vt"
+            elif config.doc_selection_parameters["tfidf_threshold_type"] == "document":
+                threshold_str = "dt"
+
+            # E.g. 'security_tfidf_vt0.8_2019_2020'
+            return keyword_theme + f"_tfidf_{threshold_str}{config.doc_selection_parameters['tfidf_threshold']}_" + "_".join(years)
+
     else:
-        threshold_str = ""
-    return keyword_theme + f"_tfidf_{threshold_str}{config.dtm_parameters['tfidf_threshold']}_" + "_".join(years)
+        raise ValueError(f"The task: {task} is undefined. Options are tm (topic modeling) and dtm (dynamic topic modeling). ")
 
 
 if __name__ == '__main__':
@@ -42,83 +57,64 @@ if __name__ == '__main__':
     options, for instance also Grobid
     - Contributor to BERTopic package for Convex Hulls.
     - Make txt output file with topic output: topics, top n terms, topic size
-    - Think about hierarchy for code, add UI formatting for different tasks
+    - Think about hierarchy for code, add UI formatting for different tasks; add assertions for parameters
     - Corpus specific stop words
+    
+    - Add .py file with parts of code so subtasks are read; test year_str and other new stuff
     """
 
     # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd())
     project_root = os.getcwd()
-    data = "ParlaMint"
+    dataset_name = "ParlaMint"
     task = "dtm"  # dtm, tm
+    subtask = "text splitting"  # text splitting, run topic model, plot tm, run topics over time, plot dtm
+
     # years = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"]
     years = ["2019", "2020", "2021", "2022"]
 
+    # Doc selection parameters
+    selection_method = config.doc_selection_parameters["doc_selection_method"]
+    if selection_method:  # If selection method is not None
+        keyword_theme = 'security'
+        keywords = ['safety', 'security', 'threat', 'protest', 'national security', 'demonstration', 'law enforcement',
+                    'risk', 'police', 'danger', 'hazard', 'national security', 'law enforcement']
+
+        # keyword_theme = "defense"
+        # keywords = ["military", "defense", "armed forces", "tactics", "army", "navy", "air force", "marines", "weapons",
+        #             "warfare", "combat", "operations", "cybersecurity", "deterrence"]
+    else:
+        keyword_theme, keywords = None, None
+
+    # Get year str, used for folder names
+    year_str = get_year_str(task, years, keyword_theme)
+
+    # Text cleaning
     if config.clean_parameters["clean_text"]:  # In config set clean_text to False to turn it off
         for year in years:
-            text_cleaning = TextCleaning(project_root, data, year)
+            text_cleaning = TextCleaning(project_root, dataset_name, year)
             text_cleaning.read_clean_raw_texts()
 
-    # Do preprocessing for dynamic topic modeling
-    if task == "dtm":
-        dtm = DynamicTopicModeling(project_root, data, years)
-        keyword_theme = "defense"
-        keywords = [
-            "military",
-            "defense",
-            "armed forces",
-            # "security",
-            # "strategy",
-            "tactics",
-            "army",
-            "navy",
-            "air force",
-            "marines",
-            "weapons",
-            "warfare",
-            "combat",
-            # "intelligence",
-            "operations",
-            # "training",
-            # "logistics",
-            # "surveillance",
-            "cybersecurity",
-            "deterrence"]
-        # keywords = ["defense", "military"]
-
-        # keyword_theme = "security"
-        # keywords = ['safety', 'security', 'threat', 'protest', 'national security', 'demonstration', 'law enforcement',
-        #             'risk', 'police', 'danger', 'hazard', 'national security', 'law enforcement']
-
-        if config.dtm_parameters["keyword_find"] == "search":
-            year_str = keyword_theme + "_".join(years)
-            dtm.find_keyword_docs(year_str, keywords)
-
-        elif config.dtm_parameters["keyword_find"] == "tfidf":
-            year_str = get_year_str(keyword_theme, years)
-            dtm.find_keyword_docs_tfidf(keywords, year_str)
-
-        else:
-            # Adds docs from the years together in a folder, or when keywords_find=None
-            # year_str = keyword_theme + "_".join(years)
-            year_str = get_year_str(keyword_theme, years)
-    else:
-        year_str = years[0]
+    # Document selection
+    if config.doc_selection_parameters["doc_selection_method"]:  # If doc selection method is not None
+        doc_selection = DocSelection(project_root, dataset_name, years)
+        doc_selection.find_copy_docs(keywords=keywords, keyword_year_str=year_str)
 
     init_folders = InitFolders(project_root=project_root,
-                               project=data,
+                               project=dataset_name,
                                year=year_str)
 
-    # if config.translate_param["translate"]:
-    #     from src.translate import Translate
-    #     for year in years:
-    #         translate_obj = Translate(project_root=project_root, project=data, year=year)
-    #         translate_obj.translate_text(from_last_added=True)
+    # Translate texts
+    if config.translate_param["translate"]:
+        from src.translate import Translate
+        for year in years:
+            translate_obj = Translate(project_root=project_root, project=dataset_name, year=year)
+            translate_obj.translate_text(from_last_added=True)
 
     # Initializing text data
     split_texts_path = init_folders.get_split_texts_path()
     text_bodies_path = init_folders.get_text_bodies_path()
     texts_pp = TextPreProcess(text_bodies_path, split_texts_path)
-    texts = texts_pp.get_texts()  # Text title and Chunk
+    texts = texts_pp.get_texts()  # texts has text title and chunk
 
     # Collect text chunks
     text_chunks = [chunk for value in texts.values() for chunk in value]
@@ -134,7 +130,7 @@ if __name__ == '__main__':
     reduced_embeddings = red_emb_pp.get_red_embeddings(embeddings)
 
     # Initialize topic-model
-    output_folder = os.path.join(project_root, "output", data, year_str)
+    output_folder = os.path.join(project_root, "output", dataset_name, year_str)
     analysis = Analysis(out_path=output_folder)
     topic_model = analysis.initialize_topic_model(text_chunks)
 
@@ -159,23 +155,27 @@ if __name__ == '__main__':
                             rag=rag,
                             folder=os.path.join(output_folder, "figures"),
                             year=year_str,
-                            save_html=False)
+                            save_html=False)  # Add in config
         plotting.plot()
 
     elif task == "dtm":
+        # Initialize dtm object
+        dtm = DynamicTopicModeling(project_root, dataset_name)
+
+        # Find timestamps
         timestamps_chunks = dtm.get_time_stamps(texts)  # Timestamps and chunks
         timestamps = [item["date"] for item in timestamps_chunks]  # Only Timestamps
-        print(f"Timestamps: ", len(timestamps))
-        print(f"Text chunks: ", len(text_chunks))
+        print(f'{"Number of timestamps:":<65}{len(timestamps):>10}')
+        print(f'{"Number of text chunks:":<65}{len(text_chunks):>10}')
 
-        start = time.time()
-        topics_over_time = topic_model.topics_over_time(text_chunks, timestamps, datetime_format="%Y-%m-%d", nr_bins=len(years)*2)
-        print(f"Time elapsed for topics over time: {time.time() - start:.4f} seconds")
-        print("Visualizing topics over time...")
-        fig = topic_model.visualize_topics_over_time(topics_over_time, top_n_topics=10)
-        fig.write_html(os.path.join(output_folder, "figures", f"topics_over_time_{year_str}.html"))
-    else:
-        raise ValueError(f"The task {task} is undefined. Options are tm (topic modeling) and dtm (dynamic topic modeling)")
+        # Run topics over time
+        nr_of_bins = len(years) * 4
+        topics_over_time = dtm.run_dtm(topic_model, text_chunks, timestamps, nr_of_bins)
+
+        # Visualize topics over time
+        top_n_topics = 20
+        dtm.visualize_topics(topic_model, topics_over_time, output_folder, year_str, top_n_topics)
+
 
     #################################################################
     # Merging and Evaluation below (optional)

@@ -10,13 +10,12 @@ clean_parameters = {
     'regex_ParlaMint': "\[\[|\]\]|ParlaMint.+?\s",  # Project-specific regex for ParlaMint data: remove brackets and datestamp starting with ParlaMint
 }
 
-dtm_parameters = {
-    'keyword_find': 'None',  # None, search, tfidf
+doc_selection_parameters = {
+    'doc_selection_method': 'search',  # search, tfidf, sample, None
 
     'tfidf_threshold_type': 'value',  # value, document
     'tfidf_threshold': 0.8,
 
-    'sample': False,
     'sample_size': 0.5
 }
 
