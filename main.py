@@ -1,5 +1,5 @@
 import os
-import time
+import pandas as pd
 
 import config
 from src.init_folders import InitFolders
@@ -15,6 +15,7 @@ from src.dtm import DynamicTopicModeling
 from src.texts_pp import TextPreProcess
 from src.embeddings_pp import EmbeddingsPreProcess
 from src.red_embeddings_pp import RedEmbeddingsPreProcess
+
 
 def get_year_str(task, years, keyword_theme=None):
     """
@@ -37,10 +38,12 @@ def get_year_str(task, years, keyword_theme=None):
                 threshold_str = "dt"
 
             # E.g. 'security_tfidf_vt0.8_2019_2020'
-            return keyword_theme + f"_tfidf_{threshold_str}{config.doc_selection_parameters['tfidf_threshold']}_" + "_".join(years)
+            return keyword_theme + f"_tfidf_{threshold_str}{config.doc_selection_parameters['tfidf_threshold']}_" + "_".join(
+                years)
 
     else:
-        raise ValueError(f"The task: {task} is undefined. Options are tm (topic modeling) and dtm (dynamic topic modeling). ")
+        raise ValueError(
+            f"The task: {task} is undefined. Options are tm (topic modeling) and dtm (dynamic topic modeling). ")
 
 
 if __name__ == '__main__':
@@ -51,15 +54,13 @@ if __name__ == '__main__':
     - Add making automatic folders for project
     - Add option to not install sentence-transformers (and make use of cheap default embedding for development).
     - In general it might also be great to have a dev set that we can use to do test runs (especially because ).  
-    
+
     TODO:
     - Split up pre-processing part of old repository, make separate preproc repo. Option to add several preproc.
     options, for instance also Grobid
     - Contributor to BERTopic package for Convex Hulls.
-    - Make txt output file with topic output: topics, top n terms, topic size
-    - Think about hierarchy for code, add UI formatting for different tasks; add assertions for parameters
+    - Think about hierarchy for code, add UI formatting for different tasks; add assertions for parameters; add functionality to read texts with keywords without sampling texts
     - Corpus specific stop words
-    
     - Add .py file with parts of code so subtasks are read; test year_str and other new stuff
     """
 
@@ -69,10 +70,13 @@ if __name__ == '__main__':
     task = "dtm"  # dtm, tm
     subtask = "text splitting"  # text splitting, run topic model, plot tm, run topics over time, plot dtm
 
-    # years = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"]
-    years = ["2019", "2020", "2021", "2022"]
+    years = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"]
+    # years = ["2020", "2021", "2022"]
 
     # Doc selection parameters
+    use_selected_docs = True
+    select_documents = False
+
     selection_method = config.doc_selection_parameters["doc_selection_method"]
     if selection_method:  # If selection method is not None
         keyword_theme = 'security'
@@ -87,6 +91,7 @@ if __name__ == '__main__':
 
     # Get year str, used for folder names
     year_str = get_year_str(task, years, keyword_theme)
+    print("Year str: ", year_str)
 
     # Text cleaning
     if config.clean_parameters["clean_text"]:  # In config set clean_text to False to turn it off
@@ -96,8 +101,13 @@ if __name__ == '__main__':
 
     # Document selection
     if config.doc_selection_parameters["doc_selection_method"]:  # If doc selection method is not None
-        doc_selection = DocSelection(project_root, dataset_name, years)
-        doc_selection.find_copy_docs(keywords=keywords, keyword_year_str=year_str)
+        if select_documents:
+            print("Selecting documents...")
+            doc_selection = DocSelection(project_root, dataset_name, years)
+            doc_selection.find_copy_docs(keywords=keywords, keyword_year_str=year_str)
+        elif use_selected_docs:
+            # In this case, use the docs already selected
+            print("Using selected documents...")
 
     init_folders = InitFolders(project_root=project_root,
                                project=dataset_name,
@@ -134,6 +144,10 @@ if __name__ == '__main__':
     analysis = Analysis(out_path=output_folder)
     topic_model = analysis.initialize_topic_model(text_chunks)
 
+    save_topic_words = False
+    if save_topic_words:
+        analysis.save_topic_words(topic_model)
+
     if task == "tm":
         # Plotting
         model_name = analysis.get_model_file_name()
@@ -169,13 +183,28 @@ if __name__ == '__main__':
         print(f'{"Number of text chunks:":<65}{len(text_chunks):>10}')
 
         # Run topics over time
-        nr_of_bins = len(years) * 4
-        topics_over_time = dtm.run_dtm(topic_model, text_chunks, timestamps, nr_of_bins)
+        if config.LOAD_TOPICS_OVER_TIME_FROM_FILE:
+            print("Loading topics over time from file...")
+            topics_over_time = pd.read_csv(os.path.join(output_folder, "models", "topics_over_time.csv"))
+        else:
+            nr_of_bins = len(years) * 4
+            topics_over_time = dtm.run_dtm(topic_model, text_chunks, timestamps, nr_of_bins, output_folder)
 
         # Visualize topics over time
-        top_n_topics = 20
-        dtm.visualize_topics(topic_model, topics_over_time, output_folder, year_str, top_n_topics)
-
+        top_n_topics = 50
+        topics_to_show = [1, 4, 5, 6, 7, 9, 11, 13, 14, 15]
+        topics_background = [1, 4, 5, 9, 11, 13]
+        background_alpha = 0.2
+        color_legend_opaque = True
+        dtm.visualize_topics(topic_model=topic_model,
+                             topics_over_time=topics_over_time,
+                             output_folder=output_folder,
+                             year_str=year_str,
+                             top_n=top_n_topics,
+                             topics_to_show=topics_to_show,
+                             topics_background=topics_background,
+                             background_alpha=background_alpha,
+                             legend_opaque=color_legend_opaque)
 
     #################################################################
     # Merging and Evaluation below (optional)

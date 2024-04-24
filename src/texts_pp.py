@@ -152,7 +152,7 @@ class TextPreProcess:
             return data_dict['texts']
         else:
             raise ValueError(
-                f"Folder output/project/texts does not contain text .pkl dict file with split text size: {self.split_size} and text clean method: {self.clean_meth}. "
+                f"Folder output/project/year/texts does not contain text .pkl dict file with split text size: {self.split_size} and text clean method: {self.clean_meth}. "
                 f"Set LOAD_TEXT_SPLITS_FROM_FILE to False and generate split texts at runtime.")
 
     def generate_split_texts(self):

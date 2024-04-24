@@ -1,9 +1,11 @@
 import spacy
 from bertopic import BERTopic
 import umap
+import pandas as pd
 from bertopic.representation import MaximalMarginalRelevance
 from bertopic.representation import PartOfSpeech
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, ENGLISH_STOP_WORDS
+
 from keyphrase_vectorizers import KeyphraseCountVectorizer
 from sentence_transformers import SentenceTransformer
 
@@ -115,7 +117,19 @@ class Analysis:
         # Conditionally set vectorizer_model if using a stop words vectorizer
         if self.clean_meth == "vect":
             print("Initializing topic model with stop words vectorizer.")
-            vectorizer_model = CountVectorizer(**config.countvectorizer_parameters)
+            use_custom_words = True
+            if use_custom_words:
+                print("Using custom stop words.")
+                custom_stop_words = config.countvectorizer_parameters["custom_stop_words"]
+                stop_words = ENGLISH_STOP_WORDS.union(custom_stop_words)
+            else:
+                print("NOT using custom, only English stop words.")
+                stop_words = ENGLISH_STOP_WORDS
+
+            vectorizer_model = CountVectorizer(ngram_range=(1, 3),
+                                               stop_words=list(stop_words),
+                                               min_df=0.01,
+                                               lowercase=False)
 
             if self.use_keyphrase:
                 print("Using KeyPhrase as CountVectorizer.")
@@ -189,3 +203,24 @@ class Analysis:
             str: representation model values in str
         """
         return f"_mmr{bool_ind(self.use_mmr)}_p{bool_ind(self.use_pos)}_kp{bool_ind(self.use_keyphrase)}"
+
+    def save_topic_words(self, topic_model, top_n_topics=None):
+        """
+        Save the top 10 terms of the first top_n_topics topics to a csv file, saving to 'models' folder
+        """
+        topic_repr = topic_model.topic_representations_
+
+        if top_n_topics:
+            topic_repr = dict(sorted(topic_repr.items(), key=lambda item: item[0])[:top_n_topics])
+
+        data_for_df = []
+        for topic_id, words_weights in topic_repr.items():
+            # Extract only the words, ignoring the weights
+            words = ', '.join([word for word, weight in words_weights])
+            data_for_df.append({"Topic ID": topic_id, "Words": words})
+
+        # Create a DataFrame
+        df = pd.DataFrame(data_for_df)
+
+        # Write the DataFrame to a CSV file
+        df.to_excel(os.path.join(self.models_path, f"topic_words_{top_n_topics}.xlsx"), index=False)

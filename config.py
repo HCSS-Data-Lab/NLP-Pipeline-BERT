@@ -4,6 +4,7 @@ LOAD_EMBEDDINGS_FROM_FILE = True
 LOAD_REDUCED_EMBEDDINGS_FROM_FILE = True
 LOAD_TOPIC_MODEL_FROM_FILE = True
 LOAD_MODEL_EMBEDDINGS_FROM_FILE = True
+LOAD_TOPICS_OVER_TIME_FROM_FILE = True
 
 clean_parameters = {
     'clean_text': False,  # Bool indicator whether to apply text cleaning
@@ -11,7 +12,7 @@ clean_parameters = {
 }
 
 doc_selection_parameters = {
-    'doc_selection_method': 'search',  # search, tfidf, sample, None
+    'doc_selection_method': 'tfidf',  # search, tfidf, sample, None
 
     'tfidf_threshold_type': 'value',  # value, document
     'tfidf_threshold': 0.8,
@@ -64,10 +65,27 @@ bertopic_parameters = {
 
 countvectorizer_parameters = {  # CountVectorizer
     'ngram_range': (1, 3),
-    'stop_words': 'english',
-    # 'stop_words': ['de', 'het', 'een', 'en', 'van', 'ik', 'te', 'dat', 'die', 'in', 'een', 'hij', 'het', 'niet', 'zijn', 'is', 'was', 'op', 'aan', 'met', 'als', 'voor', 'had', 'er', 'maar', 'om', 'hem', 'dan', 'zou', 'of', 'wat', 'mijn', 'men', 'dit', 'zo', 'door', 'over', 'ze', 'zich', 'bij', 'ook', 'tot', 'je', 'mij', 'uit', 'der', 'daar', 'haar', 'naar', 'heb', 'hoe', 'heeft', 'hebben', 'deze', 'u', 'want', 'nog', 'zal', 'me', 'zij', 'nu', 'ge', 'geen', 'omdat', 'iets', 'worden', 'toch', 'al', 'waren', 'veel', 'meer', 'doen', 'toen', 'moet', 'ben', 'zonder', 'kan', 'hun', 'dus', 'alles', 'onder', 'ja', 'eens', 'hier', 'wie', 'werd', 'altijd', 'doch', 'wordt', 'wezen', 'kunnen', 'ons', 'zelf', 'tegen', 'na', 'reeds', 'wil', 'kon', 'niets', 'uw', 'iemand', 'geweest', 'andere'],
     'min_df': 0.01,
-    'lowercase': False
+    'lowercase': False,
+
+    'custom_stop_words': ["minister", "chamber", "debate", "question", "period", "motion", "vvd", "group",  # Words from ChatGPT
+                          "party", "behalf", "tabled", "policy", "role", "state", "member", "government",
+                          "task", "law", "extension", "d66", "constitution", "amendment", "committee",
+                          "procedure", "outcome", "work", "parliament", "meeting", "increase", "article",
+                          "approach", "vote", "proposal", "case", "need", "end", "decision", "plan",
+                          "objective", "measure", "arrangement", "growth", "operation", "reinforcement",
+                          "service", "scheme", "upgrade", "process", "practice", "structure", "enlargement",
+
+                           # Phrases from ChatGPT
+                          "Minister question", "debate question", "Motion", "The Chamber", "Chamber heard debate",
+                          "calls Government",  "legislative", "legislative proposal", "heard debate",
+                          "Whereas debate",  "Whereas",
+
+                            # Phrases selected from static topic output
+                          "The Motion", "VVD Group", "getting No skt", "motion tabled", "cabinet", "Chamber",
+                          "The cabinet", "D66 Group", "behalf D66", "D66 wants", "amendment item", "Amendment No",
+                          "CDA Group", "behalf CDA Group", "suspend", "suspend sitting", "minutes",
+                          "minute debate", "welcome Minitster", "item"]
 }
 
 kpcountvectorizer_parameters = {  # KeyphraseCountVectorizer

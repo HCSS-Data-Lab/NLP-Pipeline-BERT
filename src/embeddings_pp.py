@@ -78,7 +78,7 @@ class EmbeddingsPreProcess:
             return data_dict['embeddings']
         else:
             raise ValueError(
-                f"Folder output/project/embeddings does not contain specified emb .pkl dict file. "
+                f"Folder output/project/year/embeddings does not contain specified emb .pkl dict file. "
                 f"Set LOAD_EMBEDDINGS_FROM_FILE to False and generate embeddings at runtime.")
 
     def generate_embeddings(self, data):
