@@ -132,7 +132,7 @@ class TextPreProcess:
         """
         text_names = sorted([text_file for text_file in os.listdir(self.bodies_path) if text_file.endswith('.txt')])
         print(f'{"Number of texts in folder:":<65}{len(text_names):>10}')
-        print(f"Split size: {self.split_size}")
+        print(f'{"Split size:":<65}{self.split_size:>10}')
 
         if self.splits_from_file:
             texts = self.load_split_texts()

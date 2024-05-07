@@ -48,9 +48,9 @@ class Analysis:
         self.model_from_file = config.LOAD_TOPIC_MODEL_FROM_FILE
         self.mod_emb_from_file = config.LOAD_MODEL_EMBEDDINGS_FROM_FILE
 
-        self.clean_meth = config.texts_parameters["clean_meth"]
-        self.split_size = config.texts_parameters["split_size"]
-        self.chunk_size = config.texts_parameters["chunk_size"]
+        self.clean_meth = config.text_splitting_parameters["clean_meth"]
+        self.split_size = config.text_splitting_parameters["split_size"]
+        self.chunk_size = config.text_splitting_parameters["chunk_size"]
 
         self.emb_model = config.model_parameters["emb_model"]
         self.bert_model_str = self.emb_model.split("/")[-1]  # When model name is like 'mixedbread-ai/mxb...', only take the second part

@@ -27,7 +27,7 @@ def add_convex_hulls(fig, topic_per_doc, embeddings_2d, topic_range):
 
 def get_sample_indices(topic_model, sample=1.0):
     np.random.seed(0)
-    num_topics_in_fig = config.plotting_parameters["n_total"]
+    num_topics_in_fig = config.tm_plotting_parameters["n_total"]
     topic_per_doc = topic_model.topics_
     sample_indices = []
     for topic in list(set(topic_per_doc))[:num_topics_in_fig]:

@@ -14,8 +14,6 @@ from src.doc_selection import DocSelection
 from src.dtm import DynamicTopicModeling
 from src.texts_pp import TextPreProcess
 from src.embeddings_pp import EmbeddingsPreProcess
-from src.red_embeddings_pp import RedEmbeddingsPreProcess
-
 
 def get_year_str(task, years, keyword_theme=None):
     """
@@ -95,9 +93,10 @@ if __name__ == '__main__':
     # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd())
     project_root = os.getcwd()
     dataset_name = "ParlaMint"
-    task = "dtm"  # dtm, tm
+    task = "tm"  # dtm, tm
 
-    years = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"]
+    # years = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"]
+    years = ["2022"]
 
     # Assert parameters
     assert_parameters(task, years)
@@ -154,10 +153,7 @@ if __name__ == '__main__':
     emb_path = init_folders.get_emb_path()
     embeddings_pp = EmbeddingsPreProcess(emb_path)
     embeddings = embeddings_pp.get_embeddings(text_chunks)
-
-    # Initialize reduced embeddings
-    red_emb_pp = RedEmbeddingsPreProcess(emb_path)
-    reduced_embeddings = red_emb_pp.get_red_embeddings(embeddings)
+    reduced_embeddings = embeddings_pp.get_red_embeddings(embeddings)
 
     # Initialize topic-model
     output_folder = os.path.join(project_root, "output", dataset_name, year_str)

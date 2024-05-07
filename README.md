@@ -92,18 +92,22 @@ The project folder is structured as follows:
 │                                         
 ├── src
     ├── analysis.py
+    ├── doc_selection.py
+    ├── dtm.py
     ├── embeddings_pp.py
     ├── evaluation.py
+    ├── init_folders.py
     ├── merge.py
     ├── plotting.py
-    ├── init_files.py   
-    ├── red_embeddings_pp.py  
-    ├── translate.py
-    └── texts_pp.py
+    ├── RAG.py   
+    ├── text_cleaning.py
+    ├── texts_pp.py
+    └── translate.py
 │                                      
 ├── utils
-    ├── visualize_documents_func.py    
-    └── text_process_llm.py                             
+    ├── visualize_func.py
+    ├── visualize_docs_perc.py
+    └── text_process_llm.py                           
 │                                      
 ├── .gitignore
 │
