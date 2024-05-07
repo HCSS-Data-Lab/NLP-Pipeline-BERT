@@ -1,7 +1,7 @@
 # NLP Pipeline BERT
 
 This repository does the following:
-- Clean raw text bodies using regex.
+- Clean raw text bodies using regex
 - Translate text using EasyNMT package
 - Select documents relevant to keywords using TF-IDF
 - Read cleaned text bodies from specified input folder
@@ -36,11 +36,16 @@ The `requirements.txt` is up to date.
   - `task`: task can be `tm` (topic modeling) or `dtm` (dynamic topic modeling).
   - `years`: years should be a list of str years, like `[''2015']`. If `task=tm`, years can contain only a single year.
 - Specify parameters in `config.py`:
-  - `clean_parameters`: set `clean_text` to `True` and define a regex in `regex_[dataset_name]` to use for cleaning
-  - `translate_param`: set `translate` to `True` to translate texts from `source_lang` to `target_lang`
-  - `doc_selection_parameters`: set `use_keyword_doc_selection` to `True` to use the keyword document selection.
-  - `text_splitting_parameters`: parameters for text splitting
-  - `model_parameters`: parameters for 
+  - `clean_parameters`: set `clean_text` to `True` and define a regex in `regex_[dataset_name]` to use for cleaning.
+  - `translate_param`: set `translate` to `True` to translate texts from `source_lang` to `target_lang`.
+  - `doc_selection_parameters`: 
+      - `use_keyword_doc_selection`: set to `True` to use the keyword document selection. 
+      - `select_dcouments`: set to `True` to select documents at runtime; if `False`, selected documents from an earlier run are used.
+      - `doc_selection_method`: select relevant docs using TF-IDF (`tfidf`), select relevant docs using keyword search (`search`), sample random documents (`sample`).
+      - `tfidf_threshold_type`: set number of documents based on cumulative TF-IDF value (`value`) or fraction of most relevant documents (`document`).
+      - `tfidf_threshold`: threshold for TF-IDF, if `type=value` it is cumulative TF-IDF value; if `type=document` it is fraction of documents.
+      - `sample_size`: sample size for random document sample.
+  (The rest of the parameters are obvious or don't change)
 - Initializing split texts, embeddings, reduced embeddings, and a trained topic model object at runtime takes several hours, depending on the dataset. To facilitate loading these data objects from a saved file, bool variables in `config.py` are specified and can be changed:
   - Loading split texts from file (LOAD_TEXT_SPLITS_FROM_FILE);
   - Loading text embeddings from file (LOAD_EMBEDDINGS_FROM_FILE);
