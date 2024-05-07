@@ -2,7 +2,7 @@ import os
 
 class InitFolders:
 
-    def __init__(self, project_root, project, year="2022"):
+    def __init__(self, project_root, dataset_name, year_str):
         """
         InitFolders takes as parameters project_root, project, and year and creates folder structure
         initializes and saves
@@ -10,7 +10,8 @@ class InitFolders:
 
         Parameters:
             project_root (str): Path of project root, should be path to NLP-Pipeline-BERT.
-            project (str): Identifier for the project, used in naming subdirectories.
+            dataset_name (str): Identifier for the project, used in naming subdirectories.
+            year_str (str): year string
 
         Attributes:
             text_bodies_path (str): Directory path where text bodies are stored.
@@ -22,14 +23,14 @@ class InitFolders:
             labels_path (str): Dir where labels from RAG are stored.
         """
         self.project_root = project_root
-        self.project = project
+        self.dataset_name = dataset_name
 
-        self.input_folder = os.path.join(self.project_root, "input", project)
+        self.input_folder = os.path.join(self.project_root, "input", dataset_name)
         if not os.path.exists(self.input_folder):
-            raise ValueError(f"No project folder in input for project name {self.project}. The path {self.input_folder} does not exist. Create it and make sure it contains a folder text_bodies.")
+            raise ValueError(f"No project folder in input for dataset name {self.dataset_name}. The path {self.input_folder} does not exist. Create it and make sure it contains a folder text_bodies.")
 
-        self.text_bodies_path = os.path.join(self.input_folder, year, "text_bodies")
-        self.output_folder = os.path.join(self.project_root, "output", project, year)
+        self.text_bodies_path = os.path.join(self.input_folder, year_str, "text_bodies")
+        self.output_folder = os.path.join(self.project_root, "output", dataset_name, year_str)
 
         self.split_texts_path = os.path.join(self.output_folder, "texts")
         self.emb_path = os.path.join(self.output_folder, "embeddings")

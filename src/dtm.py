@@ -75,7 +75,7 @@ def extract_date(name: str):
 
 class DynamicTopicModeling:
 
-    def __init__(self, project_root, dataset_name):
+    def __init__(self, project_root, dataset_name, **kwargs):
         self.project_root = project_root
         self.dataset_name = dataset_name
         self.project_folder = os.path.join(self.project_root, "input", self.dataset_name)
@@ -89,28 +89,52 @@ class DynamicTopicModeling:
             texts (dict):
 
         Returns:
-            time_stamps (List[tuple[str, str]]):
+            timestamps (List[str]): only timestamps
+            timestamp_chunks (List[tuple[str, str]]): timestamp and chunk in tuple
         """
-        time_stamps = []
+        timestamps = []
+        timestamp_chunks = []
         for text_name, chunks in texts.items():
             date = extract_date(text_name)
             if date:
                 for chunk in chunks:
-                    time_stamps.append({"date": date, "chunk": chunk})
+                    timestamps.append(date)
+                    timestamp_chunks.append({"date": date, "chunk": chunk})
             else:
                 raise ValueError("No date was recognized in the text name. Make sure a date in the format year-month-day is part of the text name.")
-        return time_stamps
+        return timestamps, timestamp_chunks
 
-    # def get_topics_over_time(self, output_folder):
-    #     if self.topics_ot_from_file:
-    #         topics_over_time = pd.read_csv(os.path.join(output_folder, "models", "topics_over_time.csv"))
-    #     else:
-    #         self.generate_topics_over_time()
+    def get_timestamp_bins(self, timestamps, frequency='QS'):
+        """
+        Generate timestamp bins for given timestamps, which is the date str for each text chunk,
+        and assign them to bins with size frequency. E.g. if frequency='Q', the size is a quarter;
+        or if frequency='M', the size is a month. 'QS' means quarter start, so the label is the start of the quarter, not end.
 
-    def run_dtm(self, topic_model, text_chunks, timestamps, nr_bins, output_folder, save_topics=True):
+        Args:
+            timestamps (List[str]): timestamps as list of date str
+            frequency (str): size of timestamp bin, see pandas.date_range documentation for options
+
+        Returns:
+            timestamp_bins (pandas.Categorical): each timestamp assigned the correct label of its timestamp bin
+        """
+        timestamps = pd.to_datetime(timestamps, format="%Y-%m-%d")
+
+        # Define the start and end of your period
+        start_year = timestamps.min().year
+        end_year = timestamps.max().year
+
+        # Generate bins
+        quarters = pd.date_range(start=f'{start_year}-01-01', end=f'{end_year}-12-31', freq=frequency)
+
+        # Bin each timestamp into a fraction of size frequency
+        timestamp_bins = pd.cut(timestamps, bins=quarters, labels=quarters[:-1].strftime('%Y-%m-%d'),
+                                include_lowest=True)
+        return timestamp_bins
+
+    def run_dtm(self, topic_model, text_chunks, timestamps, output_folder, save_topics=True):
         print("Generating topics over time...")
         start = time.time()
-        topics_over_time = topic_model.topics_over_time(text_chunks, timestamps, datetime_format="%Y-%m-%d", nr_bins=nr_bins)
+        topics_over_time = topic_model.topics_over_time(text_chunks, timestamps, datetime_format="%Y-%m-%d")
         print(f"Time elapsed for topics over time: {time.time() - start:.4f} seconds\n")
 
         if save_topics:
@@ -118,22 +142,17 @@ class DynamicTopicModeling:
 
         return topics_over_time
 
-    def visualize_topics(self, topic_model, topics_over_time, output_folder, year_str, top_n=None, topics_to_show=None,
-                         topics_background=None, background_alpha=None, legend_opaque=True):
+    def visualize_topics(self, topic_model, topics_over_time, output_folder, year_str):
         print("Visualizing topics over time...")
         custom_labels_df = pd.read_csv(os.path.join(output_folder, "models", "Topic_Descriptions.csv"))
         custom_labels = custom_labels_df["Topic Name"].to_list()
         topic_model.set_topic_labels(custom_labels)
         fig = visualize_topics_over_time_(topic_model,
                                           topics_over_time,
-                                          top_n_topics=top_n,
-                                          topics=topics_to_show,
                                           normalize_frequency=True,
                                           custom_labels=True,
-                                          topics_background=topics_background,
-                                          background_alpha=background_alpha,
-                                          color_legend_opaque=legend_opaque,
-                                          title="<b>Trendanalyse securitisering 2015 - 2022</b>")
+                                          title="<b>Trendanalyse securitisering 2015 - 2022</b>",
+                                          **config.dtm_plotting_parameters)
 
         out_path = os.path.join(output_folder, "figures", f"topics_over_time_{year_str}.html")
         if os.path.exists(out_path):

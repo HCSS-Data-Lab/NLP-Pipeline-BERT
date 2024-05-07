@@ -12,10 +12,12 @@ from datetime import datetime, date
 import shutil
 
 def get_timestamp_dates(path):
+    # Read timestamps
     df = pd.read_csv(path)
     unique_timestamps = set(df["Timestamp"].to_list())
+
     # Convert strings to date objects and sort them
-    sorted_bins = sorted(datetime.strptime(ts, '%Y-%m-%d %H:%M:%S.%f').date() for ts in unique_timestamps)
+    sorted_bins = sorted(datetime.strptime(ts, '%Y-%m-%d').date() for ts in unique_timestamps)
     return sorted_bins
 
 def get_bin_counts(folder, timestamps):
@@ -87,7 +89,7 @@ if __name__ == "__main__":
     os.makedirs(out_folder_path, exist_ok=True)
 
     # Copy files
-    copy_files = False
+    copy_files = False  # Set to True to copy files to output folder
     if copy_files:
         copy_files_years(years, root, out_folder_path)
 

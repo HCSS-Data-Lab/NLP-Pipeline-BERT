@@ -6,18 +6,26 @@ LOAD_TOPIC_MODEL_FROM_FILE = True
 LOAD_MODEL_EMBEDDINGS_FROM_FILE = True
 LOAD_TOPICS_OVER_TIME_FROM_FILE = True
 
-clean_parameters = {
-    'clean_text': False,  # Bool indicator whether to apply text cleaning
-    'regex_ParlaMint': "\[\[|\]\]|ParlaMint.+?\s",  # Project-specific regex for ParlaMint data: remove brackets and datestamp starting with ParlaMint
-}
-
 doc_selection_parameters = {
-    'doc_selection_method': 'tfidf',  # search, tfidf, sample, None
+    'use_keyword_doc_selection': True,  # If True, use document selection based on keywords
+    'select_documents': False,  # If True, run the document selection functions using method below; If False, read documents selected based on keywords
+
+    'doc_selection_method': 'tfidf',  # search, tfidf, sample
 
     'tfidf_threshold_type': 'value',  # value, document
     'tfidf_threshold': 0.8,
+    # If threshold type is 'value', the threshold is the fraction of total tf-idf value to include,
+    # e.g. if threshold is 0.8, it selects the top documents that contain 80% of cumulative tf-idf or relevance value.
 
-    'sample_size': 0.5
+    # If threshold type is 'document', the threshold number is the fraction of top documents to include,
+    # e.g. if threshold is 0.2, it selects the 20% most relevant documents, so those with highest tf-idf score, with varying total relevance value.
+
+    'sample_size': 0.5  # Sample size is used for randomly sampling documents
+}
+
+clean_parameters = {
+    'clean_text': False,  # Bool indicator whether to apply text cleaning
+    'regex_ParlaMint': "\[\[|\]\]|ParlaMint.+?\s",  # Project-specific regex for ParlaMint data: remove brackets and datestamp starting with ParlaMint
 }
 
 translate_param = {
@@ -88,7 +96,7 @@ countvectorizer_parameters = {  # CountVectorizer
                           "minute debate", "welcome Minitster", "item"]
 }
 
-kpcountvectorizer_parameters = {  # KeyphraseCountVectorizer
+kpcountvectorizer_parameters = {  # KeyphraseCountVectorizer parameters
     'stop_words': 'english',
     'spacy_pipeline': 'en_core_web_sm',
 }
@@ -102,11 +110,20 @@ umap_parameters = {
     'random_state': 0,
 }
 
-plotting_parameters = {
+tm_plotting_parameters = {
     'n_total': 50,   # Total number of topics to show in the fig
     'sample': 1,    # Sample (fraction) of docs to show in plot
     'n_words_legend': 3,    # Number of words to use in the description in the legend
-    'n_words_hover': 6    # Number of words to display when hovering over figure
+    'n_words_hover': 6,    # Number of words to display when hovering over figure
+    'save_html': False
+}
+
+dtm_plotting_parameters = {
+    'top_n_topics': 50,
+    'topics': [1, 4, 5, 6, 7, 9, 11, 13, 14, 15],  # Topics to show
+    'topics_background': [1, 4, 5, 9, 11, 13],  # Topics background
+    'background_alpha': 0.2,
+    'color_legend_opaque': True
 }
 
 rag_parameters = {

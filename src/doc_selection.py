@@ -103,8 +103,8 @@ class DocSelection:
         # Find phrases, ie keywords with two or more terms
         phrases = find_phrases(keywords)
 
-        threshold = config.dtm_parameters["tfidf_threshold"]
-        threshold_type = config.dtm_parameters["tfidf_threshold_type"]
+        threshold_type = config.doc_selection_parameters["tfidf_threshold_type"]
+        threshold = config.doc_selection_parameters["tfidf_threshold"]
 
         # Find most relevant documents for each year, and copy to the output folder
         for year in self.years:
@@ -296,6 +296,9 @@ class DocSelection:
         text_names = sorted([text_file for text_file in os.listdir(input_path) if text_file.endswith('.txt')])
         sample_inds = np.random.choice(len(text_names), size=int(sample_size * len(text_names)), replace=False)
         return [text_names[i] for i in sample_inds]
+
+    def get_project_folder(self):
+        return self.project_folder
 
     def assert_attributes(self):
         """

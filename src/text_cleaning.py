@@ -12,9 +12,9 @@ import config
 
 class TextCleaning:
 
-    def __init__(self, project_root, project, year):
-        self.project = project
-        self.input_folder = os.path.join(project_root, "input", project)
+    def __init__(self, project_root, dataset_name, year):
+        self.dataset_name = dataset_name
+        self.input_folder = os.path.join(project_root, "input", dataset_name)
         self.year = year
         self.raw_texts_path = os.path.join(self.input_folder, year, "raw_texts")
 
@@ -24,7 +24,7 @@ class TextCleaning:
         self.output_folder = os.path.join(self.input_folder, year, "text_bodies")  # Saving cleaned texts in folder text_bodies
         os.makedirs(self.output_folder, exist_ok=True)
 
-        self.regex = config.clean_parameters[f"regex_{self.project}"]
+        self.regex = config.clean_parameters[f"regex_{self.dataset_name}"]
 
     def read_clean_raw_texts(self):
         """

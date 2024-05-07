@@ -43,7 +43,7 @@ def remove_lang_prefix(file_name):
 
 class Translate:
 
-    def __init__(self, project_root, project, year, model_name="opus-mt"):
+    def __init__(self, project_root, dataset_name, year, model_name="opus-mt"):
         """
         Translate is the class to handle text translation. It takes as input the project root,
         project name, year, target language and translation model name. It initializes the input
@@ -66,8 +66,8 @@ class Translate:
         self.target_lang = config.translate_param["target_lang"]
         self.source_lang = config.translate_param["source_lang"]
 
-        self.input_folder = os.path.join(project_root, "input", project, year, "text_bodies")  # Folder with text bodies
-        self.output_folder = os.path.join(project_root, "input", project, year+f"_{self.target_lang}", "text_bodies")  # Output folder with translations
+        self.input_folder = os.path.join(project_root, "input", dataset_name, year, "text_bodies")  # Folder with text bodies
+        self.output_folder = os.path.join(project_root, "input", dataset_name, year+f"_{self.target_lang}", "text_bodies")  # Output folder with translations
         os.makedirs(self.output_folder, exist_ok=True)
 
         self.model = EasyNMT(model_name)

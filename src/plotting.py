@@ -31,7 +31,7 @@ def get_num_docs_topic(hover_labels):
 
 class Plotting:
 
-    def __init__(self, topic_model, model_name, docs, reduced_embeddings=None, folder="", save_html=False, merged=False,
+    def __init__(self, topic_model, model_name, docs, reduced_embeddings=None, folder="", merged=False,
                  plot_non_docs=False, summarize_labels=False, summarize_docs=False, rag=None, year=None):
         # Parameters
         self.topic_model = topic_model
@@ -40,7 +40,6 @@ class Plotting:
         self.docs = docs
         self.num_docs = len(docs)
         self.folder = folder
-        self.save_html = save_html
         self.merged = merged
         self.summarize_labels = summarize_labels
         self.summarize_docs = summarize_docs
@@ -51,11 +50,12 @@ class Plotting:
         self.num_topics = self.get_num_topics()
 
         # Plotting parameters
-        self.n_total = config.plotting_parameters["n_total"]
-        self.sample = config.plotting_parameters["sample"]
+        self.n_total = config.tm_plotting_parameters["n_total"]
+        self.sample = config.tm_plotting_parameters["sample"]
         self.RAG_n_words_legend = config.rag_parameters["RAG_n_words_legend"]
-        self.n_words_legend = config.plotting_parameters["n_words_legend"]
-        self.n_words_hover = config.plotting_parameters["n_words_hover"]
+        self.n_words_legend = config.tm_plotting_parameters["n_words_legend"]
+        self.n_words_hover = config.tm_plotting_parameters["n_words_hover"]
+        self.save_html = config.tm_plotting_parameters["save_html"]
         self.plot_non_docs = plot_non_docs
         self.year = year
         self.fig_title = self.get_fig_title()
@@ -250,9 +250,9 @@ class Plotting:
         # OLD TITLE
         # self.fig_title = f"Text Data | Documents & Topics (merged)\n{self.model_name}" if self.merged else f"Text Data | Documents & Topics (unmerged)\n{self.model_name}"
         if self.merged:
-            return f"(merged)\n{self.model_name}_sam{config.plotting_parameters['sample']}"
+            return f"(merged)\n{self.model_name}_sam{config.tm_plotting_parameters['sample']}"
         else:
-            return f"(unmerged)\n{self.model_name}_sam{config.plotting_parameters['sample']}"
+            return f"(unmerged)\n{self.model_name}_sam{config.tm_plotting_parameters['sample']}"
 
     def get_sample_docs(self):
         pass

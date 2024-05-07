@@ -255,6 +255,7 @@ def visualize_documents_(topic_model,
                 size=22,
                 color="Black")
         },
+        legend_title_text='Topics and topic size (% of all clustered texts)',  # Add this line
         width=width,
         height=height
     )

@@ -127,14 +127,21 @@ class TextPreProcess:
         generate_split_texts() to read text bodies and split them at runtime.
 
         Returns:
-            texts (list[tuple(str, str)]): list of tuples with text title and chunk
+            texts (List[tuple(str, str)]): list of tuples with text title and chunk
+            text_chunks (List[str]): text chunks
         """
+        text_names = sorted([text_file for text_file in os.listdir(self.bodies_path) if text_file.endswith('.txt')])
+        print(f'{"Number of texts in folder:":<65}{len(text_names):>10}')
         print(f"Split size: {self.split_size}")
+
         if self.splits_from_file:
             texts = self.load_split_texts()
         else:
             texts = self.generate_split_texts()
-        return texts
+
+        text_chunks = [chunk for value in texts.values() for chunk in value]
+        print(f'{"Text chunks:":<65}{len(text_chunks):>10}\n')
+        return texts, text_chunks
 
     def load_split_texts(self):
         """
@@ -187,8 +194,6 @@ class TextPreProcess:
 
         """
         text_names = sorted([text_file for text_file in os.listdir(self.bodies_path) if text_file.endswith('.txt')])
-        print(f'{"Number of texts in folder:":<65}{len(text_names):>10}')
-
         texts = {}
         for text_name in text_names:
             with open(os.path.join(self.bodies_path, text_name), "r", encoding="utf-8") as file:
