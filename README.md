@@ -47,12 +47,13 @@ The `requirements.txt` is up to date.
       - `sample_size`: sample size for random document sample.
 
 (The rest of the parameters are obvious or don't change)
-- Initializing split texts, embeddings, reduced embeddings, and a trained topic model object at runtime takes several hours, depending on the dataset. To facilitate loading these data objects from a saved file, bool variables in `config.py` are specified and can be changed:
+- Initializing split texts, embeddings, reduced embeddings, and a trained topic model object at runtime takes several hours, depending on the dataset. To facilitate loading these data objects from a saved file, bool variables in `config` are specified and can be changed:
   - Loading split texts from file (LOAD_TEXT_SPLITS_FROM_FILE);
   - Loading text embeddings from file (LOAD_EMBEDDINGS_FROM_FILE);
   - Loading reduced embeddings from file (LOAD_REDUCED_EMBEDDINGS_FROM_FILE);
   - Loading a trained topic model object from file (LOAD_TOPIC_MODEL_FROM_FILE);
-  - Using embeddings saved in file when training a new topic model object (LOAD_MODEL_EMBEDDINGS_FROM_FILE).
+  - Using embeddings saved in file when training a new topic model object (LOAD_MODEL_EMBEDDINGS_FROM_FILE);
+  - Load topics over time from file (LOAD_TOPICS_OVER_TIME_FROM_FILE).
  
 ## Example usage
 
