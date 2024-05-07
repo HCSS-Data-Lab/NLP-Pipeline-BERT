@@ -115,9 +115,9 @@ class TextPreProcess:
 
         self.project = self.get_project_name()
 
-        self.clean_meth = config.texts_parameters["clean_meth"]
-        self.split_size = config.texts_parameters["split_size"]
-        self.chunk_size = config.texts_parameters["chunk_size"]
+        self.clean_meth = config.text_splitting_parameters["clean_meth"]
+        self.split_size = config.text_splitting_parameters["split_size"]
+        self.chunk_size = config.text_splitting_parameters["chunk_size"]
 
         self.texts_split_name = f"texts_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
 

@@ -76,7 +76,6 @@ def assert_parameters(task, years):
                 "For task: tm (topic modeling) years list must contain only a single value. "
             )
 
-
 if __name__ == '__main__':
     """
     TODO: (Maarten)

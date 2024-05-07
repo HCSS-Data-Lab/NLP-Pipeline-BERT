@@ -1,20 +1,29 @@
 # NLP Pipeline BERT
 
 This repository does the following:
+- Clean raw text bodies using regex.
+- Translate text using EasyNMT package
+- Select documents relevant to keywords using TF-IDF
 - Read cleaned text bodies from specified input folder
-- Pre-process the text bodies in the following way: split them in specified sizes (chunks with chunk_size number of character; sentences; or sentence pairs)
+- Split text bodies in specified sizes (chunks variable in length; chunks with chunk_size number of character; sentences; or sentence pairs)
 - Make embeddings from the split text parts
-- Running topic modeling analysis with BERTopic module, which works in the following way:
+- Run topic modeling analysis with BERTopic module, which works in the following way:
     - Cluster text embeddings (high-dimensional vectors) with HDBSCAN clustering algorithm;
     - Extract topics from clusters with c-TF-IDF algorithm;
     - Reduce the dimensionality of the embeddings by mapping to a 2-dim space.
+- Run dynamic topic modeling with BERTopic module:
+    - Get timestamps for each of the text chunks
+    - Find global topics over entire dataset
+    - Find topics per timestamps
 - Plotting the results
     - (Optional): Create a retrieval augmented generator
     - (Optional): Enhance topics labels from this generator
     - (Optional): Create doc labels from this generator
-    - Plotting the documents, clustered as topics using (modified) default BERTopic visualize_documents function.
+    - Topic modeling: plotting the documents, clustered as topics using (modified) default BERTopic visualize_documents function.
+    - Dynamic topic modeling: plotting the topics over time, using (modified) BERTopic visualize_topics_over_time_ function.
+    - Dynamic topic modeling: plotting % of documents relevant to keywords
 - (Optional): Merging topic output to improve results
-- (Optional): Evaluate topic output by calculating coherence 
+- (Optional): Evaluate topic output by calculating coherence
 
 ## Requirements
 
@@ -22,9 +31,16 @@ The `requirements.txt` is up to date.
 
 ## Running code
 - Run script `main.py`, after specifying in the main:
-  - `project_root`: which should be the folder `NLP-Pipeline-BERT`. The `project_root` should contain a folder `input`, which should contain a folder with the project name, for instance `Politie`, which should contain a folder `text_bodies` with input files in `.txt` format.
-  - `project`: the project name, should correspond to a project name in the `input` folder.
-- Specify parameters in `config.py`.
+  - `project_root`: which should be the folder `NLP-Pipeline-BERT`. The `project_root` should contain a folder `input` with a dataset name folder, for instance `ParlaMint` with, in turn, a folder `text_bodies` with input files in `.txt` format.
+  - `dataset_name`: the dataset name, should correspond to a folder name in the `input` folder.
+  - `task`: task can be `tm` (topic modeling) or `dtm` (dynamic topic modeling).
+  - `years`: years should be a list of str years, like `[''2015']`. If `task=tm`, years can contain only a single year.
+- Specify parameters in `config.py`:
+  - `clean_parameters`: set `clean_text` to `True` and define a regex in `regex_[dataset_name]` to use for cleaning
+  - `translate_param`: set `translate` to `True` to translate texts from `source_lang` to `target_lang`
+  - `doc_selection_parameters`: set `use_keyword_doc_selection` to `True` to use the keyword document selection.
+  - `text_splitting_parameters`: parameters for text splitting
+  - `model_parameters`: parameters for 
 - Initializing split texts, embeddings, reduced embeddings, and a trained topic model object at runtime takes several hours, depending on the dataset. To facilitate loading these data objects from a saved file, bool variables in `config.py` are specified and can be changed:
   - Loading split texts from file (LOAD_TEXT_SPLITS_FROM_FILE);
   - Loading text embeddings from file (LOAD_EMBEDDINGS_FROM_FILE);

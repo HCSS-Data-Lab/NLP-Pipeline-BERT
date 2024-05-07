@@ -6,6 +6,17 @@ LOAD_TOPIC_MODEL_FROM_FILE = True
 LOAD_MODEL_EMBEDDINGS_FROM_FILE = True
 LOAD_TOPICS_OVER_TIME_FROM_FILE = True
 
+clean_parameters = {
+    'clean_text': False,  # Bool indicator whether to apply text cleaning
+    'regex_ParlaMint': "\[\[|\]\]|ParlaMint.+?\s",  # Project-specific regex for ParlaMint data: remove brackets and datestamp starting with ParlaMint
+}
+
+translate_param = {
+    'translate': False,
+    'target_lang': 'en',
+    'source_lang': 'nl'
+}
+
 doc_selection_parameters = {
     'use_keyword_doc_selection': True,  # If True, use document selection based on keywords
     'select_documents': False,  # If True, run the document selection functions using method below; If False, read documents selected based on keywords
@@ -23,18 +34,7 @@ doc_selection_parameters = {
     'sample_size': 0.5  # Sample size is used for randomly sampling documents
 }
 
-clean_parameters = {
-    'clean_text': False,  # Bool indicator whether to apply text cleaning
-    'regex_ParlaMint': "\[\[|\]\]|ParlaMint.+?\s",  # Project-specific regex for ParlaMint data: remove brackets and datestamp starting with ParlaMint
-}
-
-translate_param = {
-    'translate': False,
-    'target_lang': 'en',
-    'source_lang': 'nl'
-}
-
-texts_parameters = {
+text_splitting_parameters = {
     'clean_meth': 'vect',  # Text clean method: def (default, no cleaning), vect (vectorization), or ft (filter-texts function)
     'split_size': 'chunk_len',  # Text split size: chunk, chunk_len, sentence or sentence-pairs
     'chunk_size': 512,  # Number of characters in chunk
