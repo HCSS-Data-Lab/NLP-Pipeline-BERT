@@ -300,3 +300,6 @@ class TextPreProcess:
 
     def get_text_bodies_path(self):
         return self.bodies_path
+
+    def get_splits_path(self):
+        return self.splits_path

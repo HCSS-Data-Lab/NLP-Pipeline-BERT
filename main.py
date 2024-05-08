@@ -15,6 +15,8 @@ from src.dtm import DynamicTopicModeling
 from src.texts_pp import TextPreProcess
 from src.embeddings_pp import EmbeddingsPreProcess
 
+from utils.representative_docs_func import _get_representative_docs_
+
 def get_year_str(task, years, keyword_theme=None):
     """
     Get year str used for tfidf input file selection for dynamic topic modeling, like 'security_vt0.8_2019_2020'
@@ -42,23 +44,47 @@ def get_year_str(task, years, keyword_theme=None):
     else:
         print(f"Task {task} is undefined. ")
 
-def print_representative_sents(topic_model, topics):
+def get_representative_sents(topic_model, documents, num_docs, topics, texts_path, use_custom=True):
     """
-    Print and return representative sentences for given topics
+    Find and return representative sentences for given topics
 
     Args:
         topic_model (BERTopic object): trained bertopic object
+        documents (pd.DataFrame): df with text chunks and topic ID
+        num_docs (int): number of representative docs to find for each topic
         topics (List[int]): topic ids to find representative sentences for
+        texts_path (str): path where repre sentences will be saved as .txt
+        use_custom (bool): use custom representative docs function or not
 
     Returns:
         sents (List[dict[str, str]]): List of dictionaries with topic_id and sentence
     """
-    sents = []
-    for topic_id in topics:
-        sentence = topic_model.representative_docs_[topic_id][0]
-        sents.append({"topic_id": topic_id, "repr_sent": sentence})
-        print(f"Topic {topic_id}: {sentence}")
-    return sents
+    # Get representative documents for all topics using custom _get_representative_docs_
+    print("Reading representative documents...")
+    if use_custom:
+        repr_docs = _get_representative_docs_(topic_model, documents, num_docs)
+
+    # Read, save, and return representative texts
+    sents_lst = []
+    with open(os.path.join(texts_path, "repre_sents.txt"), "w+") as file:
+        for topic_id in topics:
+            # Find representative sentences
+            if use_custom:
+                sentences = repr_docs[topic_id]
+            else:
+                if num_docs > 3:
+                    raise ValueError(
+                        "Number of sentences can be at most 3. The BERTopic attribute representative_docs_ returns at 3 most representative docs. "
+                        "If num_docs must be larger than 3, set use_custom to True. "
+                    )
+                sentences = topic_model.topic_model.representative_docs_[topic_id][:num_docs]
+
+            sents_lst.append({"topic_id": topic_id, "repr_sent": sentences})
+
+            # Write to .txt
+            text = "\n\n".join(sentences)
+            file.write(f"Topic {topic_id}:\n{text}\n\n")
+    return sents_lst
 
 def assert_parameters(task, years):
     """
@@ -93,10 +119,9 @@ if __name__ == '__main__':
     # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd())
     project_root = os.getcwd()
     dataset_name = "ParlaMint"
-    task = "tm"  # dtm, tm
+    task = "dtm"  # dtm, tm
 
-    # years = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"]
-    years = ["2022"]
+    years = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"]
 
     # Assert parameters
     assert_parameters(task, years)
@@ -164,57 +189,60 @@ if __name__ == '__main__':
     if save_topic_words:
         analysis.save_topic_words(topic_model)
 
-    # repr_topics = [6, 7, 14, 15]  # Topics to find representative documents for
-    # repre_sentences = get_representative_sents(topic_model, repr_topics)
+    documents = pd.DataFrame({"Document": text_chunks, "Topic": topic_model.topics_})
+    num_docs = 5
+    repr_topics = [1, 4, 5, 6, 7, 9, 11, 13, 14, 15]  # Topics to find representative documents for
+    text_splits_path = texts_pp.get_splits_path()
+    repre_sentences = get_representative_sents(topic_model, documents, num_docs, repr_topics, text_splits_path)
 
-    if task == "tm":
-        # Plotting
-        model_name = analysis.get_model_file_name()
-        num_texts = len(text_chunks)
-
-        # Initiate RAG, enhance topic labels based on RAG and summarize docs
-        RAG_from_file = False
-        summarize_labels = False
-        summarize_docs = False
-        rag_path = init_folders.get_rag_path()
-        rag = RAG(embeddings, text_chunks, RAG_from_file, path=rag_path)
-
-        plotting = Plotting(topic_model=topic_model,
-                            reduced_embeddings=reduced_embeddings,
-                            model_name=model_name,
-                            docs=text_chunks,
-                            summarize_labels=summarize_labels,
-                            summarize_docs=summarize_docs,
-                            rag=rag,
-                            folder=os.path.join(output_folder, "figures"),
-                            year=year_str)
-        plotting.plot()
-
-    elif task == "dtm":
-        # Initialize dtm object
-        dtm = DynamicTopicModeling(project_root, dataset_name)
-
-        # Find timestamps
-        timestamps, _ = dtm.get_time_stamps(texts)  # Timestamps and chunks
-
-        # Find timestamp bins
-        timestamp_bins = dtm.get_timestamp_bins(timestamps=timestamps, frequency='QS')
-
-        print(f'{"Number of timestamps:":<65}{len(timestamp_bins):>10}')
-        print(f'{"Number of text chunks:":<65}{len(text_chunks):>10}')
-
-        # Run topics over time
-        if config.LOAD_TOPICS_OVER_TIME_FROM_FILE:
-            print("Loading topics over time from file...")
-            topics_over_time = pd.read_csv(os.path.join(output_folder, "models", "topics_over_time.csv"))
-        else:
-            topics_over_time = dtm.run_dtm(topic_model, text_chunks, timestamp_bins, output_folder)
-
-        # Visualize topics over time
-        dtm.visualize_topics(topic_model=topic_model,
-                             topics_over_time=topics_over_time,
-                             output_folder=output_folder,
-                             year_str=year_str)
+    # if task == "tm":
+    #     # Plotting
+    #     model_name = analysis.get_model_file_name()
+    #     num_texts = len(text_chunks)
+    #
+    #     # Initiate RAG, enhance topic labels based on RAG and summarize docs
+    #     RAG_from_file = False
+    #     summarize_labels = False
+    #     summarize_docs = False
+    #     rag_path = init_folders.get_rag_path()
+    #     rag = RAG(embeddings, text_chunks, RAG_from_file, path=rag_path)
+    #
+    #     plotting = Plotting(topic_model=topic_model,
+    #                         reduced_embeddings=reduced_embeddings,
+    #                         model_name=model_name,
+    #                         docs=text_chunks,
+    #                         summarize_labels=summarize_labels,
+    #                         summarize_docs=summarize_docs,
+    #                         rag=rag,
+    #                         folder=os.path.join(output_folder, "figures"),
+    #                         year=year_str)
+    #     plotting.plot()
+    #
+    # elif task == "dtm":
+    #     # Initialize dtm object
+    #     dtm = DynamicTopicModeling(project_root, dataset_name)
+    #
+    #     # Find timestamps
+    #     timestamps, _ = dtm.get_time_stamps(texts)  # Timestamps and chunks
+    #
+    #     # Find timestamp bins
+    #     timestamp_bins = dtm.get_timestamp_bins(timestamps=timestamps, frequency='QS')
+    #
+    #     print(f'{"Number of timestamps:":<65}{len(timestamp_bins):>10}')
+    #     print(f'{"Number of text chunks:":<65}{len(text_chunks):>10}')
+    #
+    #     # Run topics over time
+    #     if config.LOAD_TOPICS_OVER_TIME_FROM_FILE:
+    #         print("Loading topics over time from file...")
+    #         topics_over_time = pd.read_csv(os.path.join(output_folder, "models", "topics_over_time.csv"))
+    #     else:
+    #         topics_over_time = dtm.run_dtm(topic_model, text_chunks, timestamp_bins, output_folder)
+    #
+    #     # Visualize topics over time
+    #     dtm.visualize_topics(topic_model=topic_model,
+    #                          topics_over_time=topics_over_time,
+    #                          output_folder=output_folder,
+    #                          year_str=year_str)
 
     #################################################################
     # Merging and Evaluation below (optional)
