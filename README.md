@@ -107,6 +107,7 @@ The project folder is structured as follows:
 ├── utils
     ├── visualize_func.py
     ├── visualize_docs_perc.py
+    ├── representative_docs_func.py
     └── text_process_llm.py                           
 │                                      
 ├── .gitignore
