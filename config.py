@@ -1,10 +1,12 @@
 # BOOL variables whether to load data objects from file or not
-LOAD_TEXT_SPLITS_FROM_FILE = True
+LOAD_TEXT_SPLITS_FROM_FILE = False
 LOAD_EMBEDDINGS_FROM_FILE = True
 LOAD_REDUCED_EMBEDDINGS_FROM_FILE = True
-LOAD_TOPIC_MODEL_FROM_FILE = True
+LOAD_TOPIC_MODEL_FROM_FILE = False
 LOAD_MODEL_EMBEDDINGS_FROM_FILE = True
-LOAD_TOPICS_OVER_TIME_FROM_FILE = True
+LOAD_TOPICS_OVER_TIME_FROM_FILE = False
+
+RUN_PAPER_ANALYSIS = True
 
 clean_parameters = {
     'clean_text': False,  # Bool indicator whether to apply text cleaning
@@ -42,10 +44,11 @@ text_splitting_parameters = {
 
 model_parameters = {
     # 'emb_model': 'all-MiniLM-L6-v2',  # A: Default model for BERTopic
-    'emb_model': 'multi-qa-MiniLM-L6-cos-v1',  # B: The best small performer with large sequence length
+    # 'emb_model': 'multi-qa-MiniLM-L6-cos-v1',  # B: The best small performer with large sequence length (current in pipeline)
     # 'emb_model': 'all-mpnet-base-v2',  # C: Current sentence-BERT state-of-the-art
 
-    # 'emb_model': 'mixedbread-ai/mxbai-embed-large-v1',  # Best small performer from MTEB
+    'non_st_model': True,  # Non Sentence-Transformer model
+    'emb_model': 'Muennighoff/SGPT-125M-weightedmean-msmarco-specb-bitfit',
 
     # 'emb_model': 'nl_core_news_sm',
     # 'spacy_exclude': ['tagger', 'parser', 'ner', 'attribute_ruler', 'lemmatizer'],
@@ -69,31 +72,32 @@ bertopic_parameters = {
 
     'update_topics': False,
     'use_keyphrase': False,
+
+    'use_custom_stopwords': False,
+    'custom_stopwords': ["minister", "chamber", "debate", "question", "period", "motion", "vvd", "group",  # Words from ChatGPT
+                         "party", "behalf", "tabled", "policy", "role", "state", "member", "government",
+                         "task", "law", "extension", "d66", "constitution", "amendment", "committee",
+                         "procedure", "outcome", "work", "parliament", "meeting", "increase", "article",
+                         "approach", "vote", "proposal", "case", "need", "end", "decision", "plan",
+                         "objective", "measure", "arrangement", "growth", "operation", "reinforcement",
+                         "service", "scheme", "upgrade", "process", "practice", "structure", "enlargement",
+
+                         # Phrases from ChatGPT
+                         "Minister question", "debate question", "Motion", "The Chamber", "Chamber heard debate",
+                         "calls Government",  "legislative", "legislative proposal", "heard debate",
+                         "Whereas debate",  "Whereas",
+
+                         # Phrases selected from static topic output
+                         "The Motion", "VVD Group", "getting No skt", "motion tabled", "cabinet", "Chamber",
+                         "The cabinet", "D66 Group", "behalf D66", "D66 wants", "amendment item", "Amendment No",
+                         "CDA Group", "behalf CDA Group", "suspend", "suspend sitting", "minutes",
+                         "minute debate", "welcome Minitster", "item"]
 }
 
 countvectorizer_parameters = {  # CountVectorizer
     'ngram_range': (1, 3),
     'min_df': 0.01,
     'lowercase': False,
-
-    'custom_stop_words': ["minister", "chamber", "debate", "question", "period", "motion", "vvd", "group",  # Words from ChatGPT
-                          "party", "behalf", "tabled", "policy", "role", "state", "member", "government",
-                          "task", "law", "extension", "d66", "constitution", "amendment", "committee",
-                          "procedure", "outcome", "work", "parliament", "meeting", "increase", "article",
-                          "approach", "vote", "proposal", "case", "need", "end", "decision", "plan",
-                          "objective", "measure", "arrangement", "growth", "operation", "reinforcement",
-                          "service", "scheme", "upgrade", "process", "practice", "structure", "enlargement",
-
-                           # Phrases from ChatGPT
-                          "Minister question", "debate question", "Motion", "The Chamber", "Chamber heard debate",
-                          "calls Government",  "legislative", "legislative proposal", "heard debate",
-                          "Whereas debate",  "Whereas",
-
-                            # Phrases selected from static topic output
-                          "The Motion", "VVD Group", "getting No skt", "motion tabled", "cabinet", "Chamber",
-                          "The cabinet", "D66 Group", "behalf D66", "D66 wants", "amendment item", "Amendment No",
-                          "CDA Group", "behalf CDA Group", "suspend", "suspend sitting", "minutes",
-                          "minute debate", "welcome Minitster", "item"]
 }
 
 kpcountvectorizer_parameters = {  # KeyphraseCountVectorizer parameters
@@ -120,10 +124,12 @@ tm_plotting_parameters = {
 
 dtm_plotting_parameters = {
     'top_n_topics': 50,
-    'topics': [1, 4, 5, 6, 7, 9, 11, 13, 14, 15],  # Topics to show
-    'topics_background': [1, 4, 5, 9, 11, 13],  # Topics background
-    'background_alpha': 0.2,
-    'color_legend_opaque': True
+    'custom_labels': False,
+    'normalize_frequency': False,
+    # 'topics': [1, 4, 5, 6, 7, 9, 11, 13, 14, 15],  # Topics to show
+    # 'topics_background': [1, 4, 5, 9, 11, 13],  # Topics background
+    # 'background_alpha': 0.2,
+    # 'color_legend_opaque': False
 }
 
 rag_parameters = {

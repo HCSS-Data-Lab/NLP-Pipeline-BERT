@@ -189,60 +189,63 @@ if __name__ == '__main__':
     if save_topic_words:
         analysis.save_topic_words(topic_model)
 
-    documents = pd.DataFrame({"Document": text_chunks, "Topic": topic_model.topics_})
-    num_docs = 5
-    repr_topics = [1, 4, 5, 6, 7, 9, 11, 13, 14, 15]  # Topics to find representative documents for
     text_splits_path = texts_pp.get_splits_path()
-    repre_sentences = get_representative_sents(topic_model, documents, num_docs, repr_topics, text_splits_path)
+    documents = pd.DataFrame({"Document": text_chunks, "Topic": topic_model.topics_})
+    documents.to_csv(os.path.join(text_splits_path, "chunks_topics.csv"), index=False)
 
-    # if task == "tm":
-    #     # Plotting
-    #     model_name = analysis.get_model_file_name()
-    #     num_texts = len(text_chunks)
-    #
-    #     # Initiate RAG, enhance topic labels based on RAG and summarize docs
-    #     RAG_from_file = False
-    #     summarize_labels = False
-    #     summarize_docs = False
-    #     rag_path = init_folders.get_rag_path()
-    #     rag = RAG(embeddings, text_chunks, RAG_from_file, path=rag_path)
-    #
-    #     plotting = Plotting(topic_model=topic_model,
-    #                         reduced_embeddings=reduced_embeddings,
-    #                         model_name=model_name,
-    #                         docs=text_chunks,
-    #                         summarize_labels=summarize_labels,
-    #                         summarize_docs=summarize_docs,
-    #                         rag=rag,
-    #                         folder=os.path.join(output_folder, "figures"),
-    #                         year=year_str)
-    #     plotting.plot()
-    #
-    # elif task == "dtm":
-    #     # Initialize dtm object
-    #     dtm = DynamicTopicModeling(project_root, dataset_name)
-    #
-    #     # Find timestamps
-    #     timestamps, _ = dtm.get_time_stamps(texts)  # Timestamps and chunks
-    #
-    #     # Find timestamp bins
-    #     timestamp_bins = dtm.get_timestamp_bins(timestamps=timestamps, frequency='QS')
-    #
-    #     print(f'{"Number of timestamps:":<65}{len(timestamp_bins):>10}')
-    #     print(f'{"Number of text chunks:":<65}{len(text_chunks):>10}')
-    #
-    #     # Run topics over time
-    #     if config.LOAD_TOPICS_OVER_TIME_FROM_FILE:
-    #         print("Loading topics over time from file...")
-    #         topics_over_time = pd.read_csv(os.path.join(output_folder, "models", "topics_over_time.csv"))
-    #     else:
-    #         topics_over_time = dtm.run_dtm(topic_model, text_chunks, timestamp_bins, output_folder)
-    #
-    #     # Visualize topics over time
-    #     dtm.visualize_topics(topic_model=topic_model,
-    #                          topics_over_time=topics_over_time,
-    #                          output_folder=output_folder,
-    #                          year_str=year_str)
+    # num_docs = 5
+    # repr_topics = [1, 4, 5, 6, 7, 9, 11, 13, 14, 15]  # Topics to find representative documents for
+    # # text_splits_path = texts_pp.get_splits_path()
+    # repre_sentences = get_representative_sents(topic_model, documents, num_docs, repr_topics, text_splits_path)
+
+    if task == "tm":
+        # Plotting
+        model_name = analysis.get_model_file_name()
+        num_texts = len(text_chunks)
+
+        # Initiate RAG, enhance topic labels based on RAG and summarize docs
+        RAG_from_file = False
+        summarize_labels = False
+        summarize_docs = False
+        rag_path = init_folders.get_rag_path()
+        rag = RAG(embeddings, text_chunks, RAG_from_file, path=rag_path)
+
+        plotting = Plotting(topic_model=topic_model,
+                            reduced_embeddings=reduced_embeddings,
+                            model_name=model_name,
+                            docs=text_chunks,
+                            summarize_labels=summarize_labels,
+                            summarize_docs=summarize_docs,
+                            rag=rag,
+                            folder=os.path.join(output_folder, "figures"),
+                            year=year_str)
+        plotting.plot()
+
+    elif task == "dtm":
+        # Initialize dtm object
+        dtm = DynamicTopicModeling(project_root, dataset_name)
+
+        # Find timestamps
+        timestamps, _ = dtm.get_time_stamps(texts)  # Timestamps and chunks
+
+        # Find timestamp bins
+        timestamp_bins = dtm.get_timestamp_bins(timestamps=timestamps, frequency='QS')
+
+        print(f'{"Number of timestamps:":<65}{len(timestamp_bins):>10}')
+        print(f'{"Number of text chunks:":<65}{len(text_chunks):>10}')
+
+        # Run topics over time
+        if config.LOAD_TOPICS_OVER_TIME_FROM_FILE:
+            print("Loading topics over time from file...")
+            topics_over_time = pd.read_csv(os.path.join(output_folder, "models", "topics_over_time.csv"))
+        else:
+            topics_over_time = dtm.run_dtm(topic_model, text_chunks, timestamp_bins, output_folder)
+
+        # Visualize topics over time
+        dtm.visualize_topics(topic_model=topic_model,
+                             topics_over_time=topics_over_time,
+                             output_folder=output_folder,
+                             year_str=year_str)
 
     #################################################################
     # Merging and Evaluation below (optional)

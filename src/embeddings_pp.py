@@ -52,6 +52,10 @@ class EmbeddingsPreProcess:
         self.random_state = config.umap_parameters["random_state"]
         self.red_emb_name = f"red_embeddings_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}.npy"
 
+        if config.RUN_PAPER_ANALYSIS:
+            self.embedding_name = f"embeddings_{self.bert_model_str}.pkl"
+            self.red_emb_name = f"red_embeddings_{self.bert_model_str}.npy"
+
     def get_embeddings(self, data, parallel=False):
         """
         Get embeddings by loading them from file with load_embeddings() or generate
@@ -104,7 +108,7 @@ class EmbeddingsPreProcess:
             embeddings (torch.Tensor): text embeddings, each doc as a 768-dim vector. Shape: (num docs, 768)
         """
         print("Initializing embeddings at runtime...")
-        model = SentenceTransformer(self.bert_model)
+        model = SentenceTransformer(self.bert_model, trust_remote_code=True)
         embeddings = model.encode(data, show_progress_bar=True)
 
         with open(os.path.join(self.path, self.embedding_name), "wb") as file:
@@ -170,8 +174,8 @@ class EmbeddingsPreProcess:
             reduced_embeddings (np.array): reduced embeddings. Shape: (num docs, 768)
         """
         print("Initializing reduced embeddings at runtime...")
-        reduced_embeddings = umap.UMAP(n_neighbors=10,
-                                       n_components=2,
+        reduced_embeddings = umap.UMAP(n_neighbors=15,
+                                       n_components=5,
                                        min_dist=0.0,
                                        metric='cosine',
                                        random_state=self.random_state).fit_transform(embeddings)

@@ -5,7 +5,7 @@ import pandas as pd
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 import shutil
-from typing import List
+from typing import List, Dict
 
 import config
 from utils.visualize_func import visualize_topics_over_time_
@@ -86,11 +86,11 @@ class DynamicTopicModeling:
         Find time stamps for input texts
 
         Args:
-            texts (dict):
+            texts (Dict[tuple[str, List[str]]]): dict with tuples of (text id, list of chunks)
 
         Returns:
             timestamps (List[str]): only timestamps
-            timestamp_chunks (List[tuple[str, str]]): timestamp and chunk in tuple
+            timestamp_chunks (List[Dict[str, str]]): timestamp and chunk in tuple
         """
         timestamps = []
         timestamp_chunks = []
@@ -100,6 +100,29 @@ class DynamicTopicModeling:
                 for chunk in chunks:
                     timestamps.append(date)
                     timestamp_chunks.append({"date": date, "chunk": chunk})
+            else:
+                raise ValueError("No date was recognized in the text name. Make sure a date in the format year-month-day is part of the text name.")
+        return timestamps, timestamp_chunks
+
+    def get_time_stamps_speeches(self, speeches: List[Dict[str, str]]):
+        """
+        Find time stamps for input speeches
+
+        Args:
+            speeches (List[Dict[str, str]]): list of dict with speeches as {speech id, speech text}
+
+        Returns:
+            timestamps (List[str]): only timestamps
+            timestamp_chunks (List[Dict[str, str]]): timestamp and chunk in tuple
+        """
+        timestamps = []
+        timestamp_chunks = []
+        for speech in speeches:
+            speech_id, speech_text = speech.values()
+            date = extract_date(speech_id)
+            if date:
+                timestamps.append(date)
+                timestamp_chunks.append({"date": date, "speech": speech_text})
             else:
                 raise ValueError("No date was recognized in the text name. Make sure a date in the format year-month-day is part of the text name.")
         return timestamps, timestamp_chunks
@@ -142,17 +165,21 @@ class DynamicTopicModeling:
 
         return topics_over_time
 
-    def visualize_topics(self, topic_model, topics_over_time, output_folder, year_str):
+    def visualize_topics(self, topic_model, topics_over_time, output_folder, year_str, use_custom_labels=False, custom_vis_func=False):
         print("Visualizing topics over time...")
-        custom_labels_df = pd.read_csv(os.path.join(output_folder, "models", "Topic_Descriptions.csv"))
-        custom_labels = custom_labels_df["Topic Name"].to_list()
-        topic_model.set_topic_labels(custom_labels)
-        fig = visualize_topics_over_time_(topic_model,
-                                          topics_over_time,
-                                          normalize_frequency=True,
-                                          custom_labels=True,
-                                          title="<b>Trendanalyse securitisering 2015 - 2022</b>",
-                                          **config.dtm_plotting_parameters)
+
+        if use_custom_labels:
+            custom_labels_df = pd.read_csv(os.path.join(output_folder, "models", "Topic_Descriptions.csv"))
+            custom_labels = custom_labels_df["Topic Name"].to_list()
+            topic_model.set_topic_labels(custom_labels)
+
+        if custom_vis_func:
+            fig = visualize_topics_over_time_(topic_model,
+                                              topics_over_time,
+                                              **config.dtm_plotting_parameters)
+        else:
+            fig = topic_model.visualize_topics_over_time(topics_over_time,
+                                                         **config.dtm_plotting_parameters)
 
         out_path = os.path.join(output_folder, "figures", f"topics_over_time_{year_str}.html")
         if os.path.exists(out_path):

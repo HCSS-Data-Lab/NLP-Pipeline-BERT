@@ -3,7 +3,6 @@ import pandas as pd
 import plotly.graph_objects as go
 from scipy.spatial import ConvexHull
 from sklearn.preprocessing import normalize
-import config
 
 from umap import UMAP
 from typing import List, Union

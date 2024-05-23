@@ -5,6 +5,7 @@ import pandas as pd
 from bertopic.representation import MaximalMarginalRelevance
 from bertopic.representation import PartOfSpeech
 from sklearn.feature_extraction.text import CountVectorizer, ENGLISH_STOP_WORDS
+from transformers.pipelines import pipeline
 
 from keyphrase_vectorizers import KeyphraseCountVectorizer
 from sentence_transformers import SentenceTransformer
@@ -63,6 +64,10 @@ class Analysis:
         self.model_file_name = f"bertopic_model_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}{self.get_repr_str()}"
         self.emb_name = f"embeddings_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
 
+        if config.RUN_PAPER_ANALYSIS:
+            self.emb_name = f"embeddings_{self.bert_model_str}.pkl"
+            self.model_file_name = f"bertopic_model_{self.bert_model_str}"
+
     def initialize_topic_model(self, data):
         if self.model_from_file:
             return self.load_topic_model()
@@ -117,19 +122,16 @@ class Analysis:
         # Conditionally set vectorizer_model if using a stop words vectorizer
         if self.clean_meth == "vect":
             print("Initializing topic model with stop words vectorizer.")
-            use_custom_words = True
-            if use_custom_words:
+            if config.bertopic_parameters['use_custom_stopwords']:
                 print("Using custom stop words.")
-                custom_stop_words = config.countvectorizer_parameters["custom_stop_words"]
+                custom_stop_words = config.bertopic_parameters["custom_stopwords"]
                 stop_words = ENGLISH_STOP_WORDS.union(custom_stop_words)
             else:
-                print("NOT using custom, only English stop words.")
+                print("Not using custom stop words.")
                 stop_words = ENGLISH_STOP_WORDS
 
-            vectorizer_model = CountVectorizer(ngram_range=(1, 3),
-                                               stop_words=list(stop_words),
-                                               min_df=0.01,
-                                               lowercase=False)
+            vectorizer_model = CountVectorizer(stop_words=list(stop_words),
+                                               **config.countvectorizer_parameters)
 
             if self.use_keyphrase:
                 print("Using KeyPhrase as CountVectorizer.")
@@ -145,11 +147,18 @@ class Analysis:
             # representation_model = PartOfSpeech(config.parameters['spacy_mod_pos'])
             representation_model = PartOfSpeech(config.bertopic_parameters['spacy_mod_pos'], pos_patterns=config.bertopic_parameters["pos_patterns"])
 
+        # UMAP model
         umap_model = umap.UMAP(**config.umap_parameters)
+
+        # Embedding model
+        if config.model_parameters['non_st_model']:
+            embedding_model = pipeline("feature-extraction", model=self.emb_model)
+        else:
+            embedding_model = self.emb_model
 
         # Create the topic model
         topic_model = BERTopic(vectorizer_model=vectorizer_model,
-                               embedding_model=self.emb_model,
+                               embedding_model=embedding_model,
                                representation_model=representation_model,
                                umap_model=umap_model)
         return topic_model
@@ -166,7 +175,7 @@ class Analysis:
             topic_model (BERTopic): trained topic_model object of BERTopic module
         """
         if self.mod_emb_from_file:
-            print("Generating topic-model with pre-trained embeddings...")
+            print("Generating topic-model with embeddings from file...")
             with open(os.path.join(self.emb_path, self.emb_name), "rb") as file:
                 data_dict = pickle.load(file)
                 embeddings = data_dict['embeddings']
