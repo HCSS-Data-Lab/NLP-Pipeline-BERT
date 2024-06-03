@@ -147,6 +147,7 @@ class TextPreProcess:
 
         """
         path = os.path.join(self.splits_path, self.texts_split_name)
+        print(path)
         if os.path.exists(path):
             print(f"Split texts file name: {self.texts_split_name}. \nReading split text elements from file...")
             with open(path, "rb") as file:

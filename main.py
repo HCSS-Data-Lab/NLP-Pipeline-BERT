@@ -26,8 +26,8 @@ if __name__ == '__main__':
     """
     # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd()) #Put root project here
     project_root = os.getcwd()
-    project = "ParlaMint"
-    year = "2015"
+    project = "Politie"
+    year = "2023"
     preprocess = PreProcess(project_root=project_root,
                             project=project,
                             year=year)
@@ -51,10 +51,10 @@ if __name__ == '__main__':
     # Plotting
     model_name = analysis.get_model_file_name()
     num_texts = len(texts)
-    folder = os.path.join(output_folder, year, "figures")
+    folder = os.path.join(output_folder, "figures")
 
     # Initiate RAG, enhance topic labels based on RAG and summarize docs
-    rag = RAG(embeddings, texts, path=os.path.join(output_folder, year, 'RAG'))
+    rag = RAG(embeddings, texts, path=os.path.join(output_folder, 'RAG'))
 
     plotting = Plotting(topic_model=topic_model,
                         reduced_embeddings=reduced_embeddings,

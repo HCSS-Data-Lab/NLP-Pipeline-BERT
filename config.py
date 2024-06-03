@@ -1,11 +1,11 @@
 # BOOL variables whether to load data objects from file or not
-LOAD_TEXT_SPLITS_FROM_FILE = True
-LOAD_EMBEDDINGS_FROM_FILE = True
-LOAD_REDUCED_EMBEDDINGS_FROM_FILE = True
-LOAD_TOPIC_MODEL_FROM_FILE = True
+LOAD_TEXT_SPLITS_FROM_FILE = False
+LOAD_EMBEDDINGS_FROM_FILE = False
+LOAD_REDUCED_EMBEDDINGS_FROM_FILE = False
+LOAD_TOPIC_MODEL_FROM_FILE = False
 LOAD_MODEL_EMBEDDINGS_FROM_FILE = True
-LOAD_RAG_FROM_FILE = True
-GENAI_TOPIC_LABELS, LOAD_GENAI_TOPIC_LABELS = True, False #It's only when the first is True that the second can be true
+LOAD_RAG_FROM_FILE = False
+GENAI_TOPIC_LABELS, LOAD_GENAI_TOPIC_LABELS = False, False #It's only when the first is True that the second can be true
 GENAI_DOC_LABELS, LOAD_GENAI_DOC_LABELS = False, False #It's only when the first is True that the second can be true
 
 clean_parameters = {

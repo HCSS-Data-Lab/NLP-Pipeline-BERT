@@ -42,7 +42,6 @@ class PreProcess:
         self.emb_path = os.path.join(self.output_folder, "embeddings")
         self.model_path = os.path.join(self.output_folder, "models")
         self.labels_path = os.path.join(self.output_folder, "labels")
-
         self.create_output_folders()
 
     def initialize_texts(self):
