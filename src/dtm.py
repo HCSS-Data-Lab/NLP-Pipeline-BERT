@@ -86,7 +86,7 @@ class DynamicTopicModeling:
         Find time stamps for input texts
 
         Args:
-            texts (Dict[tuple[str, List[str]]]): dict with tuples of (text id, list of chunks)
+            texts (Dict[str, List[str]]): dict with tuples of (text id, list of chunks)
 
         Returns:
             timestamps (List[str]): only timestamps
@@ -165,7 +165,7 @@ class DynamicTopicModeling:
 
         return topics_over_time
 
-    def visualize_topics(self, topic_model, topics_over_time, output_folder, year_str, use_custom_labels=False, custom_vis_func=False):
+    def visualize_topics(self, topic_model, topics_over_time, output_folder, year_str, model_str, use_custom_labels=False, custom_vis_func=False):
         print("Visualizing topics over time...")
 
         if use_custom_labels:
@@ -181,9 +181,9 @@ class DynamicTopicModeling:
             fig = topic_model.visualize_topics_over_time(topics_over_time,
                                                          **config.dtm_plotting_parameters)
 
-        out_path = os.path.join(output_folder, "figures", f"topics_over_time_{year_str}.html")
+        out_path = os.path.join(output_folder, "figures", f"topics_over_time_{model_str}_{year_str}.html")
         if os.path.exists(out_path):
-            fig.write_html(os.path.join(output_folder, "figures", f"test_topics_over_time_{year_str}.html"))
+            fig.write_html(os.path.join(output_folder, "figures", f"test_topics_over_time_{model_str}_{year_str}.html"))
         else:
             fig.write_html(out_path)
 

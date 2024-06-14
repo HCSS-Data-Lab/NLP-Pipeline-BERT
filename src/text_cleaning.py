@@ -1,8 +1,6 @@
 """
 Text cleaning .py file
 
-Best if this is part of the preprocessing repository that we will make
-
 """
 import os
 import re

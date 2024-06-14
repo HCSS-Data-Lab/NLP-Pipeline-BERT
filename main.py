@@ -4,7 +4,7 @@ import pandas as pd
 import config
 from src.init_folders import InitFolders
 from src.text_cleaning import TextCleaning
-from src.analysis import Analysis
+from src.tm import TopicModeling
 from src.plotting import Plotting
 from src.evaluation import Evaluation
 from src.RAG import RAG
@@ -14,12 +14,19 @@ from src.doc_selection import DocSelection
 from src.dtm import DynamicTopicModeling
 from src.texts_pp import TextPreProcess
 from src.embeddings_pp import EmbeddingsPreProcess
-
 from utils.representative_docs_func import _get_representative_docs_
 
 def get_year_str(task, years, keyword_theme=None):
     """
     Get year str used for tfidf input file selection for dynamic topic modeling, like 'security_vt0.8_2019_2020'
+
+    Args:
+        task (str): tm or dtm
+        years (List[str]): list of years as str
+        keyword_theme (str): keyword theme used for output folder name
+
+    Return:
+        str: year str
     """
     if task == "tm":
         # E.g. '2020'
@@ -74,12 +81,12 @@ def get_representative_sents(topic_model, documents, num_docs, topics, texts_pat
             else:
                 if num_docs > 3:
                     raise ValueError(
-                        "Number of sentences can be at most 3. The BERTopic attribute representative_docs_ returns at 3 most representative docs. "
+                        "Number of sentences can be at most 3. The BERTopic attribute representative_docs_ returns at most 3 representative docs. "
                         "If num_docs must be larger than 3, set use_custom to True. "
                     )
-                sentences = topic_model.topic_model.representative_docs_[topic_id][:num_docs]
+                sentences = topic_model.representative_docs_[topic_id][:num_docs]
 
-            sents_lst.append({"topic_id": topic_id, "repr_sent": sentences})
+            sents_lst.append({topic_id: sentences})
 
             # Write to .txt
             text = "\n\n".join(sentences)
@@ -88,7 +95,11 @@ def get_representative_sents(topic_model, documents, num_docs, topics, texts_pat
 
 def assert_parameters(task, years):
     """
-    Function to assert parameters
+    Assert whether the task is tm or dtm and if task=tm, there is only a single year
+
+    Args:
+        task (str): tm or dtm
+        years (List[str]): list of years as str
     """
     if task not in ["tm", "dtm"]:
         raise ValueError(
@@ -101,22 +112,7 @@ def assert_parameters(task, years):
             )
 
 if __name__ == '__main__':
-    """
-    TODO: (Maarten)
-    - Maybe use logger instead of print statements (as we can also log configurations) and bring logging to the main instead of in submodules 
-    - Do not refer to local folders (find a way to define projectroot agnosticly that also works within devcontainer)
-    - Add making automatic folders for project
-    - Add option to not install sentence-transformers (and make use of cheap default embedding for development).
-    - In general it might also be great to have a dev set that we can use to do test runs (especially because ).  
 
-    TODO:
-    - Split up pre-processing part of old repository, make separate preproc repo. Option to add several preproc.
-    options, for instance also Grobid
-    - Contributor to BERTopic package for Convex Hulls.
-    - Filter corpus specific stop words dynamically. Find data selection methods.
-    """
-
-    # project_root = os.environ.get(r'C:\Github\NLP-Pipeline-BERT', os.getcwd())
     project_root = os.getcwd()
     dataset_name = "ParlaMint"
     task = "dtm"  # dtm, tm
@@ -133,7 +129,7 @@ if __name__ == '__main__':
             text_cleaning.read_clean_raw_texts()
 
     # Translate texts
-    if config.translate_param["translate"]:
+    if config.translate_parameters["translate"]:
         from src.translate import Translate
         for year in years:
             translate_obj = Translate(project_root=project_root, dataset_name=dataset_name, year=year)
@@ -145,10 +141,6 @@ if __name__ == '__main__':
         keyword_theme = 'security'
         keywords = ['safety', 'security', 'threat', 'protest', 'national security', 'demonstration', 'law enforcement',
                     'risk', 'police', 'danger', 'hazard', 'national security', 'law enforcement']
-
-        # keyword_theme = "defense"
-        # keywords = ["military", "defense", "armed forces", "tactics", "army", "navy", "air force", "marines", "weapons",
-        #             "warfare", "combat", "operations", "cybersecurity", "deterrence"]
 
         year_str = get_year_str(task, years, keyword_theme)
         doc_selection = DocSelection(project_root, dataset_name, years)
@@ -182,25 +174,25 @@ if __name__ == '__main__':
 
     # Initialize topic-model
     output_folder = os.path.join(project_root, "output", dataset_name, year_str)
-    analysis = Analysis(out_path=output_folder)
-    topic_model = analysis.initialize_topic_model(text_chunks)
+    tm = TopicModeling(out_path=output_folder)
+    topic_model = tm.initialize_topic_model(text_chunks)
 
     save_topic_words = False
     if save_topic_words:
-        analysis.save_topic_words(topic_model)
+        tm.save_topic_words(topic_model)
 
-    text_splits_path = texts_pp.get_splits_path()
-    documents = pd.DataFrame({"Document": text_chunks, "Topic": topic_model.topics_})
-    documents.to_csv(os.path.join(text_splits_path, "chunks_topics.csv"), index=False)
-
-    # num_docs = 5
-    # repr_topics = [1, 4, 5, 6, 7, 9, 11, 13, 14, 15]  # Topics to find representative documents for
-    # # text_splits_path = texts_pp.get_splits_path()
-    # repre_sentences = get_representative_sents(topic_model, documents, num_docs, repr_topics, text_splits_path)
+    get_repre_sents = False
+    if get_repre_sents:
+        text_splits_path = init_folders.get_split_texts_path()
+        documents = pd.DataFrame({"Document": text_chunks, "Topic": topic_model.topics_})
+        num_docs = 6
+        topics = [1, 2, 3, 4, 5, 6]
+        sents = get_representative_sents(topic_model, documents, num_docs=num_docs, topics=topics,
+                                         texts_path=text_splits_path, use_custom=False)
 
     if task == "tm":
         # Plotting
-        model_name = analysis.get_model_file_name()
+        model_name = tm.get_model_file_name()
         num_texts = len(text_chunks)
 
         # Initiate RAG, enhance topic labels based on RAG and summarize docs

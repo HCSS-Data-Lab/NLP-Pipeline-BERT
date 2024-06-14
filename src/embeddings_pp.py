@@ -1,6 +1,7 @@
 import os
 import pickle
 from sentence_transformers import SentenceTransformer
+# from FlagEmbedding import BGEM3FlagModel
 from multiprocessing import Pool
 import numpy as np
 from itertools import repeat
@@ -42,19 +43,17 @@ class EmbeddingsPreProcess:
         self.red_from_file = config.LOAD_REDUCED_EMBEDDINGS_FROM_FILE
 
         self.path = emb_path
-        self.clean_meth = config.text_splitting_parameters["clean_meth"]
-        self.split_size = config.text_splitting_parameters["split_size"]
-        self.chunk_size = config.text_splitting_parameters["chunk_size"]
+
         self.bert_model = config.model_parameters["emb_model"]
         self.bert_model_str = self.bert_model.split("/")[-1]
+        self.split_size = config.text_splitting_parameters["split_size"]
+        self.chunk_size = config.text_splitting_parameters["chunk_size"]
 
-        self.embedding_name = f"embeddings_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
+        self.embedding_name = f"embeddings_{self.split_size}{self.chunk_size}_{self.bert_model_str}.pkl"
+        self.red_emb_name = f"red_embeddings_{self.split_size}{self.chunk_size}_{self.bert_model_str}.npy"
+
+        self.clean_meth = config.tm_parameters["clean_meth"]
         self.random_state = config.umap_parameters["random_state"]
-        self.red_emb_name = f"red_embeddings_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}.npy"
-
-        if config.RUN_PAPER_ANALYSIS:
-            self.embedding_name = f"embeddings_{self.bert_model_str}.pkl"
-            self.red_emb_name = f"red_embeddings_{self.bert_model_str}.npy"
 
     def get_embeddings(self, data, parallel=False):
         """
@@ -102,14 +101,23 @@ class EmbeddingsPreProcess:
         and bert_model as .pkl dict. Sentence BERT model name given by self.bert_model.
 
         Args:
-            data (list[str]): input text data (chunks)
+            data (List[str]): input text data (chunks)
 
         Returns:
             embeddings (torch.Tensor): text embeddings, each doc as a 768-dim vector. Shape: (num docs, 768)
         """
         print("Initializing embeddings at runtime...")
-        model = SentenceTransformer(self.bert_model, trust_remote_code=True)
-        embeddings = model.encode(data, show_progress_bar=True)
+        if config.model_parameters['non_st_model']:
+            # IMPLEMENT HERE
+            pass
+            # model = BGEM3FlagModel(self.bert_model,  use_fp16=True)
+            # embeddings = model.encode(data)
+        else:
+            model = SentenceTransformer(self.bert_model, trust_remote_code=True)
+            embedding_dim = model.get_sentence_embedding_dimension()
+            max_seq_length = model.max_seq_length
+            print(f"Embedding dimension: {embedding_dim}\nMax sequence length: {max_seq_length}")
+            embeddings = model.encode(data, show_progress_bar=True)
 
         with open(os.path.join(self.path, self.embedding_name), "wb") as file:
             pickle.dump({'embeddings': embeddings, 'text_split_size': self.split_size, 'bert_model': self.bert_model}, file,

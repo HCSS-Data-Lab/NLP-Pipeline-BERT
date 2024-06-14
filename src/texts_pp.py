@@ -43,7 +43,7 @@ def sentencize_text(texts):
     Splits input texts into sentences, keep sentences of each document in a separate list
 
     Args:
-        texts (dict): text bodies
+        texts (Dict[str, str]): List of Dicts with text name and text body
 
     Returns:
         text_sentences (dict): A list of list with sentences for each input text
@@ -115,9 +115,9 @@ class TextPreProcess:
 
         self.project = self.get_project_name()
 
-        self.clean_meth = config.text_splitting_parameters["clean_meth"]
         self.split_size = config.text_splitting_parameters["split_size"]
         self.chunk_size = config.text_splitting_parameters["chunk_size"]
+        self.clean_meth = config.tm_parameters["clean_meth"]
 
         self.texts_split_name = f"texts_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
 
@@ -190,7 +190,7 @@ class TextPreProcess:
         Read input text_name bodies saved as .txt from bodies_path folder.
 
         Returns:
-            texts (dict): text_name bodies
+            texts (Dict[str, str]): List of Dicts with text name and text body
 
         """
         text_names = sorted([text_file for text_file in os.listdir(self.bodies_path) if text_file.endswith('.txt')])
@@ -207,7 +207,7 @@ class TextPreProcess:
         function filter_texts() if clean_meth = "ft".
 
         Args:
-            texts (dict): input text bodies
+            texts (Dict[str, str]): List of Dicts with text name and text body
 
         Returns:
             list[str]: split (and filtered) text pieces
@@ -237,7 +237,7 @@ class TextPreProcess:
         Chunks texts into segments of specified chunk size.
 
         Args:
-            texts (list[str]): input texts
+            texts (Dict[str, str]): List of Dicts with text name and text body
 
         Returns:
             list[str]: A list with the chunked text segments.

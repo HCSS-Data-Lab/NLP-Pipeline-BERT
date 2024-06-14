@@ -2,7 +2,7 @@ import os
 
 class InitFolders:
 
-    def __init__(self, project_root, dataset_name, year_str):
+    def __init__(self, project_root, dataset_name, year_str, country=None):
         """
         InitFolders takes as parameters project_root, project, and year and creates folder structure
         initializes and saves
@@ -30,7 +30,10 @@ class InitFolders:
             raise ValueError(f"No project folder in input for dataset name {self.dataset_name}. The path {self.input_folder} does not exist. Create it and make sure it contains a folder text_bodies.")
 
         self.text_bodies_path = os.path.join(self.input_folder, year_str, "text_bodies")
-        self.output_folder = os.path.join(self.project_root, "output", dataset_name, year_str)
+        if country is not None:
+            self.output_folder = os.path.join(self.project_root, "output", dataset_name, country, year_str)
+        else:
+            self.output_folder = os.path.join(self.project_root, "output", dataset_name, year_str)
 
         self.split_texts_path = os.path.join(self.output_folder, "texts")
         self.emb_path = os.path.join(self.output_folder, "embeddings")

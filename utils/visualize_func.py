@@ -24,9 +24,12 @@ def add_convex_hulls(fig, topic_per_doc, embeddings_2d, topic_range):
                                     opacity=0.1, line=dict(color='darkblue')))
     return fig
 
-def get_sample_indices(topic_model, sample=1.0):
+def get_sample_indices(topic_model, num_topics_in_fig, sample=1.0):
+    """
+    Get sample indices for the topics (eg top 50) shown in figure
+    If sample=1, all indices for each topic are automatically sampled
+    """
     np.random.seed(0)
-    num_topics_in_fig = config.tm_plotting_parameters["n_total"]
     topic_per_doc = topic_model.topics_
     sample_indices = []
     for topic in list(set(topic_per_doc))[:num_topics_in_fig]:
@@ -38,7 +41,7 @@ def get_sample_indices(topic_model, sample=1.0):
 
 def visualize_documents_(topic_model,
                          docs: List[str],
-                         indices: List[int] = None,  # Added parameter indices
+                         indices: List[int] = None,  # Added indices as parameter here
                          topics: List[int] = None,
                          embeddings: np.ndarray = None,
                          reduced_embeddings: np.ndarray = None,

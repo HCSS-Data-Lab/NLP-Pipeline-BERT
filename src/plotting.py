@@ -8,12 +8,10 @@ from utils.text_process_llm import get_summary_labels
 
 import config
 
-
 def first_at_end(lst):
-    """Append the first element of list at the end"""
+    """ Append the first element of list at the end """
     lst.append(lst.pop(0))
     return lst
-
 
 def get_num_docs_topic(hover_labels):
     """
@@ -78,8 +76,8 @@ class Plotting:
             legend_labels = self.make_legend_labels(words_legend)
         self.topic_model.set_topic_labels(legend_labels)
 
-        indices = get_sample_indices(self.topic_model, sample=self.sample)
-        print("Number of docs sampled: ", len(indices))
+        indices = get_sample_indices(self.topic_model, self.n_total, sample=self.sample)
+        print(f"Number of docs sampled for {self.n_total} topics in figure: {len(indices)}")
 
         if self.summarize_docs:
             hover_labels = get_summary_sampled_docs(self.docs, indices, RAG=self.RAG)
@@ -103,31 +101,11 @@ class Plotting:
 
         if self.save_html:
             file_name = self.get_param_str()
-            fig.write_html(os.path.join(self.folder, file_name))
-
-    def sample_docs_by_topic(self, sample_fraction=0.1):
-        """
-        Sample a given sample-size per topic, so if sample_size=0.1 10% of docs
-        from each topic will be randomly sampled. Number of samples is floor-rounded
-        to the nearest integer, ie 10% * 19 documents = 1 sample.
-
-        Args:
-            sample_fraction (float): sample size as fraction
-
-        Returns:
-            sampled_indices (lst[int]): sampled topic indices
-        """
-        np.random.seed(1)
-        sampled_indices = []
-        unique_topics = np.unique(self.topics)
-        for t in unique_topics:
-            indices = np.where(self.topics == t)[0]
-            num_docs_for_topic = indices.shape[0]
-            sampled_inds_topic = np.random.choice(indices, size=int(sample_fraction * num_docs_for_topic),
-                                                  replace=False)
-            sampled_indices.extend(sampled_inds_topic)
-
-        return sampled_indices
+            path = os.path.join(self.folder, file_name)
+            if os.path.exists(path):
+                fig.write_html(os.path.join(self.folder, "test_"+file_name))
+            else:
+                fig.write_html(os.path.join(self.folder, file_name))
 
     def make_legend_labels(self, words_legend):
         """
@@ -244,7 +222,7 @@ class Plotting:
             print(f"Plotting all documents. Number of docs: {self.num_docs}")
 
     def get_param_str(self):
-        return f"plot_mn{self.model_name}_n{self.n_total}_s{self.sample}_y{self.year}.html"
+        return f"plot_{self.model_name}_n{self.n_total}_s{self.sample}_y{self.year}.html"
 
     def get_fig_title(self):
         # OLD TITLE
@@ -253,6 +231,3 @@ class Plotting:
             return f"(merged)\n{self.model_name}_sam{config.tm_plotting_parameters['sample']}"
         else:
             return f"(unmerged)\n{self.model_name}_sam{config.tm_plotting_parameters['sample']}"
-
-    def get_sample_docs(self):
-        pass

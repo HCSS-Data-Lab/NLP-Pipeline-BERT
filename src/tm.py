@@ -1,29 +1,27 @@
-import spacy
-from bertopic import BERTopic
-import umap
-import pandas as pd
 from bertopic.representation import MaximalMarginalRelevance
+from bertopic.vectorizers import ClassTfidfTransformer
+from bertopic import BERTopic
 from bertopic.representation import PartOfSpeech
+
 from sklearn.feature_extraction.text import CountVectorizer, ENGLISH_STOP_WORDS
 from transformers.pipelines import pipeline
-
 from keyphrase_vectorizers import KeyphraseCountVectorizer
-from sentence_transformers import SentenceTransformer
-
 import time
 import os
 import pickle
+import umap
+import pandas as pd
 
 import config
 
 def bool_ind(bool_val):
     return "T" if bool_val else "F"
 
-class Analysis:
+class TopicModeling:
 
     def __init__(self, out_path):
         """
-        Class Analysis handles running the topic modeling analysis with the BERTopic module.
+        Class TopicModeling handles running the topic modeling analysis with the BERTopic module.
 
         Parameters:
             out_path (str): path to output folder with folders "models" and "embeddings"
@@ -49,24 +47,22 @@ class Analysis:
         self.model_from_file = config.LOAD_TOPIC_MODEL_FROM_FILE
         self.mod_emb_from_file = config.LOAD_MODEL_EMBEDDINGS_FROM_FILE
 
-        self.clean_meth = config.text_splitting_parameters["clean_meth"]
         self.split_size = config.text_splitting_parameters["split_size"]
         self.chunk_size = config.text_splitting_parameters["chunk_size"]
 
         self.emb_model = config.model_parameters["emb_model"]
         self.bert_model_str = self.emb_model.split("/")[-1]  # When model name is like 'mixedbread-ai/mxb...', only take the second part
 
-        self.use_mmr = config.bertopic_parameters["use_mmr"]
-        self.use_pos = config.bertopic_parameters["use_pos"]
-        self.update_topics = config.bertopic_parameters["update_topics"]
-        self.use_keyphrase = config.bertopic_parameters["use_keyphrase"]
+        self.clean_meth = config.tm_parameters["clean_meth"]
+        self.use_mmr = config.tm_parameters["use_mmr"]
+        self.use_pos = config.tm_parameters["use_pos"]
+        self.use_keyphrase = config.tm_parameters["use_keyphrase"]
+        self.use_custom_stopwords = config.tm_parameters["use_custom_stopwords"]
+        self.use_ctfidf = config.tm_parameters["use_ctfidf"]
+        self.update_topics = config.tm_parameters["update_topics"]
 
-        self.model_file_name = f"bertopic_model_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}{self.get_repr_str()}"
-        self.emb_name = f"embeddings_{self.bert_model_str}_{self.split_size}{self.chunk_size}_{self.clean_meth}.pkl"
-
-        if config.RUN_PAPER_ANALYSIS:
-            self.emb_name = f"embeddings_{self.bert_model_str}.pkl"
-            self.model_file_name = f"bertopic_model_{self.bert_model_str}"
+        self.emb_name = f"embeddings_{self.split_size}{self.chunk_size}_{self.bert_model_str}.pkl"
+        self.model_file_name = f"bertopic_model_{self.split_size}{self.chunk_size}_{self.bert_model_str}{self.get_repr_str()}"
 
     def initialize_topic_model(self, data):
         if self.model_from_file:
@@ -93,6 +89,7 @@ class Analysis:
 
         """
         print("Initializing topic-model at runtime...")
+        start = time.time()
         # Get topic-model object
         topic_model = self.get_topic_model_obj()
 
@@ -105,6 +102,7 @@ class Analysis:
 
         # Save topic-model
         topic_model.save(os.path.join(self.models_path, self.model_file_name))
+        print(f"Time elapsed to generate topic model at runtime: {time.time() - start:.3f} seconds\n")
         return topic_model
 
     def get_topic_model_obj(self):
@@ -115,19 +113,20 @@ class Analysis:
             topic_model (BERTopic): topic-model object
 
         """
-        # Initializing vectorizer to clean text and representation model, both as None if not used
+        # Initializing vectorizer to clean text, representation model and c-tf-idf model, None if not used
         vectorizer_model = None
         representation_model = None
+        ctfidf_model = None
 
         # Conditionally set vectorizer_model if using a stop words vectorizer
         if self.clean_meth == "vect":
             print("Initializing topic model with stop words vectorizer.")
-            if config.bertopic_parameters['use_custom_stopwords']:
+            if self.use_custom_stopwords:
                 print("Using custom stop words.")
-                custom_stop_words = config.bertopic_parameters["custom_stopwords"]
+                custom_stop_words = config.stop_words_parameters["custom_stopwords"]
                 stop_words = ENGLISH_STOP_WORDS.union(custom_stop_words)
             else:
-                print("Not using custom stop words.")
+                print("Using default stop words.")
                 stop_words = ENGLISH_STOP_WORDS
 
             vectorizer_model = CountVectorizer(stop_words=list(stop_words),
@@ -137,15 +136,18 @@ class Analysis:
                 print("Using KeyPhrase as CountVectorizer.")
                 vectorizer_model = KeyphraseCountVectorizer(**config.kpcountvectorizer_parameters)
 
-        # Conditionally set representation_model if using MMR for topic fine-tuning
+        # Conditionally set representation_model and ctfidf_model
         if self.use_mmr:
-            print("Applying topic fine-tuning with MMR.")
-            representation_model = MaximalMarginalRelevance(diversity=config.bertopic_parameters["mmr_diversity"])
+            print(f"Applying topic fine-tuning with MMR. diversity: {config.mmr_parameters['diversity']}")
+            representation_model = MaximalMarginalRelevance(**config.mmr_parameters)
 
         if self.use_pos:
             print("Applying topic fine-tuning with Parts Of Speech.")
-            # representation_model = PartOfSpeech(config.parameters['spacy_mod_pos'])
-            representation_model = PartOfSpeech(config.bertopic_parameters['spacy_mod_pos'], pos_patterns=config.bertopic_parameters["pos_patterns"])
+            representation_model = PartOfSpeech(**config.pos_parameters)
+
+        if self.use_ctfidf:
+            print("Applying custom c-TF-IDF model.")
+            ctfidf_model = ClassTfidfTransformer(**config.ctfidf_parameters)
 
         # UMAP model
         umap_model = umap.UMAP(**config.umap_parameters)
@@ -160,7 +162,8 @@ class Analysis:
         topic_model = BERTopic(vectorizer_model=vectorizer_model,
                                embedding_model=embedding_model,
                                representation_model=representation_model,
-                               umap_model=umap_model)
+                               umap_model=umap_model,
+                               ctfidf_model=ctfidf_model)
         return topic_model
 
     def finetune_topic_model(self, topic_model, data):
@@ -202,16 +205,17 @@ class Analysis:
 
     def get_repr_str(self):
         """
-        Get str of representation model values, used for bertopic model file name;
+        Get str of representation model values, used for bertopic model file name.
         T means preceding value is True, F means it is False.
         mmr: use MMR or not;
         p: use PoS (Parts-of-Speech) for topic fine-tuning or not;
-        kp: use KeyPhrase as CountVectorizer to filter stop words and noun phrases.
+        kp: use KeyPhrase as CountVectorizer to filter stop words and noun phrases or not.
 
         Returns:
             str: representation model values in str
         """
-        return f"_mmr{bool_ind(self.use_mmr)}_p{bool_ind(self.use_pos)}_kp{bool_ind(self.use_keyphrase)}"
+        # return f"_mmr{bool_ind(self.use_mmr)}_p{bool_ind(self.use_pos)}_kp{bool_ind(self.use_keyphrase)}"
+        return f"_ctfidf{bool_ind(self.use_ctfidf)}"
 
     def save_topic_words(self, topic_model, top_n_topics=None):
         """
@@ -233,3 +237,6 @@ class Analysis:
 
         # Write the DataFrame to a CSV file
         df.to_excel(os.path.join(self.models_path, f"topic_words_{top_n_topics}.xlsx"), index=False)
+
+    def get_model_str(self):
+        return self.bert_model_str
