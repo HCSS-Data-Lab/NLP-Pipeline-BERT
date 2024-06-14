@@ -91,7 +91,6 @@ The project folder is structured as follows:
             └── texts  # This output folder structure is not required, if the folders do not exist they will be created at runtime
 │                                         
 ├── src
-    ├── analysis.py
     ├── doc_selection.py
     ├── dtm.py
     ├── embeddings_pp.py
@@ -102,6 +101,7 @@ The project folder is structured as follows:
     ├── RAG.py   
     ├── text_cleaning.py
     ├── texts_pp.py
+    ├── tm.py
     └── translate.py
 │                                      
 ├── utils
@@ -119,6 +119,8 @@ The project folder is structured as follows:
 ├── get-pip.py
 │
 ├── main.py
+│
+├── main2.py
 │                                      
 └── requirements.txt
 ```
