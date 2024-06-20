@@ -5,15 +5,15 @@ import config
 from src.init_folders import InitFolders
 from src.text_cleaning import TextCleaning
 from src.tm import TopicModeling
-from src.plotting import Plotting
+from src.tm_plotting import Plotting
 from src.evaluation import Evaluation
 from src.RAG import RAG
 from src.merge import Merge
 
 from src.doc_selection import DocSelection
 from src.dtm import DynamicTopicModeling
-from src.texts_pp import TextPreProcess
-from src.embeddings_pp import EmbeddingsPreProcess
+from src.texts_preprocess import TextPreprocess
+from src.embeddings_preprocess import EmbeddingsPreprocess
 from utils.representative_docs_func import _get_representative_docs_
 
 def get_year_str(task, years, keyword_theme=None):
@@ -163,12 +163,12 @@ if __name__ == '__main__':
     # Initializing text data
     split_texts_path = init_folders.get_split_texts_path()
     text_bodies_path = init_folders.get_text_bodies_path()
-    texts_pp = TextPreProcess(text_bodies_path, split_texts_path)
+    texts_pp = TextPreprocess(text_bodies_path, split_texts_path)
     texts, text_chunks = texts_pp.get_texts()  # texts has text title and chunk; text_chunks is only chunks
 
     # Initialize embeddings and reduced embeddings
     emb_path = init_folders.get_emb_path()
-    embeddings_pp = EmbeddingsPreProcess(emb_path)
+    embeddings_pp = EmbeddingsPreprocess(emb_path)
     embeddings = embeddings_pp.get_embeddings(text_chunks)
     reduced_embeddings = embeddings_pp.get_red_embeddings(embeddings)
 

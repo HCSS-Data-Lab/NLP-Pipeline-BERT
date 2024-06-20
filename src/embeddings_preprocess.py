@@ -12,11 +12,11 @@ import config
 def encode_chunk(chunk, model):
     return model.encode(chunk, show_progress_bar=True)
 
-class EmbeddingsPreProcess:
+class EmbeddingsPreprocess:
 
     def __init__(self, emb_path):
         """
-        Class EmbeddingsPreProcess stores the variables needed to initialize the embeddings: emb_from_file,
+        Class EmbeddingsPreprocess stores the variables needed to initialize the embeddings: emb_from_file,
         embeddings path, text clean-method, and text split-size. It also handles the functionality to
         initialize embeddings: loading pre-trained embeddings from file or generating them at runtime
         based on input text data. It handles the same functionality for reduced embeddings: loading reduced
@@ -49,8 +49,8 @@ class EmbeddingsPreProcess:
         self.split_size = config.text_splitting_parameters["split_size"]
         self.chunk_size = config.text_splitting_parameters["chunk_size"]
 
-        self.embedding_name = f"embeddings_{self.split_size}{self.chunk_size}_{self.bert_model_str}.pkl"
-        self.red_emb_name = f"red_embeddings_{self.split_size}{self.chunk_size}_{self.bert_model_str}.npy"
+        self.embedding_name = f"embeddings_{self.bert_model_str}.pkl"
+        self.red_emb_name = f"red_embeddings_{self.bert_model_str}.npy"
 
         self.clean_meth = config.tm_parameters["clean_meth"]
         self.random_state = config.umap_parameters["random_state"]
@@ -110,8 +110,6 @@ class EmbeddingsPreProcess:
         if config.model_parameters['non_st_model']:
             # IMPLEMENT HERE
             pass
-            # model = BGEM3FlagModel(self.bert_model,  use_fp16=True)
-            # embeddings = model.encode(data)
         else:
             model = SentenceTransformer(self.bert_model, trust_remote_code=True)
             embedding_dim = model.get_sentence_embedding_dimension()
@@ -166,27 +164,23 @@ class EmbeddingsPreProcess:
         Load reduced embeddings saved as np array in folder self.path.
 
         Returns:
-            np.array: reduced embeddings. Shape: (num docs, 2)
+            np.array: reduced embeddings
         """
         print(f"Reduced embedding file name: {self.red_emb_name}. \nReading reduced embeddings from file...")
         return np.load(os.path.join(self.path, self.red_emb_name))
 
     def generate_red_embeddings(self, embeddings):
         """
-        Generate reduced embeddings from text embeddings by mapping to 2 dims using UMAP.
+        Generate reduced embeddings from text embeddings by mapping to 5 dims using UMAP.
 
         Args:
             embeddings (torch.Tensor): text embeddings
 
         Returns:
-            reduced_embeddings (np.array): reduced embeddings. Shape: (num docs, 768)
+            reduced_embeddings (np.array): reduced embeddings
         """
         print("Initializing reduced embeddings at runtime...")
-        reduced_embeddings = umap.UMAP(n_neighbors=15,
-                                       n_components=5,
-                                       min_dist=0.0,
-                                       metric='cosine',
-                                       random_state=self.random_state).fit_transform(embeddings)
+        reduced_embeddings = umap.UMAP(**config.umap_parameters).fit_transform(embeddings)
 
         # Saving reduced embeddings to file
         np.save(os.path.join(self.path, self.red_emb_name), reduced_embeddings)

@@ -6,7 +6,6 @@ import glob
 
 import config
 
-
 def sentencize_text(text_body):
     """
     Splits input text body into sentences
@@ -16,7 +15,6 @@ def sentencize_text(text_body):
 
     Returns:
         List[str] = sentences
-
     """
     delimiters = ['.', '?', '!']
     pattern = '\s|'.join(map(re.escape, delimiters))  # Add whitespace \s, regex OR delim |, and add backslash with escape
@@ -50,21 +48,19 @@ class Translate:
         and output folder, and initializes the Neural Machine Translation (NMT) model used for translation
 
         Parameters:
-        - project_root (str): The root directory of the project where the input and output folders will be located.
-        - project (str): The name of the specific project within the root directory.
-        - year (str): The year associated with the project's data.
-        - target_lang (str, optional): The language code (e.g., "en" for English) to which the text will be translated. Defaults to "en".
-        - model_name (str, optional): The name of the pre-trained NMT model to be used for translation. Defaults to "opus-mt".
+            project_root (str): The root directory of the project where the input and output folders will be located.
+            dataset_name (str): The name of the dataset within the root directory.
+            year (str): The year associated with the project's data.
+            model_name (str, optional): The name of the pre-trained NMT model to be used for translation. Defaults to "opus-mt".
 
         Attributes:
-        - input_folder (str): The path to the folder containing the text bodies to be translated. It is constructed based on the project root, project name, and year.
-        - output_folder (str): The path to the folder where the translated text bodies will be stored.
-        - target_lang (str): Stores the target language code specified during the class initialization.
-        - model (EasyNMT): An instance of the EasyNMT model specified by model_name.
+            input_folder (str): The path to the folder containing the text bodies to be translated. It is constructed based on the project root, project name, and year.
+            output_folder (str): The path to the folder where the translated text bodies will be stored.
+            model (EasyNMT): An instance of the EasyNMT model specified by model_name.
 
         """
-        self.target_lang = config.translate_param["target_lang"]
-        self.source_lang = config.translate_param["source_lang"]
+        self.target_lang = config.translate_parameters["target_lang"]
+        self.source_lang = config.translate_parameters["source_lang"]
 
         self.input_folder = os.path.join(project_root, "input", dataset_name, year, "text_bodies")  # Folder with text bodies
         self.output_folder = os.path.join(project_root, "input", dataset_name, year+f"_{self.target_lang}", "text_bodies")  # Output folder with translations
@@ -72,7 +68,7 @@ class Translate:
 
         self.model = EasyNMT(model_name)
 
-    def translate_text(self, from_last_added=True):
+    def translate_text(self, from_last_added=False):
         print("Translating texts...")
         text_names = sorted([text_file for text_file in os.listdir(self.input_folder) if text_file.endswith('.txt')])
 
@@ -84,26 +80,13 @@ class Translate:
             with open(os.path.join(self.input_folder, name), "r", encoding="utf-8") as file:
                 text_body = file.read()
 
-            # # Performance is better when giving sentences as input, not full text;
-            # # however, all sentences are concatenated with '.', other delimiters are removed. And with full text is faster
+            # # Performance is better when giving sentences as input, not full text; however, runtime is longer and all delimiters (.?!) are removed
             # sentences = sentencize_text(text_body)
-            # sentences_trans = self.model.translate(sentences, target_lang=self.target_lang, source_lang="nl")  # Translated sentences
+            # sentences_trans = self.model.translate(sentences, target_lang=self.target_lang, source_lang="nl")
             # translation = ". ".join(sentences_trans)  # Translated text
 
             translation = self.model.translate(text_body, target_lang=self.target_lang, source_lang=self.source_lang)
 
             with open(os.path.join(self.output_folder, f"{self.target_lang}_"+name), "w+", encoding="utf-8") as file:
                 file.write(translation)
-
-
-
-
-
-
-
-
-
-
-
-
 

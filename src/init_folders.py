@@ -19,7 +19,7 @@ class InitFolders:
             model_path (str): Directory path where models are stored.
             split_texts_path (str): Directory path where split texts are stored as .pkl dict file.
             fig_path (str): Directory path where figures are stored.
-            rag_path (str): Dir where RAG data is stored.
+            RAG_path (str): Dir where RAG data is stored.
             labels_path (str): Dir where labels from RAG are stored.
         """
         self.project_root = project_root

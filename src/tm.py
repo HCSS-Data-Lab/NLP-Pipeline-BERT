@@ -61,7 +61,7 @@ class TopicModeling:
         self.use_ctfidf = config.tm_parameters["use_ctfidf"]
         self.update_topics = config.tm_parameters["update_topics"]
 
-        self.emb_name = f"embeddings_{self.split_size}{self.chunk_size}_{self.bert_model_str}.pkl"
+        self.emb_name = f"embeddings_{self.bert_model_str}.pkl"
         self.model_file_name = f"bertopic_model_{self.split_size}{self.chunk_size}_{self.bert_model_str}{self.get_repr_str()}"
 
     def initialize_topic_model(self, data):
@@ -82,18 +82,17 @@ class TopicModeling:
         Load and train topic model at runtime based on given input data
 
         Args:
-            data (list[str]): text data
+            data (List[str]): text data
 
         Returns:
             topic_model (BERTopic): trained topic model object
-
         """
         print("Initializing topic-model at runtime...")
         start = time.time()
         # Get topic-model object
         topic_model = self.get_topic_model_obj()
 
-        # Train topic-model
+        # Finetune topic-model
         topic_model = self.finetune_topic_model(topic_model, data)
 
         # Update topic-model
@@ -111,7 +110,6 @@ class TopicModeling:
 
         Returns:
             topic_model (BERTopic): topic-model object
-
         """
         # Initializing vectorizer to clean text, representation model and c-tf-idf model, None if not used
         vectorizer_model = None
@@ -172,7 +170,7 @@ class TopicModeling:
 
         Args:
             topic_model (BERTopic): topic-model object, untrained
-            data (list[str]): text data
+            data (List[str]): text data
 
         Returns:
             topic_model (BERTopic): trained topic_model object of BERTopic module

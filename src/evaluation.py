@@ -2,13 +2,11 @@ import pandas as pd
 import numpy as np
 import gensim.corpora as corpora
 from gensim.models.coherencemodel import CoherenceModel
-# from octis.evaluation_metrics.diversity_metrics import TopicDiversity
 
 class Evaluation:
 
     def __init__(self):
         print("\nEval object created")
-
 
     def calculate_coherence(self, topic_model, texts, metrics):
         print("Calculating coherence...")

@@ -56,7 +56,7 @@ def visualize_documents_(topic_model,
     THIS IS THE MODIFIED FUNCTION from the BERTopic module in Python,
     such that the sampled indices are returned.
 
-    0Visualize documents and their topics in 2D
+    Visualize documents and their topics in 2D
 
     Arguments:
         topic_model: A fitted BERTopic instance.
@@ -283,10 +283,10 @@ def visualize_topics_over_time_(topic_model,
                                 height: int = 450,
                                 topics_background: List[int] = [],
                                 background_alpha: float = 1.0,
-                                color_legend_opaque: bool = True) -> go.Figure:  # Added topics_background parameter
+                                color_legend_opaque: bool = True):  # Added topics_background parameter
     colors = ["#E69F00", "#56B4E9", "#009E73", "#F0E442", "#D55E00", "#0072B2", "#CC79A7"]
-
     # Select topics based on top_n and topics args
+
     freq_df = topic_model.get_topic_freq()
     freq_df = freq_df.loc[freq_df.Topic != -1, :]
     if topics is not None:
@@ -312,12 +312,19 @@ def visualize_topics_over_time_(topic_model,
 
     # Add traces
     fig = go.Figure()
+    norm_freqs = pd.DataFrame({"Topic": [], "Norm freq": [], "Timestamp": []})
     for index, topic in enumerate(data.Topic.unique()):
         trace_data = data.loc[data.Topic == topic, :]
         topic_name = trace_data.Name.values[0]
         words = trace_data.Words.values
         if normalize_frequency:
             y = normalize(trace_data.Frequency.values.reshape(1, -1))[0]
+            y_df = pd.DataFrame({
+                "Topic": [topic] * len(y),
+                "Norm freq": y,
+                "Timestamp": trace_data.Timestamp
+            })
+            norm_freqs = pd.concat([norm_freqs, y_df], ignore_index=True)
         else:
             y = trace_data.Frequency
         marker_color = colors[index % 7]
@@ -376,4 +383,4 @@ def visualize_topics_over_time_(topic_model,
             title="<b>Onderwerpen",
         )
     )
-    return fig
+    return fig, norm_freqs

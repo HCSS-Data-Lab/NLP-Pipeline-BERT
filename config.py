@@ -4,10 +4,10 @@ LOAD_EMBEDDINGS_FROM_FILE = True
 LOAD_REDUCED_EMBEDDINGS_FROM_FILE = True
 LOAD_TOPIC_MODEL_FROM_FILE = False
 LOAD_MODEL_EMBEDDINGS_FROM_FILE = True
-LOAD_TOPICS_OVER_TIME_FROM_FILE = False
+LOAD_TOPICS_OVER_TIME_FROM_FILE = True
 
 clean_parameters = {
-    'clean_text': True,  # Bool indicator whether to apply text cleaning
+    'clean_text': False,  # Bool indicator whether to apply text cleaning
     # 'pattern': "\[\[|\]\]|ParlaMint.+?\s",  # Regex pattern for ParlaMint data: remove brackets and datestamp starting with ParlaMint (USED for first iteration)
     'pattern': r'\[\[.*?\]\]'  # Regex pattern for ParlaMint data: all text between brackets is removed (USED for paper)
 }
@@ -36,7 +36,7 @@ doc_selection_parameters = {
 }
 
 text_splitting_parameters = {
-    'split_size': 'sentence',  # Text split size: chunk, chunk_len, sentence or sentence-pairs
+    'split_size': 'sentence',  # Text split size: chunk, chunk_sentence, sentence or sentence-pairs
     'chunk_size': 512,  # Number of characters in chunk
 }
 
@@ -44,8 +44,8 @@ model_parameters = {
     'non_st_model': False,  # Non Sentence-Transformer model
     # 'emb_model': 'all-MiniLM-L6-v2',  # A: Default model for BERTopic
     # 'emb_model': 'multi-qa-MiniLM-L6-cos-v1',  # B: The best small performer with large sequence length (current in pipeline)
-    'emb_model': 'all-mpnet-base-v2',  # C: Current Sentence Transformer state-of-the-art
-    # 'emb_model': 'multi-qa-mpnet-base-dot-v1',  # Best Sentence Transformer with large sequence length (512)
+    # 'emb_model': 'all-mpnet-base-v2',  # C: Current Sentence Transformer state-of-the-art
+    'emb_model': 'multi-qa-mpnet-base-dot-v1',  # Best Sentence Transformer with large sequence length (512)
 
     # 'emb_model': 'BAAI/bge-m3',
 
@@ -69,7 +69,7 @@ tm_parameters = {
 ##################
 
 mmr_parameters = {
-    'diversity': 0.8,
+    'diversity': 0.5,
 }
 
 pos_parameters = {
@@ -114,6 +114,10 @@ ctfidf_parameters = {
     'reduce_frequent_words': True,
 }
 
+##################
+# Plotting parameters
+##################
+
 tm_plotting_parameters = {
     'n_total': 50,   # Total number of topics to show in the fig
     'sample': 1,    # Sample (fraction) of docs to show in plot
@@ -124,23 +128,29 @@ tm_plotting_parameters = {
 
 dtm_plotting_parameters = {
     'top_n_topics': 50,
-    'custom_labels': False,
+    'custom_labels': True,
     'normalize_frequency': True,
-    # 'topics': [1, 4, 5, 6, 7, 9, 11, 13, 14, 15],  # Topics to show
+    'topics': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],  # Topics to show
+    # 'title': "<b>Topic containing <i>Ukraine</i> over time</b>",
     # 'topics_background': [1, 4, 5, 9, 11, 13],  # Topics background
     # 'background_alpha': 0.2,
     # 'color_legend_opaque': False
 }
 
 rag_parameters = {
-    # RAG parameters
+    'RAG_from_file': False,
+    'summarize_labels': False,
+    'summarize_docs': False,
     'create_new_docs': False,
     'create_new_topics': False,
+
     'query_for_topic_labels': """Summarize these labels in one (sense-making) term that consists of
                             at MOST 4 words (captialize thre first letter of evey word, do NOT separate by comma):""",
-    'query_docs_label': 'Summarize this texts in at MOST 3 terms and at most 5 words (captialize the first letter of every word and separate by comma):',
-    'RAG_n_words_legend': 10,  # Number of noun frases to use to enhance the topic labels
+    'query_docs_label': 'Summarize this texts in at MOST 3 terms and at most 5 words '
+                        '(captialize the first letter of every word and separate by comma):',
+
     'LLM-model': "gpt-3.5-turbo",
+    'RAG_n_words_legend': 10,  # Number of noun frases to use to enhance the topic labels
     'temperature': 0.3,
-    'article_retrievement': 10
+    'article_retrievement': 10,
 }

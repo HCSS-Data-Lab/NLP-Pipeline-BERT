@@ -17,24 +17,21 @@ import time
 
 
 class RAG:
-    def __init__(self, embeddings, texts, RAG_from_file, path):
+    def __init__(self, embeddings, texts, path):
         """
         Create a RAG from the embeddings and texts that summarizes docs and enhances topic labels.
+
         Parameters:
             embeddings (np.array): Data Embeddings
             texts (list[str]): Original texts
-            RAG_from_file (bool): Create rag from file or not
             path (str): Path to store or retrieve RAG
 
         Attributes:
-            create_vector_store (None): Create the vectorindex based on embeddings and save it
-            summarize_labels (list[str]): Get the topic labels based on the topic words
-            summarize_docs (list[str]): Get summary labels of the docs
-
+            RAG_from_file (bool): load RAG from file or not
         """
         self.embeddings = embeddings
         self.texts = texts
-        self.RAG_from_file = RAG_from_file
+        self.RAG_from_file = config.rag_parameters["RAG_from_file"]
         self.path = path
 
     def create_vector_store_index(self, topics):

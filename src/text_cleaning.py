@@ -22,7 +22,7 @@ class TextCleaning:
         self.output_folder = os.path.join(self.input_folder, year, "text_bodies")  # Saving cleaned texts in folder text_bodies
         os.makedirs(self.output_folder, exist_ok=True)
 
-        self.regex = config.clean_parameters[f"regex_{self.dataset_name}"]
+        self.regex = config.clean_parameters["pattern"]
 
     def read_clean_raw_texts(self):
         """

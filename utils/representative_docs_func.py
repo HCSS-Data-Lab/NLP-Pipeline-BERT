@@ -5,7 +5,6 @@ import numpy as np
 from bertopic.representation._mmr import mmr
 from sklearn.metrics.pairwise import cosine_similarity
 
-
 def _get_representative_docs_(topic_model, documents: pd.DataFrame, nr_repr_docs: int = 3):
     """ Get the nr_repr_docs most representative docs per topic
 

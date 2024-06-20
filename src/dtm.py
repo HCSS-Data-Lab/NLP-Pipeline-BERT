@@ -1,27 +1,20 @@
 import os
-import numpy as np
 import time
 import pandas as pd
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
-import shutil
 from typing import List, Dict
-
-import config
-from utils.visualize_func import visualize_topics_over_time_
 
 def read_text_body(folder: str, name: str) -> str:
     with open(os.path.join(folder, name), encoding="utf-8") as file:
         text_body = file.read()
     return text_body
 
-
 def find_phrases(keywords):
     """
     Find phrases in keywords, ie keywords that consist of two terms, like 'law enforcement'; identified by space
     """
     return [kw for kw in keywords if " " in keywords]
-
 
 def preprocess_texts(texts, phrases):
     """
@@ -33,7 +26,6 @@ def preprocess_texts(texts, phrases):
             content = content.replace(phrase, phrase.replace(" ", "_"))
         preprocessed_texts[filename] = content
     return preprocessed_texts
-
 
 def compute_tf_idf_scores(texts, keywords):
     """
@@ -50,7 +42,6 @@ def compute_tf_idf_scores(texts, keywords):
     df_keywords_tfidf = df_tfidf.loc[:, df_tfidf.columns.intersection(adjusted_keywords)]
 
     return df_keywords_tfidf
-
 
 def aggregate_scores(tf_idf_scores):
     """
@@ -75,11 +66,10 @@ def extract_date(name: str):
 
 class DynamicTopicModeling:
 
-    def __init__(self, project_root, dataset_name, **kwargs):
+    def __init__(self, project_root, dataset_name):
         self.project_root = project_root
         self.dataset_name = dataset_name
         self.project_folder = os.path.join(self.project_root, "input", self.dataset_name)
-        self.topics_ot_from_file = config.LOAD_TOPICS_OVER_TIME_FROM_FILE
 
     def get_time_stamps(self, texts: dict):
         """
@@ -164,30 +154,6 @@ class DynamicTopicModeling:
             topics_over_time.to_csv(os.path.join(output_folder, "models", "topics_over_time.csv"), index=False)
 
         return topics_over_time
-
-    def visualize_topics(self, topic_model, topics_over_time, output_folder, year_str, model_str, use_custom_labels=False, custom_vis_func=False):
-        print("Visualizing topics over time...")
-
-        if use_custom_labels:
-            custom_labels_df = pd.read_csv(os.path.join(output_folder, "models", "Topic_Descriptions.csv"))
-            custom_labels = custom_labels_df["Topic Name"].to_list()
-            topic_model.set_topic_labels(custom_labels)
-
-        if custom_vis_func:
-            fig = visualize_topics_over_time_(topic_model,
-                                              topics_over_time,
-                                              **config.dtm_plotting_parameters)
-        else:
-            fig = topic_model.visualize_topics_over_time(topics_over_time,
-                                                         **config.dtm_plotting_parameters)
-
-        out_path = os.path.join(output_folder, "figures", f"topics_over_time_{model_str}_{year_str}.html")
-        if os.path.exists(out_path):
-            fig.write_html(os.path.join(output_folder, "figures", f"test_topics_over_time_{model_str}_{year_str}.html"))
-        else:
-            fig.write_html(out_path)
-
-
 
 
 

@@ -8,11 +8,12 @@ from nltk.tokenize import sent_tokenize
 
 import config
 from src.init_folders import InitFolders
-from src.embeddings_pp import EmbeddingsPreProcess
+from src.embeddings_preprocess import EmbeddingsPreprocess
 from src.tm import TopicModeling
 from src.dtm import DynamicTopicModeling
 from src.RAG import RAG
-from src.plotting import Plotting
+from src.tm_plotting import Plotting
+from src.dtm_plotting import DtmPlotting
 from utils.representative_docs_func import _get_representative_docs_
 
 def collect_debates(path):
@@ -252,7 +253,7 @@ if __name__ == '__main__':
 
     # CLEANING, thematic speech selection, making sentences
     keyword_str = "defense_defence_iter3"
-    clean_sentences_from_file = True
+    clean_sentences_from_file = False
     if clean_sentences_from_file:
         print("Reading clean sentences from file...")
         with open(os.path.join(country_folder, year_str, f'cleaned_sentences_{country}_{keyword_str}'), 'r') as file:
@@ -320,7 +321,7 @@ if __name__ == '__main__':
 
     # Initialize embeddings and reduced embeddings
     emb_path = init_folders.get_emb_path()
-    embeddings_pp = EmbeddingsPreProcess(emb_path)
+    embeddings_pp = EmbeddingsPreprocess(emb_path)
     embeddings = embeddings_pp.get_embeddings(texts)
     reduced_embeddings = embeddings_pp.get_red_embeddings(embeddings)
 
@@ -347,18 +348,13 @@ if __name__ == '__main__':
         num_texts = len(texts)
 
         # Initiate RAG, enhance topic labels based on RAG and summarize docs
-        RAG_from_file = False
-        summarize_labels = False
-        summarize_docs = False
         rag_path = init_folders.get_rag_path()
-        rag = RAG(embeddings, texts, RAG_from_file, path=rag_path)
+        rag = RAG(embeddings, texts, path=rag_path)
 
         plotting = Plotting(topic_model=topic_model,
                             model_name=model_name,
                             docs=texts,
                             reduced_embeddings=reduced_embeddings,
-                            summarize_labels=summarize_labels,
-                            summarize_docs=summarize_docs,
                             rag=rag,
                             folder=os.path.join(output_folder, "figures"),
                             year=year_str)
@@ -386,8 +382,10 @@ if __name__ == '__main__':
 
         # Visualize topics over time
         model_str = tm.get_model_str()
-        dtm.visualize_topics(topic_model=topic_model,
-                             topics_over_time=topics_over_time,
-                             output_folder=output_folder,
-                             year_str=year_str,
-                             model_str=model_str)
+        dtm_plotting = DtmPlotting()
+        dtm_plotting.visualize_topics(topic_model=topic_model,
+                                      topics_over_time=topics_over_time,
+                                      output_folder=output_folder,
+                                      year_str=year_str,
+                                      model_str=model_str,
+                                      custom_vis_func=True)

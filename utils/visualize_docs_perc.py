@@ -97,4 +97,3 @@ if __name__ == "__main__":
 
     print(text_bin_counts)
     print(all_text_bin_counts)
-

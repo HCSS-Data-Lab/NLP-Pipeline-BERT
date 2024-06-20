@@ -89,11 +89,11 @@ def filter_texts(texts):
         lemmas.append(" ".join(filtered_lemmas))
     return lemmas
 
-class TextPreProcess:
+class TextPreprocess:
 
     def __init__(self, text_bodies_path, splits_path):
         """
-        Class TextPreProcess stores the variables needed in text preprocessing: splits from file,
+        Class TextPreprocess stores the variables needed in text preprocessing: splits from file,
         text-bodies path, split-texts path, text clean method and text split size. It also handles
         all functionality of text preprocessing: loading split texts from file or reading text bodies
         and splitting texts at runtime.
@@ -215,9 +215,9 @@ class TextPreProcess:
         """
         if self.split_size == "chunk":
             splits = self.chunk_texts(texts)
-        elif self.split_size == "chunk_len":
+        elif self.split_size == "chunk_sentence":
             text_sentences = sentencize_text(texts)
-            splits = self.chunk_sents_len(text_sentences)
+            splits = self.chunk_sents(text_sentences)
         elif self.split_size == "sentence":
             splits = sentencize_text(texts)
         elif self.split_size == "sentence-pairs":
@@ -248,7 +248,7 @@ class TextPreProcess:
             chunks_out.extend(chunks)
         return chunks_out
 
-    def chunk_sents_len(self, text_sentences: dict):
+    def chunk_sents(self, text_sentences: dict):
         """
         Chunk sentences together in chunks of at most chunk_size length
 

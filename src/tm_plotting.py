@@ -26,11 +26,10 @@ def get_num_docs_topic(hover_labels):
     """
     return len(hover_labels) - hover_labels.count("")
 
-
 class Plotting:
 
     def __init__(self, topic_model, model_name, docs, reduced_embeddings=None, folder="", merged=False,
-                 plot_non_docs=False, summarize_labels=False, summarize_docs=False, rag=None, year=None):
+                 plot_non_docs=False, rag=None, year=None):
         # Parameters
         self.topic_model = topic_model
         self.red_emb = reduced_embeddings
@@ -39,13 +38,15 @@ class Plotting:
         self.num_docs = len(docs)
         self.folder = folder
         self.merged = merged
-        self.summarize_labels = summarize_labels
-        self.summarize_docs = summarize_docs
         self.RAG = rag
 
         # Variables from topic-model object
         self.topics = self.get_topics()
         self.num_topics = self.get_num_topics()
+
+        # RAG parameters
+        self.summarize_labels = config.rag_parameters["summarize_labels"]
+        self.summarize_docs = config.rag_parameters["summarize_docs"]
 
         # Plotting parameters
         self.n_total = config.tm_plotting_parameters["n_total"]
@@ -87,6 +88,8 @@ class Plotting:
         num_docs_topic = get_num_docs_topic(hover_labels)
         self.print_num_docs(num_docs_topic)
         plot_embeddings = self.make_plot_embeddings()
+
+        print("Dimensions of plot embeddings: ", plot_embeddings.shape)
 
         fig = visualize_documents_(topic_model=self.topic_model,
                                    docs=hover_labels,
@@ -177,15 +180,15 @@ class Plotting:
         the docs that belong to the outlier topic.
 
         Returns:
-            plot_embeddings (np.array): 2d data points to plot
+            plot_embeddings (np.array): embeddings to use for plotting
         """
-        if not self.plot_non_docs:
+        if self.plot_non_docs:
+            plot_embeddings = self.red_emb
+        else:
             plot_embeddings = self.red_emb.copy()
             topics = self.get_topics()
             plot_embeddings[
                 (topics == -1) | (topics >= self.n_total)] = 0  # Set embedding to 0 when id=-1 or id >= n_total
-        else:
-            plot_embeddings = self.red_emb
         return plot_embeddings
 
     def get_topics(self):

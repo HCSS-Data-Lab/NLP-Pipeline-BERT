@@ -34,7 +34,7 @@ The `requirements.txt` is up to date.
   - `project_root`: which should be the folder `NLP-Pipeline-BERT`. The `project_root` should contain a folder `input` with a dataset name folder, for instance `ParlaMint`, with, in turn, a folder `text_bodies` with input files in `.txt` format.
   - `dataset_name`: the dataset name, should correspond to a folder name in the `input` folder.
   - `task`: task can be `tm` (topic modeling) or `dtm` (dynamic topic modeling).
-  - `years`: years should be a list of str years, like `[''2015']`. If `task=tm`, years can contain only a single year.
+  - `years`: years should be a list of str years, like `['2015']`. If `task=tm`, years can contain only a single year.
 - Specify parameters in `config.py`:
   - `clean_parameters`: set `clean_text` to `True` and define a regex in `regex_[dataset_name]` to use for cleaning.
   - `translate_param`: set `translate` to `True` to translate texts from `source_lang` to `target_lang`.
@@ -93,14 +93,14 @@ The project folder is structured as follows:
 ├── src
     ├── doc_selection.py
     ├── dtm.py
-    ├── embeddings_pp.py
+    ├── embeddings_preprocess.py
     ├── evaluation.py
     ├── init_folders.py
     ├── merge.py
     ├── plotting.py
     ├── RAG.py   
     ├── text_cleaning.py
-    ├── texts_pp.py
+    ├── texts_preprocess.py
     ├── tm.py
     └── translate.py
 │                                      

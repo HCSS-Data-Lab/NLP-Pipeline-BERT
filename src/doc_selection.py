@@ -49,10 +49,10 @@ def aggregate_scores(tf_idf_scores):
     Aggregates TF-IDF scores by summing them up for each document.
 
     Parameters:
-    - tf_idf_scores: DataFrame containing the TF-IDF scores for specified keywords across documents.
+        tf_idf_scores: DataFrame containing the TF-IDF scores for specified keywords across documents.
 
     Returns:
-    A Series with the sum of TF-IDF scores for each document.
+        A Series with the sum of TF-IDF scores for each document.
     """
     # Summing up the TF-IDF scores for each document
     aggregated_scores = tf_idf_scores.sum(axis=1)
