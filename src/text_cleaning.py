@@ -44,6 +44,7 @@ class TextCleaning:
             else:
                 self.read_clean_raw_texts_year(year, save_to_folder)
         else:
+            print('hi') 
             # Do the same but without year
             pass
 

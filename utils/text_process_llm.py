@@ -3,6 +3,7 @@ import asyncio
 import os
 import pickle 
 import config
+import pandas as pd
 
 def get_summary_sampled_docs(docs: List[str], indices: List[int], RAG):
     """
@@ -46,18 +47,20 @@ def get_summary_labels(words_legend: List[str], RAG):
     """
     print('Getting topic labels from RAG...')
     labels_path = os.path.join(RAG.path, "labels")
-    if os.path.exists(labels_path+'/topic_labels.pkl') and config.LOAD_GENAI_TOPIC_LABELS==True:
+    if os.path.exists(labels_path+'/topic_labels'config.plotting_parameters['n_total']+'.pkl') and config.LOAD_GENAI_TOPIC_LABELS==True:
         print(f'Reloading stored topic labels of {len(words_legend)} labels...')
         with open(labels_path+'/topic_labels.pkl', 'rb') as file:
             words_legend = pickle.load(file)
+            print(len(words_legend))
     else:
         print(f"Getting topic labels from RAG synchronously of {len(words_legend[:config.plotting_parameters['n_total']])} texts...")
-        summarized_topics = RAG.summarize_words(words_legend[:config.plotting_parameters['n_total']])
-        #summarized_topics = [item.split(', ') for item in summarized_topics]
-        words_legend = [summarized_topics[i] if i < config.parameters['n_total'] else words_legend[i] for i in range(len(words_legend))]
-    
+        summarized_topics = RAG.summarize_words(words_legend[:config.plotting_parameters['n_total']+1])
+        #summarized_topics = RAG.summarize_words(words_legend)
+        words_legend = [summarized_topics[i] if i < config.plotting_parameters['n_total']+1 else words_legend[i] for i in range(len(words_legend))]
+        #words_legend = [summarized_topics[i] for i in range(len(words_legend))]
+        
     #Save the summarized docs
-    with open(labels_path+'/topic_labels.pkl', 'wb') as file:
+    with open(labels_path+'/topic_labels'+config.plotting_parameters['n_total']+'.pkl', 'wb') as file:
         pickle.dump(words_legend, file)
 
     return words_legend

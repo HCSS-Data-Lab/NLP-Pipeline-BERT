@@ -70,7 +70,6 @@ class RAG():
         responses = [] 
         for topic_word in topics:
             response = query_engine.query(config.rag_parameters["query_for_topic_labels"]+':'.join(topic_word))
-            print(response.response)
             responses.append(response.response)    
         return responses
 

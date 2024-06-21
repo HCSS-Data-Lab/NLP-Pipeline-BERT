@@ -1,6 +1,6 @@
 import numpy as np
 import os
-
+import pandas as pd 
 from utils.visualize_func import get_sample_indices
 from utils.visualize_func import visualize_documents_
 from utils.text_process_llm import get_summary_sampled_docs
@@ -28,7 +28,7 @@ def get_num_docs_topic(hover_labels):
 
 class Plotting:
 
-    def __init__(self, topic_model, reduced_embeddings, model_name, docs, folder="", save_html=True, merged=False, plot_non_docs=False, rag=None):
+    def __init__(self, topic_model, reduced_embeddings, model_name, docs, folder="", save_html=True, save_labels=True, merged=False, plot_non_docs=False, rag=None):
         # Parameters
         self.topic_model = topic_model
         self.red_emb = reduced_embeddings
@@ -37,6 +37,7 @@ class Plotting:
         self.num_docs = len(docs)
         self.folder = folder
         self.save_html = save_html
+        self.save_labels = save_labels
         self.merged = merged
         self.summarize_labels = config.GENAI_TOPIC_LABELS
         self.summarize_docs = config.GENAI_DOC_LABELS
@@ -71,7 +72,6 @@ class Plotting:
             size_legend_labels = self.complement_enhanced_labels_with_size(legend_labels)
             self.topic_model.set_topic_labels(size_legend_labels)
         else:
-            print('hoi')
             words_legend = self.top_n_words(n_topics=self.num_topics, n_words=self.n_words_legend)
             legend_labels = self.make_legend_labels(words_legend)
 
@@ -101,6 +101,25 @@ class Plotting:
         if self.save_html:
             file_name = self.get_param_str()
             fig.write_html(os.path.join(self.folder, file_name))
+
+        if self.save_labels:
+            words_hover = self.top_n_words(n_topics=self.num_topics, n_words=self.n_words_hover)
+            hover_labels_text = [" | ".join(w) for w in words_hover]
+            hover_labels_text = first_at_end(hover_labels_text)  # Add first element 'the|of|and..' to and of list; its topics id=-1, so the elements can be indexed by topic id
+            counts = self.topic_model.topic_sizes_  # Count or size of all topics
+            size_non_topic = counts[-1]  # The non-topic is indexed at -1
+            total = self.num_docs - size_non_topic 
+            print('total',total)
+            print(counts)
+            counts = [counts[i] / total*100 for i, count in enumerate(hover_labels_text)]
+            words_legend = [words for i, words in enumerate(hover_labels_text)]
+            #topics = self.get_topics()
+            #counts = [counts[t] if t != -1 else "" for t in topics]  # For index=-1, hover_label is "" because outlier docs are not plotted
+            print(words_legend, counts, legend_labels)
+            df = pd.DataFrame(data=[words_legend, counts, legend_labels[1:]]).T
+            df.columns = ['Topics', '%', 'RAG Terminologie']
+            df.index = range(1, len(df) + 1)
+            df.to_csv(os.path.join(self.folder, 'labels.csv'), index=True)  
 
     def sample_docs_by_topic(self, sample_fraction=0.1):
         """
@@ -193,7 +212,8 @@ class Plotting:
         counts = self.topic_model.topic_sizes_  # Count or size of all topics
         size_non_topic = counts[-1]  # The non-topic is indexed at -1
         total = self.num_docs - size_non_topic  # Total is the total number of classified documents, so subtract size of non-topic docs
-        enhanced_labels = [words+ f" ({counts[i] / total * 100:.2f}%)" for i, words in enumerate(labels)]  # Combining words and topic size in single str
+        labels = [''.join(sublist) for sublist in labels]
+        enhanced_labels = [words+ f" ({counts[i-1] / total * 100:.2f}%)" for i, words in enumerate(labels)]  # Combining words and topic size in single str
         return enhanced_labels
 
     def make_plot_embeddings(self):
@@ -250,12 +270,12 @@ class Plotting:
 
     def get_fig_title(self):
         # OLD TITLE
-        self.fig_title = "<b>Netherlands Security Threat Monitor</b><br><sub>Document clusters from foresight reports</sub>"
+        self.fig_title = ""
         return self.fig_title
         # if self.merged:
         #     return f"(merged)\n{self.model_name}_sam{config.plotting_parameters['sample']}"
         # else:
         #     return f"(unmerged)\n{self.model_name}_sam{config.plotting_parameters['sample']}"
-        
+    
     def get_sample_docs(self):
         pass

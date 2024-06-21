@@ -52,6 +52,7 @@ class Analysis:
         self.chunk_size = config.texts_parameters["chunk_size"]
 
         self.bert_model = config.model_parameters["bert_model"]
+        self.nr_topics = config.bertopic_parameters["nr_topics"]
         self.bert_model_str = self.bert_model.split("/")[-1]
         self.use_mmr = config.bertopic_parameters["use_mmr"]
         self.use_pos = config.bertopic_parameters["use_pos"]
@@ -149,7 +150,8 @@ class Analysis:
         topic_model = BERTopic(vectorizer_model=vectorizer_model,
                                embedding_model=self.bert_model,
                                representation_model=representation_model,
-                               umap_model=umap_model)
+                               umap_model=umap_model,
+                               nr_topics = self.nr_topics)
         return topic_model
 
     def train_topic_model(self, topic_model, data):

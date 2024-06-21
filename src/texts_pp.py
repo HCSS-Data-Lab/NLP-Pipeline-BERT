@@ -1,11 +1,10 @@
 import os
 from typing import List
-
+from nltk.tokenize import word_tokenize
 from tqdm import tqdm
 import spacy
 import pickle
 import re
-
 import config
 
 def make_chunks(text, max_length):
@@ -26,6 +25,25 @@ def make_chunks(text, max_length):
         text = text[max_length:]
     return chunks
 
+def make_chunks_token(text, max_length):
+    """
+    Chunk individual text to pieces of max length
+
+    Args:
+        text (str)
+        max_length (int)
+
+    Returns:
+        chunks (list[str]): text in chunks
+    """
+    chunks = []
+    tokenized_sentence = word_tokenize(text) 
+    while tokenized_sentence:
+        chunk = " ".join(tokenized_sentence[:max_length])
+        chunks.append(chunk)
+        tokenized_sentence = tokenized_sentence[max_length:]
+    return chunks
+
 def truncate_sentences(sentences: List[str], max_len: int = 512) -> List[str]:
     """
     Truncate sentences to max length
@@ -34,6 +52,15 @@ def truncate_sentences(sentences: List[str], max_len: int = 512) -> List[str]:
         List[str]: truncated sentences
     """
     return [i for s in sentences for i in make_chunks(s, max_len)]
+
+def truncate_sentences_token(sentences: List[str], max_len: int = 512) -> List[str]:
+    """
+    Truncate sentences to max length
+
+    Returns:
+        List[str]: truncated sentences
+    """
+    return [i for s in sentences for i in make_chunks_token(s, max_len)]
 
 def sentencize_text(texts):
     """
@@ -215,12 +242,16 @@ class TextPreProcess:
             splits = self.chunk_texts(texts)
         elif self.split_size == "chunk_len":
             text_sentences = sentencize_text(texts)
+            print(text_sentences)
             splits = self.chunk_sents_len(text_sentences)
         elif self.split_size == "sentence":
             splits = sentencize_text(texts)
         elif self.split_size == "sentence-pairs":
             text_sentences = sentencize_text(texts)
             splits = pair_sentences(text_sentences)
+        elif self.split_size == "tokenize":
+            text_sentences = sentencize_text(texts)
+            splits = self.chunk_sents_len_on_tokens(text_sentences)
         else:
             raise ValueError(
                 f"split_size: {self.split_size} is undefined. Valid options are 'chunk', 'sentence', or 'sentence-pairs'.")
@@ -257,9 +288,31 @@ class TextPreProcess:
             chunks (List[List[str]]): sentence chunks
         """
         chunks = []
+        text_sentences = text_sentences[:5]
         for sentences in text_sentences:
+            print(sentences)
             trunc_sentences = truncate_sentences(sentences, self.chunk_size)
             lens = [len(s) for s in trunc_sentences]  # Sentence lengths
+            sent_indices = self.get_sent_chunk_inds(lens)  # Sentence indices to chunk together
+            chunks_text = [". ".join([trunc_sentences[i] for i in inds]) for inds in sent_indices]  # Make chunks from the sentence indices
+            chunks.extend(chunks_text)
+        return chunks
+
+    def chunk_sents_len_on_tokens(self, text_sentences: List[List[str]]):
+        """
+        Chunk sentences together in chunks of at most max_len length tokens
+
+        Args:
+            text_sentences: sentences, which is the text split on "."
+
+        Returns:
+            chunks (List[List[str]]): sentence chunks
+        """
+        chunks = []
+        for sentences in text_sentences:
+            trunc_sentences = truncate_sentences_token(sentences, self.chunk_size)
+            trunc_sentences_token = [word_tokenize(t) for t in trunc_sentences] 
+            lens = [len(s) for s in trunc_sentences_token]  # Sentence based on tuncated sentences
             sent_indices = self.get_sent_chunk_inds(lens)  # Sentence indices to chunk together
             chunks_text = [". ".join([trunc_sentences[i] for i in inds]) for inds in sent_indices]  # Make chunks from the sentence indices
             chunks.extend(chunks_text)
