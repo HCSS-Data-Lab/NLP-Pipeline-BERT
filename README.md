@@ -99,6 +99,7 @@ The project folder is structured as follows:
     ├── merge.py
     ├── plotting.py
     ├── RAG.py   
+    ├── speech_preprocess.py
     ├── text_cleaning.py
     ├── texts_preprocess.py
     ├── tm.py
