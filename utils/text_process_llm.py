@@ -28,7 +28,7 @@ def get_summary_sampled_docs(docs: List[str], indices: List[int], RAG):
                 docs[idx] = summary
 
 
-    #Save the summarized docs
+    # Save the summarized docs
     with open(labels_path+'/doc_labels.pkl', 'wb') as file:
         pickle.dump(docs, file)
 

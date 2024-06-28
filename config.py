@@ -1,10 +1,14 @@
 # BOOL variables whether to load data objects from file or not
 LOAD_TEXT_SPLITS_FROM_FILE = False
-LOAD_EMBEDDINGS_FROM_FILE = True
-LOAD_REDUCED_EMBEDDINGS_FROM_FILE = True
+LOAD_EMBEDDINGS_FROM_FILE = False
+LOAD_REDUCED_EMBEDDINGS_FROM_FILE = False
 LOAD_TOPIC_MODEL_FROM_FILE = False
 LOAD_MODEL_EMBEDDINGS_FROM_FILE = True
-LOAD_TOPICS_OVER_TIME_FROM_FILE = True
+LOAD_TOPICS_OVER_TIME_FROM_FILE = False
+
+############################
+# General parameters
+############################
 
 clean_parameters = {
     'clean_text': False,  # Bool indicator whether to apply text cleaning
@@ -35,8 +39,19 @@ doc_selection_parameters = {
     'sample_size': 0.5  # Sample size is used for randomly sampling documents
 }
 
+speech_preprocessing_parameters = {
+    'sentencize_speeches': False,
+
+    'copy_raw_texts': False,
+    'clean_sentences_from_file': True,
+    'clean_speech_from_file': True,
+    'clean_common_sentences': True,
+
+    'limit': None  # Set this to an integer (say 10) to test the code for 10 speeches; None if all speeches
+}
+
 text_splitting_parameters = {
-    'split_size': 'sentence',  # Text split size: chunk, chunk_sentence, sentence or sentence-pairs
+    'split_size': 'chunk_sentence',  # Text split size: chunk, chunk_sentence, sentence or sentence-pairs
     'chunk_size': 512,  # Number of characters in chunk
 }
 
@@ -45,12 +60,8 @@ model_parameters = {
     # 'emb_model': 'all-MiniLM-L6-v2',  # A: Default model for BERTopic
     # 'emb_model': 'multi-qa-MiniLM-L6-cos-v1',  # B: The best small performer with large sequence length (current in pipeline)
     # 'emb_model': 'all-mpnet-base-v2',  # C: Current Sentence Transformer state-of-the-art
-    'emb_model': 'multi-qa-mpnet-base-dot-v1',  # Best Sentence Transformer with large sequence length (512)
 
-    # 'emb_model': 'BAAI/bge-m3',
-
-    # 'emb_model': 'nl_core_news_sm',
-    # 'spacy_exclude': ['tagger', 'parser', 'ner', 'attribute_ruler', 'lemmatizer'],
+    'emb_model': 'multi-qa-mpnet-base-dot-v1',  # Best Sentence Transformer with large sequence length (512 tokens)
 }
 
 # Topic modeling parameters
@@ -64,9 +75,9 @@ tm_parameters = {
     'update_topics': False,
 }
 
-##################
+############################
 # Separate parameter dictionaries for function call in tm.py
-##################
+############################
 
 mmr_parameters = {
     'diversity': 0.5,
@@ -114,9 +125,21 @@ ctfidf_parameters = {
     'reduce_frequent_words': True,
 }
 
-##################
+############################
+# Saving topic output parameters
+############################
+
+topic_output_parameters = {
+    'save_topic_words': False,
+
+    'get_represent_sents': False,
+    'num_docs': 6,
+    'topics': [1, 2, 3, 4, 5, 6],
+}
+
+############################
 # Plotting parameters
-##################
+############################
 
 tm_plotting_parameters = {
     'n_total': 50,   # Total number of topics to show in the fig

@@ -26,7 +26,7 @@ def get_num_docs_topic(hover_labels):
     """
     return len(hover_labels) - hover_labels.count("")
 
-class Plotting:
+class TmPlotting:
 
     def __init__(self, topic_model, model_name, docs, reduced_embeddings=None, folder="", merged=False,
                  plot_non_docs=False, rag=None, year=None):

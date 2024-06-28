@@ -166,7 +166,7 @@ class TopicModeling:
 
     def finetune_topic_model(self, topic_model, data):
         """
-        Fine-tune topic-model object on data, either pre-trained text embeddings or text data
+        Fine-tune or train topic-model object on data, either pre-trained text embeddings or text data
 
         Args:
             topic_model (BERTopic): topic-model object, untrained
