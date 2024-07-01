@@ -22,9 +22,6 @@ webapp/
 __pycache__/*
 __pycache__
 *.env
-<<<<<<< HEAD
-*store.json
-=======
 test.py
 example.py
->>>>>>> parent of f43a2f8 (Merge remote-tracking branch 'origin/Development_Arne')
+*store.json
