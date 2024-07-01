@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from scipy.spatial import ConvexHull
-from sklearn.preprocessing import normalize
+import config
 
 from umap import UMAP
 from typing import List, Union
@@ -24,12 +24,9 @@ def add_convex_hulls(fig, topic_per_doc, embeddings_2d, topic_range):
                                     opacity=0.1, line=dict(color='darkblue')))
     return fig
 
-def get_sample_indices(topic_model, num_topics_in_fig, sample=1.0):
-    """
-    Get sample indices for the topics (eg top 50) shown in figure
-    If sample=1, all indices for each topic are automatically sampled
-    """
+def get_sample_indices(topic_model, sample=1.0):
     np.random.seed(0)
+    num_topics_in_fig = config.plotting_parameters["n_total"]
     topic_per_doc = topic_model.topics_
     sample_indices = []
     for topic in list(set(topic_per_doc))[:num_topics_in_fig]:
@@ -41,7 +38,7 @@ def get_sample_indices(topic_model, num_topics_in_fig, sample=1.0):
 
 def visualize_documents_(topic_model,
                          docs: List[str],
-                         indices: List[int] = None,  # Added indices as parameter here
+                         indices: List[int] = None,  # Added parameter indices
                          topics: List[int] = None,
                          embeddings: np.ndarray = None,
                          reduced_embeddings: np.ndarray = None,
@@ -56,7 +53,7 @@ def visualize_documents_(topic_model,
     THIS IS THE MODIFIED FUNCTION from the BERTopic module in Python,
     such that the sampled indices are returned.
 
-    Visualize documents and their topics in 2D
+    0Visualize documents and their topics in 2D
 
     Arguments:
         topic_model: A fitted BERTopic instance.
@@ -257,7 +254,7 @@ def visualize_documents_(topic_model,
                 size=22,
                 color="Black")
         },
-        legend_title_text='Topics and topic size (% of all clustered texts)',  # Add this line
+        legend_title_text="Topics & topic size (% of all clustered texts)", 
         width=width,
         height=height
     )
@@ -271,116 +268,3 @@ def visualize_documents_(topic_model,
     # fig = add_convex_hulls(fig, tpds_arr, embeddings_2d, topics)  # Add convex hulls to figure
 
     return fig
-
-def visualize_topics_over_time_(topic_model,
-                                topics_over_time: pd.DataFrame,
-                                top_n_topics: int = None,
-                                topics: List[int] = None,
-                                normalize_frequency: bool = False,
-                                custom_labels: Union[bool, str] = False,
-                                title: str = "<b>Topics over Time</b>",
-                                width: int = 1250,
-                                height: int = 450,
-                                topics_background: List[int] = [],
-                                background_alpha: float = 1.0,
-                                color_legend_opaque: bool = True):  # Added topics_background parameter
-    colors = ["#E69F00", "#56B4E9", "#009E73", "#F0E442", "#D55E00", "#0072B2", "#CC79A7"]
-    # Select topics based on top_n and topics args
-
-    freq_df = topic_model.get_topic_freq()
-    freq_df = freq_df.loc[freq_df.Topic != -1, :]
-    if topics is not None:
-        selected_topics = list(topics)
-    elif top_n_topics is not None:
-        selected_topics = sorted(freq_df.Topic.to_list()[:top_n_topics])
-    else:
-        selected_topics = sorted(freq_df.Topic.to_list())
-
-    # Prepare data
-    if isinstance(custom_labels, str):
-        topic_names = [[[str(topic), None]] + topic_model.topic_aspects_[custom_labels][topic] for topic in topics]
-        topic_names = ["_".join([label[0] for label in labels[:4]]) for labels in topic_names]
-        topic_names = [label if len(label) < 30 else label[:27] + "..." for label in topic_names]
-        topic_names = {key: topic_names[index] for index, key in enumerate(topic_model.topic_labels_.keys())}
-    elif topic_model.custom_labels_ is not None and custom_labels:
-        topic_names = {key: topic_model.custom_labels_[key + topic_model._outliers] for key, _ in topic_model.topic_labels_.items()}
-    else:
-        topic_names = {key: value[:40] + "..." if len(value) > 40 else value
-                       for key, value in topic_model.topic_labels_.items()}
-    topics_over_time["Name"] = topics_over_time.Topic.map(topic_names)
-    data = topics_over_time.loc[topics_over_time.Topic.isin(selected_topics), :].sort_values(["Topic", "Timestamp"])
-
-    # Add traces
-    fig = go.Figure()
-    norm_freqs = pd.DataFrame({"Topic": [], "Norm freq": [], "Timestamp": []})
-    for index, topic in enumerate(data.Topic.unique()):
-        trace_data = data.loc[data.Topic == topic, :]
-        topic_name = trace_data.Name.values[0]
-        words = trace_data.Words.values
-        if normalize_frequency:
-            y = normalize(trace_data.Frequency.values.reshape(1, -1))[0]
-            y_df = pd.DataFrame({
-                "Topic": [topic] * len(y),
-                "Norm freq": y,
-                "Timestamp": trace_data.Timestamp
-            })
-            norm_freqs = pd.concat([norm_freqs, y_df], ignore_index=True)
-        else:
-            y = trace_data.Frequency
-        marker_color = colors[index % 7]
-        alpha = background_alpha if topic in topics_background else 1  # Conditional opacity based on whether the topic is in topics_background
-
-        if color_legend_opaque:
-            fig.add_trace(go.Scatter(x=trace_data.Timestamp, y=y,
-                                     mode='lines',
-                                     marker_color=marker_color,
-                                     opacity=alpha,  # Set opacity here
-                                     hoverinfo="text",
-                                     name=topic_name,
-                                     hovertext=[f'<b>Topic {topic}</b><br>Words: {word}' for word in words]))
-        else:
-            # Actual plot line
-            fig.add_trace(go.Scatter(x=trace_data.Timestamp, y=y,
-                                     mode='lines',
-                                     marker_color=marker_color,
-                                     opacity=alpha,
-                                     hoverinfo="text",
-                                     hovertext=[f'<b>Topic {topic}</b><br>Words: {word}' for word in words],
-                                     showlegend=False))  # Disable legend for actual lines
-
-            # Invisible line for the legend (always full opacity)
-            fig.add_trace(go.Scatter(x=[None], y=[None],  # No actual data
-                                     mode='lines',
-                                     marker_color=marker_color,
-                                     name=topic_name,
-                                     opacity=1))  # Full opacity
-
-    # Styling of the visualization
-    fig.update_xaxes(showgrid=True)
-    fig.update_yaxes(showgrid=True)
-    fig.update_layout(
-        yaxis_title="Frequentie (norm.)" if normalize_frequency else "Frequency",
-        xaxis_title="Jaren",
-        title={
-            'text': f"{title}<br><sub>Nederlandse parlementaire debatten</sub>",
-            'y': .95,
-            'x': 0.40,
-            'xanchor': 'center',
-            'yanchor': 'top',
-            'font': dict(
-                size=22,
-                color="Black")
-        },
-        template="simple_white",
-        width=width,
-        height=height,
-        hoverlabel=dict(
-            bgcolor="white",
-            font_size=16,
-            font_family="Rockwell"
-        ),
-        legend=dict(
-            title="<b>Onderwerpen",
-        )
-    )
-    return fig, norm_freqs

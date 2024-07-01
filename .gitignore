@@ -7,15 +7,24 @@
 *_def
 *_ft
 *_vect
-bertopic_model*
+<<<<<<< HEAD
+bertopic_model* 
+=======
+bertopic_model
+>>>>>>> parent of f43a2f8 (Merge remote-tracking branch 'origin/Development_Arne')
 !.gitignore
 !requirements.txt
 get-pip.py
 test.py
-*.txt
-*.tsv
-*.zip
+input/
+output/
 webapp/
 __pycache__/*
 __pycache__
 *.env
+<<<<<<< HEAD
+*store.json
+=======
+test.py
+example.py
+>>>>>>> parent of f43a2f8 (Merge remote-tracking branch 'origin/Development_Arne')

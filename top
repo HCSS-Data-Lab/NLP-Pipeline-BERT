@@ -1,0 +1,272 @@
+[33mcommit 13fe9d71f2b9d97d1150120136b646c7d82d8caf[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Maarten Vonk <maartencvonk@gmail.com>
+Date:   Fri Jun 28 16:44:13 2024 +0200
+
+    add gitignore
+
+[33mcommit d46de1c8e6fef2fc85d5c83fe3bf0898e9927414[m
+Author: Maarten Vonk <maartencvonk@gmail.com>
+Date:   Fri Jun 28 16:25:30 2024 +0200
+
+    remove large files
+
+[33mcommit a94ad609f992b15d355f3f670dea6a134459f2f9[m
+Author: Maarten Vonk <maartencvonk@gmail.com>
+Date:   Fri Jun 28 16:13:19 2024 +0200
+
+    Add store.json to gitignore
+
+[33mcommit f43a2f8ceb6cf1de5539a9db1bbcfd4571bba557[m
+Merge: 34789b3 51af9ea
+Author: Maarten Vonk <maartencvonk@gmail.com>
+Date:   Fri Jun 28 15:55:42 2024 +0200
+
+    Merge remote-tracking branch 'origin/Development_Arne'
+
+[33mcommit 51af9ead67e1ac26ce1c21267eba2e9f4881a75d[m[33m ([m[1;31morigin/Development_Arne[m[33m)[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Fri Jun 28 15:13:45 2024 +0200
+
+    Update README
+
+[33mcommit 1fedc57c0b21b75d68a25886698388fc836630b0[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Fri Jun 28 15:11:59 2024 +0200
+
+    Changed main2 to speech preprocess
+
+[33mcommit 34789b3053becbef46677fa2c06d6884a62adbcd[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Maarten Vonk <maartencvonk@gmail.com>
+Date:   Fri Jun 21 11:40:14 2024 +0200
+
+    Changes in chunk methods and topic sizes
+    
+    Chunk method more refined so we do not cut on the middle of sentences. Argument topic sizes included and output csv for monitor added.
+
+[33mcommit 4b842d9cb65774476df0bf9d414ac421c4c01375[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Thu Jun 20 10:54:12 2024 +0200
+
+    Updates
+
+[33mcommit b1afb5fdae27df4b6d548966cbe58da41421df29[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Fri Jun 14 16:51:37 2024 +0200
+
+    Update README
+
+[33mcommit 66509a2e2e91cdc6e2a7867c1e95111f61a53fd8[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Fri Jun 14 16:02:05 2024 +0200
+
+    Updates: main2 for paper, added documentation
+
+[33mcommit 6698f25e6359f340c3cdf2a4a612ecc5c0c14f0e[m
+Author: Maarten Vonk <maartencvonk@gmail.com>
+Date:   Mon Jun 3 12:55:28 2024 +0200
+
+    Chosen parameters for police NLP
+
+[33mcommit 4d60b73775f8db7558af10abde1037cce39a5ace[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Thu May 23 15:08:59 2024 +0200
+
+    add main2
+
+[33mcommit 1d6f1de338394b5275f40adac72dfc62f846d61b[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Thu May 23 14:58:26 2024 +0200
+
+    New main for paper
+
+[33mcommit 4d6689d106b6bf1224d51cf6c916573fb611700d[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Wed May 8 13:47:30 2024 +0200
+
+    Update README
+
+[33mcommit c711b0db7e48f98845035e7a64c228b760e826d2[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Wed May 8 13:46:07 2024 +0200
+
+    Add custom representative docs
+
+[33mcommit 3779e8dfc9b1aca426d3eb470db0313abaab57ea[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Tue May 7 14:58:06 2024 +0200
+
+    Update README
+
+[33mcommit 678b7a042f04e8ea9d641b274d02a7c084f81e4b[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Tue May 7 14:25:34 2024 +0200
+
+    Update README
+
+[33mcommit 3e13d2c3bef85f9c59ba45fd1b8d968202375629[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Tue May 7 14:24:09 2024 +0200
+
+    Update README
+
+[33mcommit a7bf8d34b84369a3e07fadaeff150e6ed776c05d[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Tue May 7 14:21:48 2024 +0200
+
+    Update README
+
+[33mcommit e647248dc824233e6f9e4443fdc1cc44b3ff27d2[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Tue May 7 13:55:46 2024 +0200
+
+    Update README
+
+[33mcommit 837848e53091bd433d7df09f6420b675ba413a96[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Tue May 7 13:18:27 2024 +0200
+
+    Clean code and fix setup
+
+[33mcommit b4957b0b75c7d75177dfdc60009bc0be4324cff9[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Wed Apr 24 09:36:52 2024 +0200
+
+    Added dtm plotting
+
+[33mcommit 7e5fa04803567446b40928bd262dce1a4d5f3518[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Tue Apr 16 10:05:48 2024 +0200
+
+    Reformat main
+
+[33mcommit f30e93a6dab3220c98fbd863cae4d612bc5d4e52[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Mon Apr 15 10:01:45 2024 +0200
+
+    Bug fix making timestamps
+
+[33mcommit 29018aedf656f7cfcab74d6fb7764891913b4cf9[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Mon Apr 15 09:32:12 2024 +0200
+
+    Add dynamic topic modeling
+
+[33mcommit 90152f5f05f14b9053f6d43d3a28226b8bcf7372[m
+Author: James <jimmy.levell@bluewin.ch>
+Date:   Fri Apr 5 20:38:15 2024 +0200
+
+    Update Dockerfile
+
+[33mcommit c316d2b9a220e49c87478fd2b8cf7f4be267111b[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Wed Apr 3 13:36:01 2024 +0200
+
+    Add dtm, remove test
+
+[33mcommit 0a6f3904ca14f16a80c9d840bc84b2acd5eac5d9[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Tue Apr 2 16:51:33 2024 +0200
+
+    Change emb model
+
+[33mcommit b8807d92eb861ba4cf4b712d29690bb8bbb50f51[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Tue Apr 2 15:15:14 2024 +0200
+
+    Change plotting
+
+[33mcommit e1b48cec502f93f964004141500df94376ea6171[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Tue Apr 2 15:09:41 2024 +0200
+
+    Update README
+
+[33mcommit 3cc64eb98e5287744d5018b60e78c9c76839e6f5[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Tue Apr 2 15:07:15 2024 +0200
+
+    Rename to finetune, emb model
+
+[33mcommit 249e7595fe21e126680f826730becfe02674bd24[m
+Author: James Levell <jimmy.levell@outlook.com>
+Date:   Tue Apr 2 11:56:05 2024 +0100
+
+    Feature: introduced jupyternotebook
+
+[33mcommit 583a00df9f2f2eb5fbf3a595de5a5008e6138df6[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Thu Mar 28 15:43:04 2024 +0100
+
+    Change comment in main
+
+[33mcommit 32182f5f53bb14f61a949316792dff48452f3129[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Thu Mar 28 15:38:41 2024 +0100
+
+    Remove SKC gitignore
+
+[33mcommit 0eb5df0dd46642a3ca4b238e9830565f5b8f8aa4[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Thu Mar 28 15:35:53 2024 +0100
+
+    Edit gitignore
+
+[33mcommit 7843df6606da6d9b1272d4b7ce1d8317edcf59f9[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Thu Mar 28 15:30:51 2024 +0100
+
+    Edit gitignore
+
+[33mcommit 854835ba3beff3bbc9a87f3c1ff51ba87b3ef455[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Thu Mar 28 15:15:18 2024 +0100
+
+    Change gitignore
+
+[33mcommit f5695dc2c170b9bb4991d3f84a1a4aa26ee4702e[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Thu Mar 28 15:07:39 2024 +0100
+
+    Add gitignore for folder structure
+
+[33mcommit 5f60bae42532a55849012a5c1e307f675f6339ce[m
+Author: arneeichholtz <arne.eichholtz@hotmail.com>
+Date:   Thu Mar 28 14:42:36 2024 +0100
+
+    Add translate, fix input folder layout, update readme
+
+[33mcommit c622be1f7ee531eef3ab663b6fa5535432b4f87b[m
+Author: Maarten Vonk <maartencvonk@gmail.com>
+Date:   Mon Mar 25 16:29:03 2024 +0000
+
+    updated config
+
+[33mcommit 43dbaca6dda2455612ffc9fa4aed33e4aeb8bb8b[m
+Merge: 9393033 252c8b7
+Author: Maarten Vonk <maartencvonk@gmail.com>
+Date:   Mon Mar 25 17:28:24 2024 +0100
+
+    Merge branch 'main' of https://github.com/HCSS-Data-Lab/NLP-Pipeline-BERT
+
+[33mcommit 93930336c1d8af31c541ef285a56aee566ed19d6[m
+Author: Maarten Vonk <maartencvonk@gmail.com>
+Date:   Mon Mar 25 16:23:32 2024 +0000
+
+    update topic labels
+
+[33mcommit 252c8b74f52a267c190011aac6764dcf0bd27805[m
+Merge: b99258a 5a86ade
+Author: Maarten Vonk <85985974+MaartenCVonk@users.noreply.github.com>
+Date:   Mon Mar 25 15:19:46 2024 +0100
+
+    Merge pull request #4 from HCSS-Data-Lab/development-maarten
+    
+    Add new plot function and move bools to config
+
+[33mcommit 5a86ade4dc0a9538dadd4357e5db7799bbccf806[m
+Author: Maarten Vonk <maartencvonk@gmail.com>
+Date:   Mon Mar 25 14:15:55 2024 +0000
+
+    Add new plot function and move bools to config
+
+[3

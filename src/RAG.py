@@ -7,32 +7,36 @@ from llama_index.core import ServiceContext
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 import config
 import time
-
-# from dotenv import load_dotenv
-# from sentence_transformers import SentenceTransformer
-# load_dotenv()
-# llm = OpenAI(model=config.rag_parameters['LLM-model'], temperature=config.rag_parameters['temperature'])  #
-# embed_model = HuggingFaceEmbeddings(model_name="sentence-transformers/" + config.model_parameters['emb_model'])
-# SERVICE_CONTEXT = ServiceContext.from_defaults(embed_model=embed_model)
+from dotenv import load_dotenv
 
 
-class RAG:
+load_dotenv()
+llm = OpenAI(model=config.rag_parameters['LLM-model'], temperature=config.rag_parameters['temperature']) #
+embed_model = HuggingFaceEmbeddings(model_name="sentence-transformers/"+config.model_parameters['bert_model'])
+SERVICE_CONTEXT = ServiceContext.from_defaults(embed_model=embed_model)
+
+
+class RAG():
     def __init__(self, embeddings, texts, path):
         """
         Create a RAG from the embeddings and texts that summarizes docs and enhances topic labels.
-
         Parameters:
             embeddings (np.array): Data Embeddings
             texts (list[str]): Original texts
+            RAG_from_file (bool): Create rag from file or not
             path (str): Path to store or retrieve RAG
 
         Attributes:
-            RAG_from_file (bool): load RAG from file or not
+            create_vector_store (None): Create the vectorindex based on embeddings and save it
+            summarize_labels (list[str]): Get the topic labels based on the topic words
+            summarize_docs (list[str]): Get summary labels of the docs
+
         """
         self.embeddings = embeddings
         self.texts = texts
-        self.RAG_from_file = config.rag_parameters["RAG_from_file"]
+        self.RAG_from_file = config.LOAD_RAG_FROM_FILE
         self.path = path
+        print(self.RAG_from_file, self.path)
 
     def create_vector_store_index(self, topics):
         """
@@ -61,12 +65,12 @@ class RAG:
         storage_context = StorageContext.from_defaults(persist_dir=self.path)
         index = load_index_from_storage(storage_context, service_context=SERVICE_CONTEXT)
         print('Creating or initiating the RAG took in total:', time.time() - start_time)
-        print("Get new labels from RAG")  # Create query engine and deposit topics in query enginer
-        query_engine = index.as_query_engine(similarity_top_k=config.rag_parameters['article_retrievement'], llm=llm)
-        responses = []
+        print("Get new labels from RAG") #Create query engine and deposit topics in query enginer
+        query_engine = index.as_query_engine(similarity_top_k=config.rag_parameters['article_retrievement'], llm=llm) 
+        responses = [] 
         for topic_word in topics:
-            response = query_engine.query(config.rag_parameters["query_for_topic_labels"] + ':'.join(topic_word))
-            responses.append(response.response)
+            response = query_engine.query(config.rag_parameters["query_for_topic_labels"]+':'.join(topic_word))
+            responses.append(response.response)    
         return responses
 
     async def summarize_doc(self, docs):
@@ -86,6 +90,6 @@ class RAG:
         return responses
 
     async def get_async_doc_response(self, summarizer, doc):
-        response = await summarizer.aget_response(config.rag_parameters["query_docs_label"], doc)
+        response = await summarizer.aget_response(config.rag_parameters["query_docs_label"],doc)
         return response
             
