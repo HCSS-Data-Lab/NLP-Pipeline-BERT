@@ -47,7 +47,7 @@ def get_summary_labels(words_legend: List[str], RAG):
     """
     print('Getting topic labels from RAG...')
     labels_path = os.path.join(RAG.path, "labels")
-    if os.path.exists(labels_path+'/topic_labels'config.plotting_parameters['n_total']+'.pkl') and config.LOAD_GENAI_TOPIC_LABELS==True:
+    if os.path.exists(labels_path+'/topic_labels'+config.plotting_parameters['n_total']+'.pkl') and config.LOAD_GENAI_TOPIC_LABELS==True:
         print(f'Reloading stored topic labels of {len(words_legend)} labels...')
         with open(labels_path+'/topic_labels.pkl', 'rb') as file:
             words_legend = pickle.load(file)
